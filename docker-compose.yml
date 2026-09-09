@@ -90,8 +90,12 @@ services:
     depends_on:
       - hmdm
     environment:
-      HMDM_DOMAIN: ${HMDM_DOMAIN:?set HMDM_DOMAIN in .env}
-      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL:?set LETSENCRYPT_EMAIL in .env}
+      # Plain defaults, not the "required variable" form. Compose interpolates the
+      # whole file before profiles select services, so a required marker here
+      # would abort a dev start over a variable only production needs.
+      # deploy.sh does the checking, and only when DEPLOY_MODE=prod.
+      HMDM_DOMAIN: ${HMDM_DOMAIN:-}
+      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL:-}
       CADDY_CA: ${CADDY_CA:-https://acme-v02.api.letsencrypt.org/directory}
     ports:
       - "80:80"
