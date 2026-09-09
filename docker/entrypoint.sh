@@ -32,6 +32,16 @@ if [ ! -f "$CTX" ] || [ -n "$FORCE_RECONFIGURE" ]; then
   # "Cannot assign requested address" and the broker never starts.
   sed -i "s|<Parameter name=\"mqtt.server.uri\".*|<Parameter name=\"mqtt.server.uri\" value=\"${MQTT_BIND:-0.0.0.0}:31000\"/>|" "$CTX"
   sed -i "s|<Parameter name=\"mqtt.auth\".*|<Parameter name=\"mqtt.auth\" value=\"${MQTT_AUTH:-0}\"/>|" "$CTX"
+
+  # Behind a reverse proxy every request arrives from the proxy, so without
+  # these two the panel logs the proxy's address as the device's. They are
+  # commented out in the upstream template; injected here only when set, which
+  # deploy.sh does in production and leaves empty in dev.
+  if [ -n "${PROXY_ADDRESSES:-}" ]; then
+    sed -i "s|</Context>|    <Parameter name=\"proxy.addresses\" value=\"${PROXY_ADDRESSES}\"/>\n    <Parameter name=\"proxy.ip.header\" value=\"${PROXY_IP_HEADER:-X-Real-IP}\"/>\n</Context>|" "$CTX"
+    echo "[hmdm] reverse proxy: trusting ${PROXY_ADDRESSES}, client IP from ${PROXY_IP_HEADER:-X-Real-IP}"
+  fi
+
   echo "[hmdm] wrote $CTX"
 fi
 
@@ -69,13 +79,20 @@ seed_when_ready() {
   # version your own build wants. Uploading it then fails with "APK for this version
   # already exists". Move the placeholder out of the way instead of making that your
   # problem to discover.
-  if [ -z "${CLIENT_APK:-}" ]; then
-    psql -h "$SQL_HOST" -p "$SQL_PORT" -U "$SQL_USER" -d "$SQL_BASE" -v ON_ERROR_STOP=0 -c \
-      "UPDATE applicationversions SET version = version || '-placeholder' \
-       WHERE url = 'https://h-mdm.com/files/' AND version NOT LIKE '%-placeholder';" \
-      >/dev/null 2>&1 \
-      && echo "[hmdm] placeholder launcher version renamed - upload your own APK as 6.39"
-  fi
+  # The upstream seed registers several applications hosted on h-mdm.com: the
+  # launcher itself, plus the Pager, PhoneProxy and LauncherRestarter helpers.
+  # This deployment must not depend on anyone else's download server, and the
+  # launcher row additionally occupies (com.hmdm.launcher, 6.39) - the version
+  # your own build wants, so uploading it fails with "already exists".
+  #
+  # Both problems go away by moving those rows out of the way. Nothing is
+  # deleted: the rows stay visible in the Applications list, renamed, so it is
+  # obvious what happened rather than apps silently vanishing.
+  psql -h "$SQL_HOST" -p "$SQL_PORT" -U "$SQL_USER" -d "$SQL_BASE" -v ON_ERROR_STOP=0 -c \
+    "UPDATE applicationversions SET version = version || '-upstream' \
+     WHERE url LIKE 'https://h-mdm.com/%' AND version NOT LIKE '%-upstream';" \
+    >/dev/null 2>&1 \
+    && echo "[hmdm] upstream-hosted app versions parked - upload your own APKs"
 }
 
 if [ ! -f "$SEED_MARKER" ]; then

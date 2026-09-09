@@ -1,0 +1,42 @@
+# Reverse proxy and automatic HTTPS for the MDM panel.
+#
+# Caddy obtains and renews a Let's Encrypt certificate for HMDM_DOMAIN on its
+# own - there is no certbot, no renewal cron, and no certificate paths to get
+# wrong. It needs ports 80 and 443 reachable from the internet and the domain's
+# DNS A record pointing at this host; that is the whole requirement.
+#
+# MQTT is deliberately NOT proxied. Devices open a raw TCP connection on 31000,
+# which is not HTTP, so the hmdm container publishes that port directly.
+
+{
+	email {$LETSENCRYPT_EMAIL}
+	# Staging avoids Let's Encrypt rate limits while you are testing DNS.
+	# Set CADDY_CA to https://acme-staging-v02.api.letsencrypt.org/directory
+	# for dry runs, then unset it and "docker compose up -d --force-recreate caddy".
+	acme_ca {$CADDY_CA:https://acme-v02.api.letsencrypt.org/directory}
+}
+
+{$HMDM_DOMAIN} {
+	encode gzip
+
+	# The panel serves APK downloads, which are large and slow on field links.
+	request_body {
+		max_size 512MB
+	}
+
+	reverse_proxy hmdm:8080 {
+		# Headwind logs the device IP from this header. It is matched by
+		# proxy.ip.header in the Tomcat context, which entrypoint.sh sets in
+		# production mode - the two have to agree or every device appears to
+		# come from the proxy's own address.
+		header_up X-Real-IP {remote_host}
+		header_up X-Forwarded-For {remote_host}
+		header_up X-Forwarded-Proto {scheme}
+
+		# Enrolment uploads and APK downloads can be slow.
+		transport http {
+			read_timeout 300s
+			write_timeout 300s
+		}
+	}
+}

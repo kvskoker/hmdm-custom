@@ -64,6 +64,10 @@ hmdm-android/app/release/
 keystore.properties
 
 # --- runtime data ----------------------------------------------------------
+# Caddy keeps certificates in a named docker volume, but guard against a stray
+# bind mount putting private keys in the working tree.
+caddy_data/
+caddy_config/
 logs/
 *.log
 *.pid
@@ -85,7 +89,3 @@ apply-enroll-v*.ps1
 .DS_Store
 Thumbs.db
 desktop.ini
-
-
-# Documentation:
-docs/

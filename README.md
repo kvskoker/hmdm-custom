@@ -1,138 +1,157 @@
-# Headwind MDM — local development environment
+# Headwind MDM — Medtronic Labs fork
 
-A Dockerised Headwind MDM server **built from the GitHub source**, plus notes for
-enrolling an Android Studio emulator against it. Same on Windows, macOS and Linux.
+Self-hosted Android device management for the Sierra Leone health-worker fleet.
+A fork of [Headwind MDM](https://h-mdm.com) (Apache-2.0) with three plugins added.
 
-The official `hmdm-docker` image downloads a pre-built WAR from h-mdm.com. This one
-compiles the source, so the `devicereset` plugin we are adding actually ends up in the
-running server.
+---
 
-## Where the source comes from
+## Deploy
 
-Two Dockerfiles, both multi-stage. Neither takes Headwind's *source* from a registry —
-only the toolchain images (Maven+JDK 11, Tomcat 9, Postgres) come from Docker Hub, which
-is what those images are for.
-
-| File | Source of the code | Use it for |
-|---|---|---|
-| `docker/Dockerfile` | your working copy in `./hmdm-server` | **development** — your edits are in the image |
-| `docker/Dockerfile.git` | `git clone` from GitHub at a pinned ref, inside the build | **CI and production** — reproducible, depends on nothing local |
-
-`Dockerfile.git` stages: **fetch** (alpine/git clones the repo) → **build** (Maven on JDK 11
-compiles the WAR) → **runtime** (Tomcat serves it). It records the repo and ref it built
-from in `/opt/hmdm-install/BUILD_SOURCE.txt` inside the image.
+Two settings in `.env` decide everything.
 
 ```bash
-docker build -f docker/Dockerfile.git \
-  --build-arg HMDM_REPO=https://github.com/YOURORG/hmdm-server.git \
-  --build-arg HMDM_REF=v1.0.0-devicereset \
-  -t hmdm-server:1.0.0 .
+git clone https://github.com/kvskoker/hmdm.git && cd hmdm
+cp .env.example .env      # edit DEPLOY_MODE and HMDM_DOMAIN
+./deploy.sh up            # Windows:  .\deploy.ps1 up
 ```
 
-## Layout
+First build takes 3–5 minutes. After that the panel is up at the address the
+script prints. Sign in with **admin / admin** and change the password.
 
-```
-hmdm-dev/
-├── setup.sh              # clones hmdm-server + hmdm-android
-├── docker-compose.yml
-├── docker/
-│   ├── Dockerfile        # dev: build from ./hmdm-server
-│   ├── Dockerfile.git    # release: clone from GitHub, pinned ref
-│   └── entrypoint.sh     # renders ROOT.xml, seeds the DB on first run
-├── hmdm-server/          # git clone (gitignored)
-├── hmdm-android/         # git clone, opened in Android Studio (gitignored)
-└── docs/FINDINGS-pin-reset.md
-```
-
-`hmdm-android` is deliberately **not** containerised — the emulator needs hardware
-acceleration from the host, so the launcher is developed natively in Android Studio.
-
-## Running
-
-```bash
-./setup.sh                  # or: git clone the two repos yourself
-docker compose up --build
-```
-
-On Windows use Git Bash or WSL for `setup.sh`, or just run the two `git clone` commands
-in PowerShell.
-
-First build downloads the full Maven dependency tree. After that the `.m2` cache is a
-BuildKit cache mount, so rebuilds take a minute or two.
-
-| | |
+| Command | What it does |
 |---|---|
-| Panel | http://localhost:8080 — `admin` / `admin` |
-| Panel from the emulator | http://10.0.2.2:8080 |
-| MQTT push | localhost:31000 → 10.0.2.2:31000 from the emulator |
-| Postgres | localhost:5433, db/user `hmdm`, password `topsecret` |
+| `./deploy.sh up` | Start. Builds the image if it doesn't exist yet. |
+| `./deploy.sh rebuild` | Rebuild the server after a code change, then start. |
+| `./deploy.sh logs` | Follow the server log. |
+| `./deploy.sh down` | Stop. Database and uploaded APKs are kept. |
+| `./deploy.sh reset` | Stop **and delete** the database and uploaded APKs. |
+
+### Production
+
+```ini
+DEPLOY_MODE=prod
+HMDM_DOMAIN=mdm.example.com
+LETSENCRYPT_EMAIL=you@example.com
+SQL_PASS=<something long>
+```
+
+`./deploy.sh up` then starts Caddy alongside the server. Caddy obtains a Let's
+Encrypt certificate for your domain and renews it by itself — there is no
+certbot and no renewal cron. Tomcat and Postgres are bound to loopback; only
+Caddy and the MQTT port are reachable from outside.
+
+Before the first production start:
+
+- point the domain's **DNS A record** at the host
+- open **80**, **443** and **31000** in the firewall
+- set `SQL_PASS` — it is written into the database on creation and is awkward
+  to change afterwards
+
+Testing DNS? Uncomment `CADDY_CA` in `.env` to use Let's Encrypt's staging
+endpoint first. A misconfigured domain against the real endpoint burns your
+rate limit for a week.
+
+### Development
+
+```ini
+DEPLOY_MODE=dev
+HMDM_DOMAIN=10.0.2.2      # the Android emulator's route to your host
+```
+
+Panel on `http://localhost:8080`, Postgres on `5433`. For a real handset on the
+same network, set `HMDM_DOMAIN` to your machine's LAN IP instead — that value is
+what the server advertises to devices in QR codes and APK download URLs, so
+`localhost` will not work from a phone.
+
+---
+
+## Why port 31000 is published in both modes
+
+Push notifications use MQTT, which is a raw TCP connection rather than HTTP.
+A reverse proxy cannot carry it, so the server publishes 31000 directly and
+devices connect to `HMDM_DOMAIN:31000`. Without it devices still sync, just on
+their own schedule instead of when you ask them to — which also makes lost-device
+tracking fall back to the launcher's fixed 15-minute interval.
+
+---
+
+## What's in here
+
+```
+docker/          the deployment. Dockerfile builds the server from source;
+                 entrypoint.sh renders the Tomcat config from environment
+                 variables at start-up; Caddyfile is the production proxy.
+hmdm-server/     the fork. Upstream Headwind plus the plugins below.
+hmdm-android/    the launcher. Only needed to build a customised APK.
+tools/           diagnostics, kept out of the deployment path.
+docs/            longer notes.
+```
+
+### Plugins added by this fork
+
+| Plugin | What it does |
+|---|---|
+| **Device Management** (`devicereset`) | Remote PIN reset, reboot, lock, factory reset — with a retyped device number required before a wipe. |
+| **Device Enrollment** (`deviceenroll`) | One QR code per group, devices numbered automatically (`KAI001`, `KAI002`…). Groups share a configuration, so app deployment stays in one place. |
+| **Device Tracking** (`devicelocation`) | Devices on a map, last few positions kept per device. Report one lost and the server pushes it every couple of minutes until you mark it found. |
+
+The plugins hook into upstream through `SyncResponseHook` and the event bus, so
+`hmdm-server` stays close to upstream and can be diffed against it.
+
+---
+
+## Building the launcher APK
+
+Only needed if you want a launcher pointing at your server by default. Otherwise
+enrol with a QR code and skip this.
 
 ```bash
-docker compose logs -f hmdm            # server log
-docker compose up -d --build hmdm      # rebuild after a code change
-docker compose exec db psql -U hmdm    # poke at the database
-docker compose down -v                 # wipe everything including the database
+cd hmdm-android
+./gradlew assembleOpensourceDebug -PhmdmBaseUrl=https://mdm.example.com
 ```
 
-### Why JDK 11 and not JDK 8
+Upload the resulting APK in **Applications**, then set it as the main app of a
+configuration so QR enrolment can install it.
 
-The root pom sets `java.version=1.8`, which is the *bytecode target*, not the compiler.
-Some dependencies — `activemq-broker` in the `notification` module in particular — ship
-class files at version 55 (Java 11), and a JDK 8 `javac` cannot read those at all:
+---
+
+## Troubleshooting
+
+**Devices don't appear on the map.** The tracking page names the cause itself —
+usually the configuration's *Location Tracking* is "No active tracking", or the
+launcher was never granted the location permission. `tools/diagnose-location.ps1`
+walks the whole chain on a connected emulator or handset and reports the first
+broken link.
+
+**Push doesn't reach devices.** Check 31000 is open and that `MQTT_AUTH` matches
+what the launcher expects. The server logs `Failed to create MQTT broker service`
+if the broker could not bind.
+
+**Users can factory-reset their device from Settings.** Add this to
+*Configurations → edit → Settings → Restrictions*:
 
 ```
-bad class file: .../activemq-broker-5.18.6.jar(org/apache/activemq/broker/BrokerPlugin.class)
-  class file has wrong version 55.0, should be 52.0
+no_factory_reset,no_safe_boot,no_add_user,no_debugging_features,no_config_date_time,no_modify_accounts,no_install_unknown_sources,no_network_reset
 ```
 
-Upstream `BUILD.txt` says Ubuntu 22.04 + `apt install maven`, where the default JDK is
-11 — so JDK 11 compiling to Java 8 bytecode is what Headwind actually builds with, and
-what both Dockerfiles use.
+`no_factory_reset` is the one that matters; the rest close the routes around it.
+Note that hiding the pull-down shade itself is a premium Headwind feature and is
+a stub in the open-source launcher — these restrictions lock what is behind the
+door rather than hiding the door.
 
-### Two settings that differ from the upstream template
+---
 
-- `mqtt.server.uri` binds to `0.0.0.0:31000`, not a hostname. Binding to a name that
-  resolves to an address the NIC doesn't hold gives `Cannot assign requested address`
-  and the broker silently never starts — the exact failure we hit on the GCE box.
-- `mqtt.auth` is `0` in dev to keep emulator testing simple. **Production stays at 1.**
+## Upstream
 
-## Enrolling an emulator
-
-1. **Create an AVD without Google Play.** Device Manager → a phone → a system image
-   labelled *Google APIs* or *AOSP*, **not** *Google Play*. API 33 or 34. Play images
-   refuse `dpm set-device-owner`.
-
-2. **Point the launcher at the dev server** — `hmdm-android/app/build.gradle`:
-
-   ```gradle
-   buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:8080\"")
-   buildConfigField("String", "SECONDARY_BASE_URL", "\"http://10.0.2.2:8080\"")
-   ```
-
-   Plain HTTP is fine; the manifest already sets `usesCleartextTraffic="true"`.
-
-3. **Install and promote to device owner** on a freshly wiped emulator with no accounts:
-
-   ```bash
-   adb install -r app/build/outputs/apk/debug/app-debug.apk
-   adb shell dpm set-device-owner com.hmdm.launcher/com.hmdm.launcher.AdminReceiver
-   ```
-
-   Expect `Success: Device owner set to package com.hmdm.launcher`. A refusal means the
-   emulator has an account or is already provisioned — wipe data and retry.
-
-4. **Enrol** — launch the app and give it a device number that exists in the panel.
-
-## Proving the PIN reset path before writing the plugin
+Apache-2.0, from [h-mdm/hmdm-server](https://github.com/h-mdm/hmdm-server) and
+[h-mdm/hmdm-android](https://github.com/h-mdm/hmdm-android). To compare against
+upstream later:
 
 ```bash
-adb shell locksettings set-pin 1111
-# then unlock the emulator once by hand
+git remote add upstream-server https://github.com/h-mdm/hmdm-server.git
+git fetch upstream-server
+git diff upstream-server/master --stat -- hmdm-server
 ```
 
-That unlock matters: `setResetPasswordToken()` only becomes active after the user next
-enters their existing credential. Then get `"passwordReset": "2222"` into the sync
-response for that device and watch the log for `Password successfully changed`. That one
-line proves the whole chain and turns the rest of the project into plumbing and UI.
-
-See `docs/FINDINGS-pin-reset.md` for why no launcher changes are needed.
+There is no shared history, so that diff lists every file — still useful for
+spotting your changes and for picking up upstream fixes by hand.

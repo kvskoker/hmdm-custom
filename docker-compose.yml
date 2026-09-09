@@ -1,63 +1,108 @@
-# Headwind MDM - local development stack.
+# Headwind MDM - the whole stack.
 #
-#   ./setup.sh                     one-time: clones hmdm-server + hmdm-android
-#   docker compose up --build      build from ./hmdm-server and run
-#   docker compose up -d --build hmdm    rebuild after a code change
-#   docker compose logs -f hmdm
-#   docker compose down -v         wipe everything, database included
+#   ./deploy.sh up          start (reads DEPLOY_MODE and the domain from .env)
+#   ./deploy.sh logs        follow the server log
+#   ./deploy.sh down        stop
+#   ./deploy.sh rebuild     rebuild the server image after a code change
 #
-# Panel      http://localhost:8080        admin / admin
-# From AVD   http://10.0.2.2:8080         (emulator's route to your host)
-# MQTT push  localhost:31000  ->  10.0.2.2:31000 from the emulator
-# Postgres   localhost:5433               hmdm / topsecret
+# On Windows use .\deploy.ps1 with the same words.
+#
+# Everything is built from the source in this repository. Nothing is pulled
+# from the upstream Headwind project at build or run time.
+
+name: hmdm
 
 services:
   db:
     image: postgres:14
+    restart: unless-stopped
     environment:
-      POSTGRES_DB: hmdm
-      POSTGRES_USER: hmdm
-      POSTGRES_PASSWORD: topsecret
+      POSTGRES_DB: ${SQL_BASE:-hmdm}
+      POSTGRES_USER: ${SQL_USER:-hmdm}
+      POSTGRES_PASSWORD: ${SQL_PASS:?set SQL_PASS in .env}
     volumes:
       - pgdata:/var/lib/postgresql/data
+    # Published only in dev, so a production host does not expose Postgres.
     ports:
-      - "5433:5432"
+      - "${DB_PUBLISH:-127.0.0.1:5433}:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U hmdm -d hmdm"]
+      test: ["CMD-SHELL", "pg_isready -U ${SQL_USER:-hmdm} -d ${SQL_BASE:-hmdm}"]
       interval: 5s
       timeout: 3s
       retries: 20
 
   hmdm:
     build:
-      context: .                    # repo root, so the build can see ./hmdm-server
+      context: .
       dockerfile: docker/Dockerfile
+    restart: unless-stopped
     depends_on:
       db:
         condition: service_healthy
     environment:
       SQL_HOST: db
-      SQL_PASS: topsecret
-      PROTOCOL: http
-      # HMDM_HOST is the address the SERVER advertises to devices: APK download
-      # URLs, file URLs, QR payloads and the MQTT endpoint are all built from it.
-      # Set it in .env to your PC's LAN IP so the browser, the emulator and real
-      # phones on the same network all resolve it. 10.0.2.2 is emulator-only.
-      BASE_HOST: ${HMDM_HOST:-10.0.2.2}:8080
-      BASE_DOMAIN: ${HMDM_HOST:-10.0.2.2}
+      SQL_BASE: ${SQL_BASE:-hmdm}
+      SQL_USER: ${SQL_USER:-hmdm}
+      SQL_PASS: ${SQL_PASS:?set SQL_PASS in .env}
+
+      # What the SERVER advertises to devices: APK download URLs, file URLs, QR
+      # payloads and the MQTT endpoint are all built from these. In production
+      # this is your public domain; in dev it is the address the emulator or
+      # phone can reach your machine on.
+      PROTOCOL: ${HMDM_PROTOCOL:-http}
+      BASE_HOST: ${HMDM_BASE_HOST:?deploy.sh sets this from HMDM_DOMAIN}
+      BASE_DOMAIN: ${HMDM_DOMAIN:?set HMDM_DOMAIN in .env}
+      BASE_PATH: ""
+
+      # Behind Caddy the client IP arrives in a header; without this every
+      # device is logged as the proxy. Empty in dev, where there is no proxy.
+      PROXY_ADDRESSES: ${PROXY_ADDRESSES:-}
+      PROXY_IP_HEADER: ${PROXY_IP_HEADER:-X-Real-IP}
+
       MQTT_BIND: 0.0.0.0
-      MQTT_AUTH: "0"                # dev only - production keeps this at 1
+      MQTT_AUTH: ${MQTT_AUTH:-1}
+
+      LANGUAGE: ${LANGUAGE:-en}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@localhost}
       FORCE_RECONFIGURE: "1"
-      ADMIN_EMAIL: admin@localhost
-      # PHASE-1 SPIKE: arm a one-shot device PIN reset. Set a PIN, recreate the
-      # container, then sync the device. Comment out again once proven.
-      HMDM_DEV_PASSWORD_RESET: "${DEV_PIN:-}"
+
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-25}
+      SMTP_SSL: ${SMTP_SSL:-0}
+      SMTP_STARTTLS: ${SMTP_STARTTLS:-0}
+      SMTP_USERNAME: ${SMTP_USERNAME:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_FROM: ${SMTP_FROM:-}
     ports:
-      - "8080:8080"
+      # 8080 is published in dev so you can reach the panel directly. In
+      # production deploy.sh binds it to loopback, because Caddy fronts it.
+      - "${PANEL_PUBLISH:-8080}:8080"
+      # MQTT push. Always published: devices open a raw TCP connection here,
+      # which a reverse proxy cannot carry.
       - "31000:31000"
     volumes:
-      - hmdmdata:/opt/hmdm          # uploaded APKs, plugin files, logs
+      - hmdmdata:/opt/hmdm
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    profiles: ["prod"]
+    depends_on:
+      - hmdm
+    environment:
+      HMDM_DOMAIN: ${HMDM_DOMAIN:?set HMDM_DOMAIN in .env}
+      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL:?set LETSENCRYPT_EMAIL in .env}
+      CADDY_CA: ${CADDY_CA:-https://acme-v02.api.letsencrypt.org/directory}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddydata:/data      # certificates live here - keep this volume
+      - caddyconfig:/config
 
 volumes:
   pgdata:
   hmdmdata:
+  caddydata:
+  caddyconfig:
