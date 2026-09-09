@@ -7,11 +7,19 @@
       .\deploy.ps1 logs      follow the server log
       .\deploy.ps1 reset     stop AND DELETE the database and uploaded files
 
+  Anything else is passed straight to "docker compose", so
+  ".\deploy.ps1 ps" and ".\deploy.ps1 logs --tail=500 hmdm" work.
+
   DEPLOY_MODE in .env decides http-on-localhost versus https-on-your-domain.
   Compose cannot derive one variable from another, so this script does that one
-  step and then hands over to plain "docker compose".
+  step. It writes the results back into .env in a managed block, which means
+  plain "docker compose ..." works too - without that, every compose command run
+  by hand fails with "required variable HMDM_BASE_HOST is missing a value".
 #>
-param([string]$Command = "up")
+param(
+    [string]$Command = "up",
+    [Parameter(ValueFromRemainingArguments = $true)] [string[]]$Rest
+)
 
 $ErrorActionPreference = 'Stop'
 Set-Location (Split-Path -Parent $MyInvocation.MyCommand.Path)
@@ -52,9 +60,40 @@ switch ($mode) {
         $env:PANEL_PUBLISH    = '8080'
         $env:DB_PUBLISH       = '5433'
         $env:PROXY_ADDRESSES  = ''
+        $env:PROXY_IP_HEADER  = ''
     }
     default { throw "DEPLOY_MODE must be 'dev' or 'prod', not '$mode'" }
 }
+
+# --- keep .env in step with DEPLOY_MODE --------------------------------------
+# Compose reads .env by itself, so once these values are in there, every plain
+# "docker compose" command works exactly as this script's do. The block is
+# rewritten on every run; edit DEPLOY_MODE and HMDM_DOMAIN above it, not this.
+$markBegin = '# ---- derived by deploy.ps1 from DEPLOY_MODE - do not edit ----'
+$markEnd   = '# ---- end derived block ----'
+
+$kept = @()
+$skip = $false
+foreach ($line in (Get-Content .env)) {
+    if ($line -eq $markBegin -or $line -match '^# ---- derived by deploy\.(sh|ps1) from DEPLOY_MODE') { $skip = $true; continue }
+    if ($line -eq $markEnd) { $skip = $false; continue }
+    if (-not $skip) { $kept += $line }
+}
+while ($kept.Count -gt 0 -and $kept[-1].Trim() -eq '') { $kept = $kept[0..($kept.Count - 2)] }
+
+$block = @(
+    $markBegin,
+    "COMPOSE_PROFILES=$($env:COMPOSE_PROFILES)",
+    "HMDM_PROTOCOL=$($env:HMDM_PROTOCOL)",
+    "HMDM_BASE_HOST=$($env:HMDM_BASE_HOST)",
+    "PANEL_PUBLISH=$($env:PANEL_PUBLISH)",
+    "DB_PUBLISH=$($env:DB_PUBLISH)",
+    "PROXY_ADDRESSES=$($env:PROXY_ADDRESSES)",
+    "PROXY_IP_HEADER=$($env:PROXY_IP_HEADER)",
+    $markEnd
+)
+Copy-Item .env .env.bak -Force
+Set-Content -Path .env -Value ($kept + '' + $block) -Encoding ascii
 
 function Show-Banner {
     $panel = if ($mode -eq 'dev') { "$($env:HMDM_PROTOCOL)://${domain}:8080" } else { "$($env:HMDM_PROTOCOL)://$domain" }
@@ -69,10 +108,10 @@ switch ($Command) {
     'up'      { Show-Banner; docker compose up -d }
     'rebuild' { Show-Banner; docker compose build hmdm; docker compose up -d }
     'down'    { docker compose down }
-    'logs'    { docker compose logs -f hmdm }
+    'logs'    { if ($Rest) { docker compose logs @Rest } else { docker compose logs -f hmdm } }
     'reset'   {
         $a = Read-Host "This deletes the database and every uploaded APK. Type 'yes'"
         if ($a -eq 'yes') { docker compose down -v } else { Write-Host "Cancelled." }
     }
-    default   { Write-Host "Usage: .\deploy.ps1 {up|rebuild|down|logs|reset}"; exit 1 }
+    default   { docker compose @($Command) @Rest }
 }
