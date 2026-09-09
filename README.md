@@ -3,6 +3,9 @@
 Self-hosted Android device management for the Sierra Leone health-worker fleet.
 A fork of [Headwind MDM](https://h-mdm.com) (Apache-2.0) with three plugins added.
 
+This repository is self-contained. It builds from the source in `hmdm-server/`
+and pulls nothing from the upstream project at build or run time.
+
 ---
 
 ## Deploy
@@ -10,13 +13,22 @@ A fork of [Headwind MDM](https://h-mdm.com) (Apache-2.0) with three plugins adde
 Two settings in `.env` decide everything.
 
 ```bash
-git clone https://github.com/kvskoker/hmdm.git && cd hmdm
+git clone git@github.com:YOURORG/YOURREPO.git && cd YOURREPO
 cp .env.example .env      # edit DEPLOY_MODE and HMDM_DOMAIN
 ./deploy.sh up            # Windows:  .\deploy.ps1 up
 ```
 
 First build takes 3–5 minutes. After that the panel is up at the address the
 script prints. Sign in with **admin / admin** and change the password.
+
+**Then upload a launcher APK — enrollment does not work without one.** A QR code
+carries the download URL and SHA-256 of the APK the device installs as device
+owner, so the server has to be holding that file. A fresh database ships with no
+usable launcher: the upstream rows that point at `h-mdm.com` are parked on first
+start, because this deployment must not depend on anyone else's download server.
+Build one (see *Building the launcher APK*) or upload an existing build under
+**Applications**, then open the configuration and set it as the **main app**.
+Until that is done, requesting a QR code returns HTTP 500.
 
 | Command | What it does |
 |---|---|
@@ -102,8 +114,10 @@ The plugins hook into upstream through `SyncResponseHook` and the event bus, so
 
 ## Building the launcher APK
 
-Only needed if you want a launcher pointing at your server by default. Otherwise
-enrol with a QR code and skip this.
+You need a launcher APK on the server before any device can enrol — QR
+enrollment installs it, so it cannot be skipped. Build your own if you want the
+server address baked in as the default; otherwise upload a build you already
+have.
 
 ```bash
 cd hmdm-android

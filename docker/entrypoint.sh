@@ -88,11 +88,23 @@ seed_when_ready() {
   # Both problems go away by moving those rows out of the way. Nothing is
   # deleted: the rows stay visible in the Applications list, renamed, so it is
   # obvious what happened rather than apps silently vanishing.
+  # The URL is blanked as well as the version renamed. Renaming alone is not
+  # enough: a configuration's main app still points at the parked row, and the
+  # QR endpoint hashes the main app's APK before it can build the payload. With
+  # the h-mdm.com URL left in place that hash attempt fetches a bare directory,
+  # gets 403, and the whole QR request fails with a 500 that says nothing about
+  # the real cause. A blank URL is the "no APK yet" state the code already
+  # understands, so the failure stays legible until you upload your own build.
   psql -h "$SQL_HOST" -p "$SQL_PORT" -U "$SQL_USER" -d "$SQL_BASE" -v ON_ERROR_STOP=0 -c \
-    "UPDATE applicationversions SET version = version || '-upstream' \
+    "UPDATE applicationversions SET version = version || '-upstream', url = '' \
      WHERE url LIKE 'https://h-mdm.com/%' AND version NOT LIKE '%-upstream';" \
     >/dev/null 2>&1 \
-    && echo "[hmdm] upstream-hosted app versions parked - upload your own APKs"
+    && echo "[hmdm] upstream-hosted app versions parked"
+
+  echo "[hmdm] NEXT STEP: upload your launcher APK in Applications and set it as"
+  echo "[hmdm]            the main app of a configuration. QR enrollment cannot"
+  echo "[hmdm]            work until you do - the QR payload carries that APK's"
+  echo "[hmdm]            download URL and checksum."
 }
 
 if [ ! -f "$SEED_MARKER" ]; then
