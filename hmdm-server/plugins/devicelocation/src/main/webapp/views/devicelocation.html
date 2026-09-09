@@ -1,0 +1,177 @@
+<div ng-controller="PluginDevicelocationTabController">
+
+    <div ng-show="errorMessage" class="alert alert-danger">{{errorMessage}}</div>
+    <div ng-show="successMessage" class="alert alert-success">{{successMessage}}</div>
+
+    <p class="text-muted" localized>plugin.devicelocation.intro</p>
+
+    <!-- Nothing arriving has two specific causes, both of them switches that default to
+         off and neither of them announcing itself. Name whichever one is actually set. -->
+    <div class="alert alert-warning" ng-if="devicesWithoutLocation > 0">
+        <button type="button" class="btn btn-xs btn-link pull-right"
+                style="padding: 0 4px; text-decoration: none;"
+                ng-click="toggleBanner()"
+                localized-title="plugin.devicelocation.banner.toggle">
+            <span class="glyphicon"
+                  ng-class="bannerCollapsed ? 'glyphicon-chevron-down' : 'glyphicon-chevron-up'"></span>
+        </button>
+        <p style="margin-bottom: 0;">
+            <span localized>plugin.devicelocation.coverage.missing.1</span>
+            <strong>{{devicesWithoutLocation}}</strong>
+            <span localized>plugin.devicelocation.coverage.missing.2</span>
+            <strong>{{deviceCount}}</strong>
+            <span ng-if="!bannerCollapsed"
+                  localized>plugin.devicelocation.coverage.missing.3</span>
+            <a href="" ng-if="bannerCollapsed" ng-click="toggleBanner()"
+               localized>plugin.devicelocation.banner.why</a>
+        </p>
+        <ul ng-if="!bannerCollapsed" style="margin-bottom: 0; margin-top: 8px;">
+            <li ng-if="diagnostics.syncingWithoutLocation > 0">
+                <strong localized>plugin.devicelocation.diag.onhandset.title</strong>
+                <strong>{{diagnostics.syncingWithoutLocation}}</strong>
+                <span localized>plugin.devicelocation.diag.onhandset</span>
+            </li>
+            <li ng-if="diagnostics.devicesNotTracking > 0 &amp;&amp; !diagnostics.trackAllDevices">
+                <strong localized>plugin.devicelocation.diag.tracking.title</strong>
+                <span localized>plugin.devicelocation.diag.tracking.1</span>
+                <strong>{{diagnostics.devicesNotTracking}}</strong>
+                <span localized>plugin.devicelocation.diag.tracking.2</span>
+            </li>
+            <li ng-if="diagnostics.devicesNotTracking > 0 &amp;&amp; diagnostics.trackAllDevices">
+                <strong localized>plugin.devicelocation.diag.forced.title</strong>
+                <span localized>plugin.devicelocation.diag.forced</span>
+            </li>
+            <li localized>plugin.devicelocation.diag.permission</li>
+        </ul>
+    </div>
+
+    <div class="alert alert-danger" ng-if="mapError">{{mapError}}</div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div id="devicelocation-map"
+                 style="height: 460px; width: 100%; border: 1px solid #ddd; border-radius: 3px;">
+            </div>
+            <p class="help-block" localized>plugin.devicelocation.map.hint</p>
+        </div>
+
+        <div class="col-md-4">
+            <!-- Devices reported lost, first, because that is why anyone opens this page -->
+            <h4 localized>plugin.devicelocation.lost.title</h4>
+            <table class="table table-condensed" ng-if="lost.length > 0">
+                <tr ng-repeat="l in lost">
+                    <td>
+                        <a href="" ng-click="select(l.deviceNumber)">
+                            <strong>{{l.deviceNumber}}</strong>
+                        </a>
+                        <div class="text-muted">
+                            <small>
+                                <span localized>plugin.devicelocation.lost.reportedby</span>
+                                {{l.reportedBy}},
+                                {{l.reportedAt | date:'yyyy-MM-dd HH:mm'}}
+                            </small>
+                        </div>
+                        <div ng-if="l.note"><small>{{l.note}}</small></div>
+                    </td>
+                    <td class="text-right">
+                        <button type="button" class="btn btn-xs btn-default"
+                                ng-if="hasPermission('plugin_devicelocation_lost')"
+                                ng-click="reportFound(l.deviceNumber)"
+                                localized>plugin.devicelocation.button.found</button>
+                    </td>
+                </tr>
+            </table>
+            <p class="text-muted" ng-if="lost.length === 0"
+               localized>plugin.devicelocation.lost.none</p>
+
+            <h4 localized>plugin.devicelocation.devices.title</h4>
+            <p class="text-muted"><small localized>plugin.devicelocation.devices.hint</small></p>
+            <table class="table table-condensed table-striped">
+                <thead>
+                <tr>
+                    <th localized>plugin.devicelocation.column.device</th>
+                    <th localized>plugin.devicelocation.column.seen</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- Every device is listed, including ones that have never reported: a
+                     device you have not heard from is the one you most want to flag. -->
+                <tr ng-repeat="p in points" ng-class="{'warning': p.deviceNumber === selected}">
+                    <td>
+                        <a href="" ng-click="select(p.deviceNumber)">{{p.deviceNumber}}</a>
+                        <span ng-if="p.lost" class="label label-danger"
+                              localized>plugin.devicelocation.label.lost</span>
+                        <div ng-if="!hasPosition(p) && p.requestUpdates === 'DONOTTRACK'
+                                    && !diagnostics.trackAllDevices">
+                            <small class="text-danger">
+                                <span localized>plugin.devicelocation.row.notracking</span>
+                                {{p.configurationName}}
+                            </small>
+                        </div>
+                    </td>
+                    <td>
+                        <small ng-class="{'text-muted': !hasPosition(p)}">{{age(p)}}</small>
+                    </td>
+                    <td class="text-right text-nowrap">
+                        <button type="button" class="btn btn-xs btn-default"
+                                ng-if="!p.lost && hasPermission('plugin_devicelocation_lost')"
+                                ng-click="reportLost(p.deviceNumber)"
+                                localized>plugin.devicelocation.button.lost</button>
+                        <button type="button" class="btn btn-xs btn-warning"
+                                ng-if="p.lost && hasPermission('plugin_devicelocation_lost')"
+                                ng-click="reportFound(p.deviceNumber)"
+                                localized>plugin.devicelocation.button.found</button>
+                    </td>
+                </tr>
+                <tr ng-if="points.length === 0">
+                    <td colspan="3" class="text-muted"
+                        localized>plugin.devicelocation.devices.none</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ============================================================== the trail -->
+    <div ng-if="selected" style="margin-top: 20px;">
+        <h4>
+            <span localized>plugin.devicelocation.trail.title</span>
+            {{selected}}
+            <button type="button" class="btn btn-xs btn-default" ng-click="clearSelection()"
+                    localized>plugin.devicelocation.button.close</button>
+            <button type="button" class="btn btn-xs btn-danger"
+                    ng-if="hasPermission('plugin_devicelocation_lost')"
+                    ng-click="clearHistory(selected)"
+                    localized>plugin.devicelocation.button.clearhistory</button>
+        </h4>
+        <p class="text-muted">
+            <span localized>plugin.devicelocation.trail.hint.1</span>
+            <strong>{{keepPoints}}</strong>
+            <span localized>plugin.devicelocation.trail.hint.2</span>
+        </p>
+        <table class="table table-condensed table-striped">
+            <thead>
+            <tr>
+                <th localized>plugin.devicelocation.column.when</th>
+                <th localized>plugin.devicelocation.column.position</th>
+                <th localized>plugin.devicelocation.column.context</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="p in trail">
+                <td>{{p.ts | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+                <td><code>{{p.lat | number:5}}, {{p.lon | number:5}}</code></td>
+                <td>
+                    <span ng-if="p.whileLost" class="label label-danger"
+                          localized>plugin.devicelocation.label.whilelost</span>
+                </td>
+            </tr>
+            <tr ng-if="trail.length === 0">
+                <td colspan="3" class="text-muted"
+                    localized>plugin.devicelocation.trail.none</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

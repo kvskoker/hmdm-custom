@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd"
+        logicalFilePath="devicelocation.changelog.xml">
+
+    <changeSet id="plugin-devicelocation-01-register" author="maxcit" context="common">
+        <comment>Plugin,new: devicelocation</comment>
+        <sql>
+            INSERT INTO plugins (
+            identifier, name, description,
+            javascriptModuleFile, functionsViewTemplate, settingsViewTemplate,
+            namelocalizationkey,
+            settingsPermission, functionsPermission, deviceFunctionsPermission,
+            enabledForDevice
+            )
+            VALUES (
+            'devicelocation', 'Device Tracking', 'Device locations on a map, and tracking for lost devices',
+            'app/components/plugins/devicelocation/devicelocation.module.js',
+            'app/components/plugins/devicelocation/views/devicelocation.html',
+            'app/components/plugins/devicelocation/views/settings.html',
+            'plugin.devicelocation.localization.key.name',
+            'plugin_devicelocation_settings', 'plugin_devicelocation_access',
+            'plugin_devicelocation_access',
+            TRUE
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="plugin-devicelocation-02-permissions" author="maxcit" context="common">
+        <comment>Permissions,new: viewing the map, and flagging a device lost</comment>
+        <sql>
+            INSERT INTO permissions (name, description)
+            VALUES ('plugin_devicelocation_access', 'Can see device locations on the map');
+            INSERT INTO userRolePermissions (roleId, permissionId)
+            SELECT id, currval('permissions_id_seq') FROM userroles WHERE id IN (1, 2);
+
+            INSERT INTO permissions (name, description)
+            VALUES ('plugin_devicelocation_settings', 'Can change device tracking settings');
+            INSERT INTO userRolePermissions (roleId, permissionId)
+            SELECT id, currval('permissions_id_seq') FROM userroles WHERE id IN (1, 2);
+
+            INSERT INTO permissions (name, description)
+            VALUES ('plugin_devicelocation_lost', 'Can report a device lost, which tracks it closely');
+            INSERT INTO userRolePermissions (roleId, permissionId)
+            SELECT id, currval('permissions_id_seq') FROM userroles WHERE id IN (1, 2);
+        </sql>
+    </changeSet>
+
+    <changeSet id="plugin-devicelocation-03-tables" author="maxcit" context="common">
+        <comment>Tables,new: location points, the lost flag, and per-customer settings.
+
+        Points are deliberately few. A health worker's device reports its position on a
+        schedule, and keeping a long history of where a named person has been is a
+        liability, not a feature - so the normal retention is a handful of points per
+        device and the table is trimmed on every insert. A device reported lost is the
+        exception: it is tracked closely and its points are kept until it is found,
+        because that is the situation the history is actually for.</comment>
+        <sql>
+            CREATE TABLE plugin_devicelocation_point (
+                id SERIAL NOT NULL CONSTRAINT plugin_devicelocation_point_pr_key PRIMARY KEY,
+                deviceId INT NOT NULL REFERENCES devices (id) ON DELETE CASCADE,
+                customerId INT NOT NULL REFERENCES customers (id) ON DELETE CASCADE,
+                lat DOUBLE PRECISION NOT NULL,
+                lon DOUBLE PRECISION NOT NULL,
+                ts BIGINT NOT NULL,
+                whileLost BOOLEAN NOT NULL DEFAULT FALSE
+            );
+            CREATE INDEX plugin_devicelocation_point_device_idx
+                ON plugin_devicelocation_point (deviceId, ts DESC);
+            CREATE UNIQUE INDEX plugin_devicelocation_point_uniq
+                ON plugin_devicelocation_point (deviceId, ts);
+
+            CREATE TABLE plugin_devicelocation_lost (
+                deviceId INT NOT NULL CONSTRAINT plugin_devicelocation_lost_pr_key PRIMARY KEY
+                    REFERENCES devices (id) ON DELETE CASCADE,
+                customerId INT NOT NULL REFERENCES customers (id) ON DELETE CASCADE,
+                reportedAt BIGINT NOT NULL,
+                reportedBy VARCHAR(100),
+                note TEXT
+            );
+
+            CREATE TABLE plugin_devicelocation_settings (
+                id SERIAL NOT NULL CONSTRAINT plugin_devicelocation_settings_pr_key PRIMARY KEY,
+                customerId INT NOT NULL UNIQUE REFERENCES customers (id) ON DELETE CASCADE,
+                keepPoints INT NOT NULL DEFAULT 5,
+                normalIntervalMins INT NOT NULL DEFAULT 360,
+                lostIntervalMins INT NOT NULL DEFAULT 2,
+                tileUrl TEXT NOT NULL DEFAULT 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                tileAttribution TEXT NOT NULL DEFAULT '&#169; OpenStreetMap contributors'
+            );
+
+            INSERT INTO plugin_devicelocation_settings (customerId) SELECT id FROM customers;
+        </sql>
+    </changeSet>
+    <changeSet id="plugin-devicelocation-04-trackall" author="maxcit" context="common">
+        <comment>Column,new: trackAllDevices.
+
+        Whether the launcher collects a position at all is a per-configuration setting
+        (configurations.requestUpdates), which defaults to DONOTTRACK. A fleet that wants
+        routine location reporting would otherwise have to remember to change it on every
+        configuration, and a configuration created later would silently opt out. With this
+        on, the sync hook asks every device for GPS regardless, and the configuration
+        setting stops being a trap.
+
+        Defaulted to TRUE because routine reporting is what this plugin was installed
+        for; turn it off to hand the decision back to each configuration.</comment>
+        <sql>
+            ALTER TABLE plugin_devicelocation_settings
+                ADD COLUMN trackAllDevices BOOLEAN NOT NULL DEFAULT TRUE;
+        </sql>
+    </changeSet>
+</databaseChangeLog>

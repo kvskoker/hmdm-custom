@@ -1,0 +1,165 @@
+<div ng-controller="PluginDeviceenrollTabController">
+
+    <div ng-show="errorMessage" class="alert alert-danger">{{errorMessage}}</div>
+    <div ng-show="successMessage" class="alert alert-success">{{successMessage}}</div>
+
+    <p class="text-muted" localized>plugin.deviceenroll.intro</p>
+
+    <!-- ================================================================= rules -->
+    <h4 localized>plugin.deviceenroll.rules.title</h4>
+
+    <table class="table table-striped" style="margin-bottom: 30px;">
+        <thead>
+        <tr>
+            <th localized>plugin.deviceenroll.column.group</th>
+            <th localized>plugin.deviceenroll.column.configuration</th>
+            <th localized>plugin.deviceenroll.column.prefix</th>
+            <th localized>plugin.deviceenroll.column.next</th>
+            <th localized>plugin.deviceenroll.column.enabled</th>
+            <th localized>plugin.deviceenroll.column.qr</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="item in rules">
+            <td><strong>{{item.groupName}}</strong></td>
+            <td>{{item.configurationName}}</td>
+            <td><code>{{item.prefix}}</code></td>
+            <td><code>{{nextNumber(item)}}</code></td>
+            <td>{{item.enabled ? '&#10003;' : ''}}</td>
+            <td>
+                <div ng-if="item.mainAppId">
+                    <img ng-src="{{qrUrl(item)}}" width="120" height="120" alt="QR"/>
+                    <div>
+                        <a ng-href="{{qrUrl(item)}}" target="_blank"
+                           localized>plugin.deviceenroll.qr.open</a>
+                    </div>
+                </div>
+                <div ng-if="!item.mainAppId" class="text-danger" style="max-width: 220px;">
+                    <small localized>plugin.deviceenroll.qr.nomainapp</small>
+                </div>
+            </td>
+            <td class="text-nowrap">
+                <a href="" ng-click="edit(item)" localized>plugin.deviceenroll.action.edit</a>
+                &nbsp;
+                <a href="" ng-click="remove(item)" localized>plugin.deviceenroll.action.delete</a>
+            </td>
+        </tr>
+        <tr ng-if="rules.length === 0">
+            <td colspan="7" class="text-muted" localized>plugin.deviceenroll.rules.empty</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- ============================================================ add / edit -->
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <strong ng-if="!form.id" localized>plugin.deviceenroll.form.title.new</strong>
+            <strong ng-if="form.id" localized>plugin.deviceenroll.form.title.edit</strong>
+        </div>
+        <div class="panel-body">
+            <p class="text-muted" localized>plugin.deviceenroll.form.hint</p>
+            <form class="form-horizontal">
+
+                <div class="form-group">
+                    <label class="col-sm-4 control-label"
+                           localized>plugin.deviceenroll.label.group</label>
+                    <div class="col-sm-8">
+                        <select class="form-control" ng-model="form.groupChoice">
+                            <option value="{{GROUP_NEW}}"
+                                    localized>plugin.deviceenroll.group.new</option>
+                            <option ng-repeat="g in groups" value="{{g.id}}">{{g.name}}</option>
+                        </select>
+                        <input type="text" class="form-control" style="margin-top: 6px;"
+                               ng-if="form.groupChoice === GROUP_NEW"
+                               ng-model="form.newGroupName"
+                               localized-placeholder="plugin.deviceenroll.placeholder.group"/>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-4 control-label"
+                           localized>plugin.deviceenroll.label.configuration</label>
+                    <div class="col-sm-8">
+                        <select class="form-control" ng-model="form.configurationId"
+                                ng-options="c.id as c.name for c in configurations"></select>
+                        <p class="help-block" localized>plugin.deviceenroll.configuration.hint</p>
+                        <p class="help-block text-danger" ng-if="selectedHasNoMainApp()"
+                           localized>plugin.deviceenroll.configuration.nomainapp</p>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-4 control-label"
+                           localized>plugin.deviceenroll.label.prefix</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" ng-model="form.prefix"
+                               localized-placeholder="plugin.deviceenroll.placeholder.prefix"/>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-4 control-label"
+                           localized>plugin.deviceenroll.label.digits</label>
+                    <div class="col-sm-8">
+                        <input type="number" class="form-control" min="1" max="8"
+                               ng-model="form.digits"/>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-4 control-label"
+                           localized>plugin.deviceenroll.label.next</label>
+                    <div class="col-sm-8">
+                        <input type="number" class="form-control" min="1" ng-model="form.nextSeq"/>
+                        <p class="help-block" ng-if="preview()">
+                            <span localized>plugin.deviceenroll.preview</span>
+                            <code>{{preview()}}</code>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-sm-offset-4 col-sm-8">
+                        <label>
+                            <input type="checkbox" ng-model="form.enabled"/>
+                            <span localized>plugin.deviceenroll.label.enabled</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-sm-offset-4 col-sm-8">
+                        <button type="button" class="btn btn-primary" ng-disabled="working"
+                                ng-click="save()"
+                                localized>plugin.deviceenroll.button.save</button>
+                        <button type="button" class="btn btn-default" ng-click="clear()"
+                                localized>plugin.deviceenroll.button.clear</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========================================================== assignments -->
+    <h4 localized>plugin.deviceenroll.assignments.title</h4>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th localized>plugin.deviceenroll.column.assigned</th>
+            <th localized>plugin.deviceenroll.column.original</th>
+            <th localized>plugin.deviceenroll.column.when</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="a in assignments">
+            <td><code>{{a.assignedNumber}}</code></td>
+            <td>{{a.originalNumber}}</td>
+            <td>{{a.assignTime | date:'yyyy-MM-dd HH:mm'}}</td>
+        </tr>
+        <tr ng-if="assignments.length === 0">
+            <td colspan="3" class="text-muted" localized>plugin.deviceenroll.assignments.empty</td>
+        </tr>
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,91 @@
+# ===========================================================================
+# Headwind MDM fork - one repository for the whole stack.
+#
+# Rule: commit source and templates, never build output and never secrets.
+# Clone this, run "docker compose up --build", and everything is rebuilt.
+#
+# hmdm-server/ and hmdm-android/ keep their own .gitignore files from upstream.
+# Git applies all three together; this one covers the wrapper and anything
+# upstream's rules miss.
+# ===========================================================================
+
+# --- local environment / secrets -------------------------------------------
+# .env carries the host address devices are told to use and can hold secrets.
+# .env.example is committed as the template.
+.env
+*.env.local
+
+# Filled-in copies of committed templates. Upstream ignores these inside
+# hmdm-server/ too; repeated here so the rule survives if that file changes.
+hmdm-server/server/build.properties
+hmdm-server/server/context.xml
+
+# --- build output ----------------------------------------------------------
+target/
+**/target/
+build/
+**/build/
+out/
+*.war
+*.class
+*.exe
+
+# Fetched by the Maven frontend plugin at build time, never hand-edited.
+hmdm-server/server/src/main/webapp/lib/
+hmdm-server/server/webtarget/node/
+**/node_modules/
+**/bower_components/
+
+# --- jars ------------------------------------------------------------------
+# Build output, EXCEPT the ones that are genuinely source:
+#   * classgraph - checked into plugins/platform/local-maven-repo and resolved
+#     from there by a file:// repository. Without it the build cannot compile.
+#   * gradle-wrapper.jar - this IS gradlew. Without it "./gradlew" cannot run
+#     on a fresh clone.
+*.jar
+!hmdm-server/plugins/platform/local-maven-repo/**/*.jar
+!hmdm-server/plugins/platform/src/main/lib/*.jar
+!**/gradle/wrapper/gradle-wrapper.jar
+
+# --- Android ---------------------------------------------------------------
+hmdm-android/.gradle/
+hmdm-android/local.properties
+hmdm-android/captures/
+hmdm-android/.externalNativeBuild/
+hmdm-android/.cxx/
+hmdm-android/app/release/
+*.apk
+*.aab
+*.ap_
+*.dex
+# Signing material must never be committed.
+*.keystore
+*.jks
+keystore.properties
+
+# --- runtime data ----------------------------------------------------------
+logs/
+*.log
+*.pid
+
+# --- the applier's safety copies and my delivery packages ------------------
+_backup_*/
+_to_delete/
+hmdm-mdm-v*.zip
+hmdm-enroll-v*.zip
+apply-mdm-v*.ps1
+apply-enroll-v*.ps1
+
+# --- editors and OS --------------------------------------------------------
+.idea/
+*.iml
+.vscode/
+*.swp
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+
+# Documentation:
+docs/

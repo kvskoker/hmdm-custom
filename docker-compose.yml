@@ -1,0 +1,63 @@
+# Headwind MDM - local development stack.
+#
+#   ./setup.sh                     one-time: clones hmdm-server + hmdm-android
+#   docker compose up --build      build from ./hmdm-server and run
+#   docker compose up -d --build hmdm    rebuild after a code change
+#   docker compose logs -f hmdm
+#   docker compose down -v         wipe everything, database included
+#
+# Panel      http://localhost:8080        admin / admin
+# From AVD   http://10.0.2.2:8080         (emulator's route to your host)
+# MQTT push  localhost:31000  ->  10.0.2.2:31000 from the emulator
+# Postgres   localhost:5433               hmdm / topsecret
+
+services:
+  db:
+    image: postgres:14
+    environment:
+      POSTGRES_DB: hmdm
+      POSTGRES_USER: hmdm
+      POSTGRES_PASSWORD: topsecret
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hmdm -d hmdm"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  hmdm:
+    build:
+      context: .                    # repo root, so the build can see ./hmdm-server
+      dockerfile: docker/Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SQL_HOST: db
+      SQL_PASS: topsecret
+      PROTOCOL: http
+      # HMDM_HOST is the address the SERVER advertises to devices: APK download
+      # URLs, file URLs, QR payloads and the MQTT endpoint are all built from it.
+      # Set it in .env to your PC's LAN IP so the browser, the emulator and real
+      # phones on the same network all resolve it. 10.0.2.2 is emulator-only.
+      BASE_HOST: ${HMDM_HOST:-10.0.2.2}:8080
+      BASE_DOMAIN: ${HMDM_HOST:-10.0.2.2}
+      MQTT_BIND: 0.0.0.0
+      MQTT_AUTH: "0"                # dev only - production keeps this at 1
+      FORCE_RECONFIGURE: "1"
+      ADMIN_EMAIL: admin@localhost
+      # PHASE-1 SPIKE: arm a one-shot device PIN reset. Set a PIN, recreate the
+      # container, then sync the device. Comment out again once proven.
+      HMDM_DEV_PASSWORD_RESET: "${DEV_PIN:-}"
+    ports:
+      - "8080:8080"
+      - "31000:31000"
+    volumes:
+      - hmdmdata:/opt/hmdm          # uploaded APKs, plugin files, logs
+
+volumes:
+  pgdata:
+  hmdmdata:

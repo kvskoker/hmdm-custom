@@ -1,0 +1,238 @@
+<div ng-controller="PluginDeviceresetTabController">
+
+    <div class="row">
+        <div class="col-md-8">
+
+            <div ng-show="errorMessage" class="alert alert-danger">{{errorMessage}}</div>
+
+            <div ng-show="rebootQueued" class="alert alert-info">
+                <span localized>plugin.devicereset.result.reboot</span> {{rebootQueued}}
+            </div>
+
+            <div ng-show="actionResult" class="alert alert-info">{{actionResult}}</div>
+
+            <!-- The PIN is shown once, here, and never returned again. -->
+            <div ng-show="generatedPin" class="alert alert-success">
+                <p>
+                    <strong localized>plugin.devicereset.result.title</strong>
+                    {{generatedFor}}
+                </p>
+                <p style="font-size: 28px; letter-spacing: 6px; font-family: monospace;">{{generatedPin}}</p>
+                <p localized>plugin.devicereset.result.note</p>
+                <button class="btn btn-default btn-sm" ng-click="dismissPin()" localized>button.close</button>
+            </div>
+
+            <h4 localized>plugin.devicereset.section.actions</h4>
+
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label" localized>plugin.devicereset.label.device</label>
+                    <div class="col-sm-8">
+                        <input type="text"
+                               ng-model="request.deviceNumber"
+                               localized-placeholder="search.placeholder.device"
+                               autocomplete="off"
+                               class="form-control"
+                               uib-typeahead="device for device in getDevices($viewValue)"
+                               typeahead-wait-ms="300"
+                               typeahead-focus-first="false"/>
+
+                        <p ng-show="deviceStatus && !deviceStatus.found" class="text-danger"
+                           style="margin-top:6px;">
+                            <strong localized>plugin.devicereset.status.notfound</strong>
+                        </p>
+
+                        <p ng-show="deviceStatus.found" style="margin-top:6px;">
+                            <span class="label label-danger" ng-if="deviceStatus.locked"
+                                  localized>plugin.devicereset.status.locked</span>
+                            <span class="label label-success" ng-if="!deviceStatus.locked"
+                                  localized>plugin.devicereset.status.unlocked</span>
+                            <span class="text-muted" ng-if="deviceStatus.lastUpdate">
+                                &nbsp;<span localized>plugin.devicereset.status.lastseen</span>
+                                {{deviceStatus.lastUpdate | date:'yyyy-MM-dd HH:mm'}}
+                            </span>
+                            <span class="text-muted" ng-if="!deviceStatus.lastUpdate">
+                                &nbsp;<span localized>plugin.devicereset.status.neverseen</span>
+                            </span>
+                        </p>
+                        <p ng-show="deviceStatus.locked" class="text-muted" style="margin-top:2px;">
+                            &ldquo;{{deviceStatus.lockMessage}}&rdquo;
+                        </p>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-sm-offset-4 col-sm-8">
+                        <h5 localized>plugin.devicereset.section.pin</h5>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-4 control-label" localized>plugin.devicereset.label.pinlength</label>
+                    <div class="col-sm-8">
+                        <select class="form-control" ng-model="request.pinLength">
+                            <option ng-value="4">4</option>
+                            <option ng-value="6" ng-selected="true">6</option>
+                            <option ng-value="8">8</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-sm-offset-4 col-sm-8">
+                        <button type="submit" class="btn btn-primary"
+                                ng-click="resetPin()" ng-disabled="working"
+                                localized>plugin.devicereset.button.reset</button>
+                    </div>
+                </div>
+            </form>
+
+            <hr/>
+
+            <h4 localized>plugin.devicereset.section.reboot</h4>
+            <p class="text-muted" localized>plugin.devicereset.hint.reboot</p>
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <div class="col-sm-offset-4 col-sm-8">
+                        <button type="button" class="btn btn-warning"
+                                ng-click="rebootDevice()" ng-disabled="working"
+                                localized>plugin.devicereset.button.reboot</button>
+                    </div>
+                </div>
+            </form>
+
+            <hr/>
+
+            <h4 localized>plugin.devicereset.section.lock</h4>
+            <p class="text-muted" localized>plugin.devicereset.hint.lock</p>
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label" localized>plugin.devicereset.label.lockmessage</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" ng-model="lockMessage"
+                               localized-placeholder="plugin.devicereset.placeholder.lockmessage"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-4 col-sm-8">
+                        <button type="button" class="btn btn-warning"
+                                ng-click="lockDevice()" ng-disabled="working"
+                                localized>plugin.devicereset.button.lock</button>
+                        <button type="button" class="btn btn-default"
+                                ng-click="unlockDevice()" ng-disabled="working"
+                                localized>plugin.devicereset.button.unlock</button>
+                    </div>
+                </div>
+            </form>
+
+            <hr/>
+
+            <h4 class="text-danger" localized>plugin.devicereset.section.wipe</h4>
+            <p class="text-muted" localized>plugin.devicereset.hint.wipe</p>
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label" localized>plugin.devicereset.label.confirmdevice</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" ng-model="confirmDeviceNumber"
+                               localized-placeholder="plugin.devicereset.placeholder.confirmdevice"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-4 col-sm-8">
+                        <button type="button" class="btn btn-danger"
+                                ng-click="factoryResetDevice()"
+                                ng-disabled="working || !confirmDeviceNumber"
+                                localized>plugin.devicereset.button.factoryreset</button>
+                    </div>
+                </div>
+            </form>
+
+            <p class="text-muted" localized>plugin.devicereset.hint.token</p>
+        </div>
+    </div>
+
+    <hr/>
+
+    <h4 localized>plugin.devicereset.history.title</h4>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th localized>plugin.devicereset.column.device</th>
+            <th localized>plugin.devicereset.column.requestedby</th>
+            <th localized>plugin.devicereset.column.requested</th>
+            <th localized>plugin.devicereset.column.status</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="item in history">
+            <td>{{item.deviceNumber}}</td>
+            <td>{{item.requestedBy}}</td>
+            <td>{{item.requestTime | date:'yyyy-MM-dd HH:mm'}}</td>
+            <td localized>{{item.status | deviceResetStatus}}</td>
+        </tr>
+        <tr ng-if="history.length === 0">
+            <td colspan="4" class="text-muted" localized>plugin.devicereset.history.empty</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h4 localized>plugin.devicereset.commands.title</h4>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th localized>plugin.devicereset.column.device</th>
+            <th localized>plugin.devicereset.column.command</th>
+            <th localized>plugin.devicereset.column.requestedby</th>
+            <th localized>plugin.devicereset.column.requested</th>
+            <th localized>plugin.devicereset.column.status</th>
+            <th localized>plugin.devicereset.column.capable</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="item in commands">
+            <td>{{item.deviceNumber}}</td>
+            <td>{{item.commandType}}</td>
+            <td>{{item.requestedBy}}</td>
+            <td>{{item.requestTime | date:'yyyy-MM-dd HH:mm'}}</td>
+            <td localized>{{item.status | deviceResetStatus}}</td>
+            <td>
+                <span ng-if="item.deviceCapable === false" class="label label-danger"
+                      localized>plugin.devicereset.capable.no</span>
+                <span ng-if="item.deviceCapable === true" class="label label-success"
+                      localized>plugin.devicereset.capable.yes</span>
+                <span ng-if="item.deviceCapable === undefined || item.deviceCapable === null"
+                      class="text-muted">&ndash;</span>
+            </td>
+        </tr>
+        <tr ng-if="commands.length === 0">
+            <td colspan="6" class="text-muted" localized>plugin.devicereset.commands.empty</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h4 localized>plugin.devicereset.locked.title</h4>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th localized>plugin.devicereset.column.device</th>
+            <th localized>plugin.devicereset.column.lockmessage</th>
+            <th localized>plugin.devicereset.column.requestedby</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="item in lockedDevices">
+            <td>{{item.deviceNumber}}</td>
+            <td>{{item.lockMessage}}</td>
+            <td>{{item.requestedBy}}</td>
+            <td>
+                <button class="btn btn-xs btn-default" ng-click="unlockDevice(item.deviceNumber)"
+                        localized>plugin.devicereset.button.unlock</button>
+            </td>
+        </tr>
+        <tr ng-if="lockedDevices.length === 0">
+            <td colspan="4" class="text-muted" localized>plugin.devicereset.locked.empty</td>
+        </tr>
+        </tbody>
+    </table>
+</div>

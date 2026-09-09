@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd"
+        logicalFilePath="devicereset.changelog.xml">
+
+    <changeSet id="plugin-devicereset-01-register" author="maxcit" context="common">
+        <comment>Plugin,new: devicereset</comment>
+        <sql>
+            INSERT INTO plugins (
+            identifier, name, description,
+            javascriptModuleFile,
+            functionsViewTemplate,
+            settingsViewTemplate,
+            namelocalizationkey,
+            settingsPermission, functionsPermission, deviceFunctionsPermission,
+            enabledForDevice
+            )
+            VALUES (
+            'devicereset', 'Device PIN Reset', 'Reset the lock screen PIN of a managed device',
+            'app/components/plugins/devicereset/devicereset.module.js',
+            'app/components/plugins/devicereset/views/devicereset.html',
+            NULL,
+            'plugin.devicereset.localization.key.name',
+            'plugin_devicereset_access',
+            'plugin_devicereset_access',
+            'plugin_devicereset_access',
+            TRUE
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="plugin-devicereset-02-permission" author="maxcit" context="common">
+        <comment>Permission,new: plugin_devicereset_access</comment>
+        <sql>
+            INSERT INTO permissions (name, description)
+            VALUES ('plugin_devicereset_access', 'Can reset the lock screen PIN of a device');
+            INSERT INTO userRolePermissions (roleId, permissionId)
+            SELECT id, currval('permissions_id_seq') FROM userroles WHERE id IN (1, 2);
+        </sql>
+    </changeSet>
+
+    <changeSet id="plugin-devicereset-03-table" author="maxcit" context="common">
+        <comment>Table,new: plugin_devicereset_password</comment>
+        <sql>
+            CREATE TABLE plugin_devicereset_password (
+                id serial NOT NULL CONSTRAINT plugin_devicereset_password_pr_key PRIMARY KEY,
+                customerId INT NOT NULL REFERENCES customers (id) ON DELETE CASCADE,
+                deviceId INT NOT NULL REFERENCES devices (id) ON DELETE CASCADE,
+                newPassword VARCHAR(64) NOT NULL,
+                requestedBy VARCHAR(100),
+                requestTime BIGINT NOT NULL,
+                deliverTime BIGINT,
+                confirmTime BIGINT,
+                status INT NOT NULL DEFAULT 0
+            );
+            CREATE INDEX plugin_devicereset_password_device_idx
+                ON plugin_devicereset_password (deviceId, status);
+        </sql>
+    </changeSet>
+    <changeSet id="plugin-devicereset-04-commands" author="maxcit" context="common">
+        <comment>Table,new: plugin_devicereset_command</comment>
+        <sql>
+            CREATE TABLE plugin_devicereset_command (
+                id serial NOT NULL CONSTRAINT plugin_devicereset_command_pr_key PRIMARY KEY,
+                customerId INT NOT NULL REFERENCES customers (id) ON DELETE CASCADE,
+                deviceId INT NOT NULL REFERENCES devices (id) ON DELETE CASCADE,
+                commandType VARCHAR(20) NOT NULL,
+                requestedBy VARCHAR(100),
+                requestTime BIGINT NOT NULL,
+                deliverTime BIGINT,
+                confirmTime BIGINT,
+                status INT NOT NULL DEFAULT 0
+            );
+            CREATE INDEX plugin_devicereset_command_device_idx
+                ON plugin_devicereset_command (deviceId, status);
+        </sql>
+    </changeSet>
+    <changeSet id="plugin-devicereset-05-rename" author="maxcit" context="common">
+        <comment>Rename to Device Management - the plugin now covers several device commands</comment>
+        <sql>
+            UPDATE plugins
+            SET name = 'Device Management',
+                description = 'Reset the lock screen PIN, reboot and otherwise command a managed device'
+            WHERE identifier = 'devicereset';
+        </sql>
+    </changeSet>
+    <changeSet id="plugin-devicereset-06-lock" author="maxcit" context="common">
+        <comment>Table,new: plugin_devicereset_lock - lock is device state, not a one-shot command</comment>
+        <sql>
+            CREATE TABLE plugin_devicereset_lock (
+                deviceId INT NOT NULL CONSTRAINT plugin_devicereset_lock_pr_key PRIMARY KEY
+                    REFERENCES devices (id) ON DELETE CASCADE,
+                customerId INT NOT NULL REFERENCES customers (id) ON DELETE CASCADE,
+                locked BOOLEAN NOT NULL DEFAULT FALSE,
+                lockMessage TEXT,
+                requestedBy VARCHAR(100),
+                updateTime BIGINT NOT NULL
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="plugin-devicereset-07-wipe-permission" author="maxcit" context="common">
+        <comment>Permission,new: plugin_devicereset_wipe - factory reset is irreversible,
+        so it is gated separately from routine PIN resets and reboots</comment>
+        <sql>
+            INSERT INTO permissions (name, description)
+            VALUES ('plugin_devicereset_wipe', 'Can remotely factory reset a device');
+            INSERT INTO userRolePermissions (roleId, permissionId)
+            SELECT id, currval('permissions_id_seq') FROM userroles WHERE id = 1;
+        </sql>
+    </changeSet>
+    <changeSet id="plugin-devicereset-08-wipe-admin" author="maxcit" context="common">
+        <comment>Grant plugin_devicereset_wipe to Admin (role 2) as well. In the private
+        usage scenario the account admin is role 2, not Super-Admin, so role 1 alone
+        left nobody able to wipe a device.</comment>
+        <sql>
+            INSERT INTO userRolePermissions (roleId, permissionId)
+            SELECT 2, p.id FROM permissions p
+            WHERE p.name = 'plugin_devicereset_wipe'
+              AND NOT EXISTS (SELECT 1 FROM userRolePermissions urp
+                              WHERE urp.roleId = 2 AND urp.permissionId = p.id);
+        </sql>
+    </changeSet>
+    <changeSet id="plugin-devicereset-09-capability" author="maxcit" context="common">
+        <comment>Column,new: deviceCapable - the launcher reports whether it actually has the
+        rights to carry out a command. Without this an admin sees "queued" for a wipe the
+        device already said it cannot perform.</comment>
+        <sql>
+            ALTER TABLE plugin_devicereset_command ADD COLUMN deviceCapable BOOLEAN;
+        </sql>
+    </changeSet>
+</databaseChangeLog>

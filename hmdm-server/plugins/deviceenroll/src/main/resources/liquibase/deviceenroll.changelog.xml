@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd"
+        logicalFilePath="deviceenroll.changelog.xml">
+
+    <changeSet id="plugin-deviceenroll-01-register" author="maxcit" context="common">
+        <comment>Plugin,new: deviceenroll</comment>
+        <sql>
+            INSERT INTO plugins (
+            identifier, name, description,
+            javascriptModuleFile, functionsViewTemplate, settingsViewTemplate,
+            namelocalizationkey,
+            settingsPermission, functionsPermission, deviceFunctionsPermission,
+            enabledForDevice
+            )
+            VALUES (
+            'deviceenroll', 'Device Enrollment', 'Automatic device numbering for mass enrollment',
+            'app/components/plugins/deviceenroll/deviceenroll.module.js',
+            'app/components/plugins/deviceenroll/views/deviceenroll.html',
+            NULL,
+            'plugin.deviceenroll.localization.key.name',
+            'plugin_deviceenroll_access', 'plugin_deviceenroll_access', 'plugin_deviceenroll_access',
+            FALSE
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="plugin-deviceenroll-02-permission" author="maxcit" context="common">
+        <comment>Permission,new: plugin_deviceenroll_access</comment>
+        <sql>
+            INSERT INTO permissions (name, description)
+            VALUES ('plugin_deviceenroll_access', 'Can manage automatic device numbering rules');
+            INSERT INTO userRolePermissions (roleId, permissionId)
+            SELECT id, currval('permissions_id_seq') FROM userroles WHERE id IN (1, 2);
+        </sql>
+    </changeSet>
+
+    <changeSet id="plugin-deviceenroll-03-tables" author="maxcit" context="common">
+        <comment>Tables,new: numbering rules and the numbers already handed out</comment>
+        <sql>
+            CREATE TABLE plugin_deviceenroll_rule (
+                configurationId INT NOT NULL CONSTRAINT plugin_deviceenroll_rule_pr_key PRIMARY KEY
+                    REFERENCES configurations (id) ON DELETE CASCADE,
+                customerId INT NOT NULL REFERENCES customers (id) ON DELETE CASCADE,
+                prefix VARCHAR(20) NOT NULL,
+                digits INT NOT NULL DEFAULT 3,
+                nextSeq INT NOT NULL DEFAULT 1,
+                enabled BOOLEAN NOT NULL DEFAULT TRUE
+            );
+
+            CREATE TABLE plugin_deviceenroll_assigned (
+                deviceId INT NOT NULL CONSTRAINT plugin_deviceenroll_assigned_pr_key PRIMARY KEY
+                    REFERENCES devices (id) ON DELETE CASCADE,
+                customerId INT NOT NULL REFERENCES customers (id) ON DELETE CASCADE,
+                originalNumber TEXT,
+                assignedNumber TEXT NOT NULL,
+                assignTime BIGINT NOT NULL
+            );
+        </sql>
+    </changeSet>
+    <changeSet id="plugin-deviceenroll-04-group" author="maxcit" context="common">
+        <comment>Column,new: groupId - devices numbered by a rule also join that rule's group.
+        Headwind's own auto-creation has a single global newDeviceGroupId, which cannot
+        express "Kailahun devices go to the Kailahun group".</comment>
+        <sql>
+            ALTER TABLE plugin_deviceenroll_rule
+                ADD COLUMN groupId INT REFERENCES groups (id) ON DELETE SET NULL;
+        </sql>
+    </changeSet>
+    <changeSet id="plugin-deviceenroll-05-group-key" author="maxcit" context="common">
+        <comment>Rules are keyed on the group, not the configuration.
+
+        An enrollment QR code carries com.hmdm.GROUP alongside com.hmdm.CONFIG - the core
+        panel's own QR page emits "?create=1&amp;group=&lt;id&gt;" - and the launcher passes both
+        back at enrolment. So one configuration can serve any number of groups, each with
+        its own QR code. Keying the rule on the configuration forced a configuration per
+        location, which meant maintaining the same application list in a dozen places.
+
+        Rules with no group cannot be addressed by a QR code and are dropped here.</comment>
+        <sql>
+            DELETE FROM plugin_deviceenroll_rule WHERE groupId IS NULL;
+
+            ALTER TABLE plugin_deviceenroll_rule
+                DROP CONSTRAINT plugin_deviceenroll_rule_pr_key;
+            ALTER TABLE plugin_deviceenroll_rule ADD COLUMN id SERIAL;
+            ALTER TABLE plugin_deviceenroll_rule
+                ADD CONSTRAINT plugin_deviceenroll_rule_pr_key PRIMARY KEY (id);
+
+            ALTER TABLE plugin_deviceenroll_rule ALTER COLUMN groupId SET NOT NULL;
+            ALTER TABLE plugin_deviceenroll_rule
+                DROP CONSTRAINT IF EXISTS plugin_deviceenroll_rule_groupid_fkey;
+            ALTER TABLE plugin_deviceenroll_rule
+                ADD CONSTRAINT plugin_deviceenroll_rule_group_fk
+                FOREIGN KEY (groupId) REFERENCES groups (id) ON DELETE CASCADE;
+            ALTER TABLE plugin_deviceenroll_rule
+                ADD CONSTRAINT plugin_deviceenroll_rule_group_uniq UNIQUE (groupId);
+        </sql>
+    </changeSet>
+</databaseChangeLog>

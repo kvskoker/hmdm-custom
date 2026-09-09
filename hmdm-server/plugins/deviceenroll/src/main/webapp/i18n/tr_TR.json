@@ -1,0 +1,58 @@
+{
+  "plugin.deviceenroll.localization.key.name": "Device Enrollment",
+  "breadcrumb.plugin.deviceenroll.main": "Device Enrollment",
+
+  "plugin.deviceenroll.intro": "One QR code per group. Scan it on a factory-reset device and the device joins that group, takes the group's configuration, and is renamed to the next number in the group's sequence. Groups can share a configuration, so the applications you deploy stay in one place.",
+
+  "plugin.deviceenroll.rules.title": "Enrollment rules",
+  "plugin.deviceenroll.rules.empty": "No enrollment rules yet. Add one below.",
+
+  "plugin.deviceenroll.column.group": "Group",
+  "plugin.deviceenroll.column.configuration": "Configuration",
+  "plugin.deviceenroll.column.prefix": "Prefix",
+  "plugin.deviceenroll.column.next": "Next device",
+  "plugin.deviceenroll.column.enabled": "Enabled",
+  "plugin.deviceenroll.column.qr": "Enrollment QR",
+  "plugin.deviceenroll.column.assigned": "Number",
+  "plugin.deviceenroll.column.original": "Enrolled as",
+  "plugin.deviceenroll.column.when": "When",
+
+  "plugin.deviceenroll.action.edit": "Edit",
+  "plugin.deviceenroll.action.delete": "Delete",
+
+  "plugin.deviceenroll.qr.open": "Open full size",
+  "plugin.deviceenroll.qr.nomainapp": "No QR code: this configuration has no main application. Open Configurations, edit it, and set the Headwind launcher as the main app - the QR code has to tell a factory-reset device which app to install.",
+
+  "plugin.deviceenroll.form.title.new": "Add an enrollment rule",
+  "plugin.deviceenroll.form.title.edit": "Edit enrollment rule",
+  "plugin.deviceenroll.form.hint": "Each group gets one rule and one QR code. Point as many groups as you like at the same configuration - they share its applications and settings, and only the group and the numbering differ.",
+
+  "plugin.deviceenroll.label.group": "Group",
+  "plugin.deviceenroll.group.new": "Create a new group...",
+  "plugin.deviceenroll.placeholder.group": "e.g. Kailahun",
+  "plugin.deviceenroll.label.configuration": "Configuration",
+  "plugin.deviceenroll.configuration.hint": "The configuration devices of this group are enrolled into. Sharing one configuration across groups is the normal case - it is what keeps application deployment in one place.",
+  "plugin.deviceenroll.configuration.nomainapp": "This configuration has no main application, so it cannot produce an enrollment QR code. Set the Headwind launcher as its main app first, or choose a different configuration.",
+  "plugin.deviceenroll.label.prefix": "Device prefix",
+  "plugin.deviceenroll.placeholder.prefix": "e.g. KAI",
+  "plugin.deviceenroll.label.digits": "Digits",
+  "plugin.deviceenroll.label.next": "Next number",
+  "plugin.deviceenroll.label.enabled": "Enabled",
+  "plugin.deviceenroll.preview": "Next device will be called",
+
+  "plugin.deviceenroll.button.save": "Save rule",
+  "plugin.deviceenroll.button.clear": "Clear form",
+
+  "plugin.deviceenroll.saved": "Enrollment rule saved. Scan the group's QR code to enrol devices into it.",
+  "plugin.deviceenroll.deleted": "Enrollment rule removed. The group, its configuration and the devices already enrolled are unchanged.",
+  "plugin.deviceenroll.confirm.replace": "This group already has an enrollment rule. Replace it? Devices already numbered keep their numbers, and the sequence carries on from where it is. A group can only have one rule, because the QR code identifies the group.",
+  "plugin.deviceenroll.confirm.delete": "Stop numbering devices enrolled into ${name}? The group, its configuration and the devices already enrolled are left as they are - only the automatic numbering is removed.",
+
+  "plugin.deviceenroll.assignments.title": "Numbers handed out",
+  "plugin.deviceenroll.assignments.empty": "No devices numbered yet",
+
+  "plugin.deviceenroll.error.group.required": "Choose a group, or type a name for a new one",
+  "plugin.deviceenroll.error.configuration.required": "Choose the configuration to enrol these devices into",
+  "plugin.deviceenroll.error.prefix.required": "Enter a device prefix",
+  "plugin.deviceenroll.error.rule.exists": "This group already has an enrollment rule"
+}
