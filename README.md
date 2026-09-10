@@ -119,10 +119,91 @@ enrollment installs it, so it cannot be skipped. Build your own if you want the
 server address baked in as the default; otherwise upload a build you already
 have.
 
+### Server address
+
+The launcher compiles in a primary and a secondary server address. Both resolve
+in this order, first match wins:
+
+1. `-PhmdmBaseUrl=...` / `-PhmdmSecondaryUrl=...` on the command line
+2. `HMDM_BASE_URL` / `HMDM_SECONDARY_URL` in the environment
+3. `gradle.properties`
+4. the default in `app/build.gradle`
+
+`gradle.properties` in this repo is set to the emulator address
+(`http://10.0.2.2:8080`) for local work, so **a build for real devices must
+override it.** The build prints what it resolved — check that line before you
+ship the APK:
+
+```
+[hmdm] BASE_URL=https://mdm.example.com  SECONDARY=https://mdm.example.com
+```
+
+QR enrollment sends `com.hmdm.BASE_URL`, which overrides the compiled primary,
+so a wrong primary is survivable. The **secondary is not sent by the server**,
+so whatever is compiled in is what devices keep — and `GetServerConfigTask`
+really does fall back to it when the primary fails. Left at the emulator
+address, every failed sync in the field retries against a dead host.
+
+For local testing, a debug build against the emulator is fine:
+
 ```bash
 cd hmdm-android
-./gradlew assembleOpensourceDebug -PhmdmBaseUrl=https://mdm.example.com
+./gradlew assembleOpensourceDebug
 ```
+
+**For a fleet, build release-signed.** Android accepts an update only if it is
+signed with the same key as the installed app, and debug builds use a throwaway
+keystore generated per machine. A fleet enrolled with a debug build can never be
+updated from anywhere else — the only remedy is re-enrolling every device.
+
+Create the key once and keep it somewhere that outlives any single laptop:
+
+```bash
+keytool -genkeypair -v -keystore hmdm-release.jks \
+        -alias hmdm -keyalg RSA -keysize 4096 -validity 10000
+```
+
+Then build with it. The Android Gradle Plugin takes the key on the command line,
+so the repository needs no change and no secret:
+
+```bash
+./gradlew assembleOpensourceRelease \
+  -PhmdmBaseUrl=https://mdm.example.com \
+  -PhmdmSecondaryUrl=https://mdm.example.com \
+  -Pandroid.injected.signing.store.file=$PWD/hmdm-release.jks \
+  -Pandroid.injected.signing.store.password="$KS_PASS" \
+  -Pandroid.injected.signing.key.alias=hmdm \
+  -Pandroid.injected.signing.key.password="$KS_PASS"
+```
+
+On Windows, **quote each `-P` argument and set the password first**. PowerShell
+mangles an unquoted argument containing `=`, and an empty variable is passed as
+nothing at all — which shifts the remaining arguments and produces the confusing
+`Cannot locate tasks that match '.injected.signing.store.file=C:\...'`.
+
+```powershell
+$env:KS_PASS = Read-Host "Keystore password"
+$ks = (Resolve-Path .\hmdm-release.jks).Path
+
+./gradlew assembleOpensourceRelease `
+  "-PhmdmBaseUrl=https://mdm.example.com" `
+  "-PhmdmSecondaryUrl=https://mdm.example.com" `
+  "-Pandroid.injected.signing.store.file=$ks" `
+  "-Pandroid.injected.signing.store.password=$env:KS_PASS" `
+  "-Pandroid.injected.signing.key.alias=hmdm" `
+  "-Pandroid.injected.signing.key.password=$env:KS_PASS"
+```
+
+Confirm what you built before it reaches any device:
+
+```bash
+apksigner verify --print-certs app/build/outputs/apk/opensource/release/*.apk
+```
+
+Whoever holds this keystore controls launcher updates for the whole fleet. It
+belongs in the MoH's custody, escrowed, not on one workstation — losing it means
+re-enrolling every device, and leaking it means someone else can push a launcher
+update to all of them.
 
 Upload the resulting APK in **Applications**, then set it as the main app of a
 configuration so QR enrolment can install it.

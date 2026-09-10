@@ -97,12 +97,24 @@ angular.module('plugin-deviceenroll', ['ngResource', 'ui.bootstrap', 'ui.router'
         // create=1 is what puts com.hmdm.CONFIG in the QR payload, and group=<id> is what
         // puts com.hmdm.GROUP there. Without create=1 the device falls back to the global
         // "create new devices" setting and this rule never applies.
+        //
+        // useId=serial emits com.hmdm.DEVICE_ID_USE, and that is what stops the launcher
+        // asking the technician to type a device ID. MainActivity tries
+        // SystemUtils.autoSetDeviceId() first and only shows the dialog when it returns
+        // false, so with this set the device enrols under its serial unattended - and
+        // AutoNumberSyncHook renames it to this rule's next number on the first sync.
+        // Without it the launcher falls back to BuildConfig.DEVICE_ID_CHOICE, which is
+        // "user": one prompt per device, 647 times.
+        //
+        // A handset that will not report a serial (Build.getSerial() is restricted on
+        // some Android 10+ devices) still prompts. That is a fallback, not a failure:
+        // whatever is typed is replaced by the rule's number on the first sync.
         $scope.qrUrl = function (rule) {
             if (!rule || !rule.qrCodeKey) {
                 return null;
             }
             return 'rest/public/qr/' + rule.qrCodeKey
-                 + '?create=1&group=' + rule.groupId + '&size=260';
+                 + '?create=1&group=' + rule.groupId + '&useId=serial&size=260';
         };
 
         var pad = function (value, digits) {
