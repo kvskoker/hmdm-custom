@@ -47,6 +47,10 @@ If the hostname already exists, edit its existing server block; do not add a
 duplicate. Preserve working TLS certificate paths. Use the `location /` and
 upload-size settings from `docker/nginx-hmdm.conf.example` inside its HTTPS
 server block, keeping the HTTP-to-HTTPS redirect.
+The template's `map` block belongs outside any `server` block, in Nginx's
+`http` context (normally the enclosing context for `sites-enabled` files).
+Include it once when copying the location settings; it provides the
+`$hmdm_connection_upgrade` variable.
 
 For a new hostname on Ubuntu/Debian using `sites-available`/`sites-enabled`, first
 confirm `/etc/nginx/sites-available/hmdm` and `/etc/nginx/sites-enabled/hmdm` do
@@ -100,3 +104,19 @@ on the devices' network. Verify QR URLs use `https://mdm.maxcit.com`, without
 `:8088`. Do not enroll devices until HTTPS is valid. A 502 response usually means
 Headwind is still starting, the proxy port differs from `HMDM_HTTP_PORT`, or the
 proxy is in a container and cannot reach the host's loopback interface.
+
+## WebSocket and session checks
+
+For this root deployment, the browser's alert socket must connect to
+`wss://mdm.maxcit.com/ws/alerts`, not `/home/fleet/ws/alerts`. The frontend URL
+fix must be rebuilt into the server image; a proxy reload alone cannot fix the
+JavaScript bundle. Test while signed in: a successful handshake shows HTTP 101
+in the browser's Network panel. Check that the HTTPS server block has the
+template's HTTP/1.1 and Upgrade/Connection directives, not only the port-80 block.
+
+A 403 from `/rest/private/users/current` is an HTTP authentication/access error,
+not a WebSocket handshake response. Try signing in again in a private window.
+If it persists after a successful login, inspect the login response and cookie
+storage/sending in the browser and capture `docker compose logs --tail=150 hmdm`.
+Share statuses and cookie attributes only, never passwords or cookie values.
+Do not disable authentication or expose private REST routes to resolve a 403.

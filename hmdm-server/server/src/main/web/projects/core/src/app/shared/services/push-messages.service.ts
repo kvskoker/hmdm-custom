@@ -4,13 +4,14 @@ import {webSocket} from 'rxjs/webSocket';
 import {SnackBarService} from 'hmdm-ui-kit';
 import {TAlertDTO} from '../../entity/alert/types/alert-dto.type';
 import {environment} from '../../../environments/environment';
+import {websocketUrl} from '../utils/websocket-url';
 
 @Injectable({providedIn: 'root'})
 export class PushMessagesService {
   private readonly snackBar = inject(SnackBarService);
 
   private getFullWsUrl(path: string): string {
-    return `${environment.baseApiUrl}${path}`;
+    return websocketUrl(path, environment.baseApiUrl, document.baseURI);
   }
 
   public listenForPushMessages(path: string): Observable<TAlertDTO> {

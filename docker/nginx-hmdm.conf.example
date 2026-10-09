@@ -1,6 +1,11 @@
 # Host-installed Nginx only. Replace the domain and port before enabling.
 # Initial HTTP configuration; enable trusted HTTPS before enrolling devices.
 # If this hostname already has a server block, merge into that block instead.
+map $http_upgrade $hmdm_connection_upgrade {
+    default upgrade;
+    '' close;
+}
+
 server {
     listen 80;
     server_name mdm.maxcit.com;
@@ -14,7 +19,7 @@ server {
         proxy_set_header X-Forwarded-For $remote_addr;
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
+        proxy_set_header Connection $hmdm_connection_upgrade;
         proxy_read_timeout 300s;
         proxy_send_timeout 300s;
     }
