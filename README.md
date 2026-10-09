@@ -1,6 +1,6 @@
-# Headwind MDM — Medtronic Labs fork
+# Custom Headwind MDM
 
-Self-hosted Android device management for the Sierra Leone health-worker fleet.
+Self-hosted Android device management.
 This upgrade branch targets server 7.03.1 and Android 6.39. See
 [the upgrade notes](docs/UPGRADE-v7.md) before using an existing database.
 A fork of [Headwind MDM](https://h-mdm.com) (Apache-2.0) with three plugins added.
@@ -30,8 +30,10 @@ owner, so the server has to be holding that file. A fresh database ships with no
 usable launcher: the upstream rows that point at `h-mdm.com` are parked on first
 start, because this deployment must not depend on anyone else's download server.
 Build one (see *Building the launcher APK*) or upload an existing build under
-**Applications**, then open the configuration and set it as the **main app**.
-Until that is done, requesting a QR code returns HTTP 500.
+**Applications**, then select that version under the configuration's
+**MDM Settings > MDM application**, with admin receiver class
+`com.hmdm.launcher.AdminReceiver`. Until that is done, the QR action may be
+disabled or fail to display an image.
 
 | Command | What it does |
 |---|---|
@@ -117,99 +119,15 @@ The plugins hook into upstream through `SyncResponseHook` and the event bus, so
 
 ## Building the launcher APK
 
-You need a launcher APK on the server before any device can enrol — QR
-enrollment installs it, so it cannot be skipped. Build your own if you want the
-server address baked in as the default; otherwise upload a build you already
-have.
+Follow [Build the launcher and enroll devices](docs/LAUNCHER-SETUP.md) for:
 
-### Server address
+1. Server address and Android SDK setup.
+2. Windows PowerShell and Linux Bash build/signing commands.
+3. Uploading the APK and selecting **MDM application** in **MDM Settings**.
+4. Group enrollment QR codes, device testing, and launcher updates.
 
-The launcher compiles in a primary and a secondary server address. Both resolve
-in this order, first match wins:
-
-1. `-PhmdmBaseUrl=...` / `-PhmdmSecondaryUrl=...` on the command line
-2. `HMDM_BASE_URL` / `HMDM_SECONDARY_URL` in the environment
-3. `gradle.properties`
-4. the default in `app/build.gradle`
-
-`gradle.properties` in this repo is set to the emulator address
-(`http://10.0.2.2:8080`) for local work, so **a build for real devices must
-override it.** The build prints what it resolved — check that line before you
-ship the APK:
-
-```
-[hmdm] BASE_URL=https://mdm.example.com  SECONDARY=https://mdm.example.com
-```
-
-QR enrollment sends `com.hmdm.BASE_URL`, which overrides the compiled primary,
-so a wrong primary is survivable. The **secondary is not sent by the server**,
-so whatever is compiled in is what devices keep — and `GetServerConfigTask`
-really does fall back to it when the primary fails. Left at the emulator
-address, every failed sync in the field retries against a dead host.
-
-For local testing, a debug build against the emulator is fine:
-
-```bash
-cd hmdm-android
-./gradlew assembleOpensourceDebug
-```
-
-**For a fleet, build release-signed.** Android accepts an update only if it is
-signed with the same key as the installed app, and debug builds use a throwaway
-keystore generated per machine. A fleet enrolled with a debug build can never be
-updated from anywhere else — the only remedy is re-enrolling every device.
-
-Create the key once and keep it somewhere that outlives any single laptop:
-
-```bash
-keytool -genkeypair -v -keystore hmdm-release.jks \
-        -alias hmdm -keyalg RSA -keysize 4096 -validity 10000
-```
-
-Then build with it. The Android Gradle Plugin takes the key on the command line,
-so the repository needs no change and no secret:
-
-```bash
-./gradlew assembleOpensourceRelease \
-  -PhmdmBaseUrl=https://mdm.example.com \
-  -PhmdmSecondaryUrl=https://mdm.example.com \
-  -Pandroid.injected.signing.store.file=$PWD/hmdm-release.jks \
-  -Pandroid.injected.signing.store.password="$KS_PASS" \
-  -Pandroid.injected.signing.key.alias=hmdm \
-  -Pandroid.injected.signing.key.password="$KS_PASS"
-```
-
-On Windows, **quote each `-P` argument and set the password first**. PowerShell
-mangles an unquoted argument containing `=`, and an empty variable is passed as
-nothing at all — which shifts the remaining arguments and produces the confusing
-`Cannot locate tasks that match '.injected.signing.store.file=C:\...'`.
-
-```powershell
-$env:KS_PASS = Read-Host "Keystore password"
-$ks = (Resolve-Path .\hmdm-release.jks).Path
-
-./gradlew assembleOpensourceRelease `
-  "-PhmdmBaseUrl=https://mdm.example.com" `
-  "-PhmdmSecondaryUrl=https://mdm.example.com" `
-  "-Pandroid.injected.signing.store.file=$ks" `
-  "-Pandroid.injected.signing.store.password=$env:KS_PASS" `
-  "-Pandroid.injected.signing.key.alias=hmdm" `
-  "-Pandroid.injected.signing.key.password=$env:KS_PASS"
-```
-
-Confirm what you built before it reaches any device:
-
-```bash
-apksigner verify --print-certs app/build/outputs/apk/opensource/release/*.apk
-```
-
-Whoever holds this keystore controls launcher updates for the whole fleet. It
-belongs in the MoH's custody, escrowed, not on one workstation — losing it means
-re-enrolling every device, and leaking it means someone else can push a launcher
-update to all of them.
-
-Upload the resulting APK in **Applications**, then set it as the main app of a
-configuration so QR enrolment can install it.
+Use the same signing key for every launcher update. The guide keeps signing
+passwords out of command arguments and explicitly sets both server addresses.
 
 ---
 
