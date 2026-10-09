@@ -84,6 +84,11 @@ what the server advertises to devices in QR codes and APK download URLs, so
 
 ## Port conflicts
 
+If Nginx already owns ports 80/443, keep it and set `HMDM_PROXY=external`
+with `DEPLOY_MODE=prod`. Follow [the Nginx setup guide](docs/NGINX-SETUP.md)
+to stop bundled Caddy and configure HTTPS forwarding. Do not switch to dev
+mode just to disable Caddy: that changes device URLs to HTTP.
+
 Set host ports in `.env`, above the generated `derived by deploy` block:
 
 ```ini

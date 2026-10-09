@@ -45,6 +45,8 @@ Get-Content .env | ForEach-Object {
 $mode   = if ($env:DEPLOY_MODE) { $env:DEPLOY_MODE } else { 'dev' }
 $domain = $env:HMDM_DOMAIN
 if (-not $domain) { throw "set HMDM_DOMAIN in .env" }
+$proxy = if ($env:HMDM_PROXY) { $env:HMDM_PROXY } else { 'caddy' }
+if ($proxy -cnotin @('caddy', 'external')) { throw "HMDM_PROXY must be 'caddy' or 'external'" }
 
 $portDefaults = @{
     HMDM_HTTP_PORT = 8080
@@ -65,8 +67,11 @@ foreach ($name in $portDefaults.Keys) {
 
 switch ($mode) {
     'prod' {
-        if (-not $env:LETSENCRYPT_EMAIL) { throw "set LETSENCRYPT_EMAIL in .env - Let's Encrypt requires it" }
-        $env:COMPOSE_PROFILES = 'prod'
+        $env:COMPOSE_PROFILES = ''
+        if ($proxy -eq 'caddy') {
+            if (-not $env:LETSENCRYPT_EMAIL) { throw "set LETSENCRYPT_EMAIL in .env - Let's Encrypt requires it" }
+            $env:COMPOSE_PROFILES = 'prod'
+        }
         $env:HMDM_PROTOCOL    = 'https'
         $env:HMDM_BASE_HOST   = $domain
         $env:PANEL_PUBLISH    = "127.0.0.1:$($env:HMDM_HTTP_PORT)"
@@ -121,6 +126,7 @@ function Show-Banner {
     Write-Host ""
     Write-Host "  mode     $mode"
     Write-Host "  panel    $panel"
+    if ($mode -eq 'prod') { Write-Host "  proxy    $proxy (external mode requires your own HTTPS configuration)" }
     Write-Host "  devices  advertised as $($env:HMDM_PROTOCOL)://$($env:HMDM_BASE_HOST), MQTT host port $($env:MQTT_HOST_PORT)"
     Write-Host ""
 }

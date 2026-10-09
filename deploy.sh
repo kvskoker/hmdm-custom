@@ -39,6 +39,11 @@ set -a; . /dev/stdin <<< "$USER_ENV"; set +a
 
 : "${DEPLOY_MODE:=dev}"
 : "${HMDM_DOMAIN:?set HMDM_DOMAIN in .env}"
+: "${HMDM_PROXY:=caddy}"
+case "$HMDM_PROXY" in
+  caddy|external) ;;
+  *) echo "HMDM_PROXY must be 'caddy' or 'external'" >&2; exit 1 ;;
+esac
 
 : "${HMDM_HTTP_PORT:=8080}"
 : "${DB_HOST_PORT:=5433}"
@@ -57,16 +62,17 @@ done
 
 case "$DEPLOY_MODE" in
   prod)
-    : "${LETSENCRYPT_EMAIL:?set LETSENCRYPT_EMAIL in .env - Let us Encrypt requires it}"
-    COMPOSE_PROFILES=prod
+    COMPOSE_PROFILES=""
+    if [ "$HMDM_PROXY" = caddy ]; then
+      : "${LETSENCRYPT_EMAIL:?set LETSENCRYPT_EMAIL in .env - Let us Encrypt requires it}"
+      COMPOSE_PROFILES=prod
+    fi
     HMDM_PROTOCOL=https
-    # Devices reach the panel on 443 through Caddy, so the advertised host
-    # carries no port. Tomcat is bound to loopback; only Caddy talks to it.
+    # The selected reverse proxy terminates public HTTPS on 443.
     HMDM_BASE_HOST="$HMDM_DOMAIN"
     PANEL_PUBLISH="127.0.0.1:$HMDM_HTTP_PORT"
     DB_PUBLISH="127.0.0.1:$DB_HOST_PORT"
-    # Caddy is the only thing in front of Tomcat. Trusting the whole Docker
-    # bridge range is safe here because nothing else can reach the container.
+    # Override for a custom Docker network; trust only the proxy's network.
     PROXY_ADDRESSES="${PROXY_ADDRESSES:-172.16.0.0/12}"
     PROXY_IP_HEADER="${PROXY_IP_HEADER:-X-Real-IP}"
     ;;
@@ -107,6 +113,7 @@ banner() {
     echo
     echo "  mode     $DEPLOY_MODE"
     echo "  panel    $HMDM_PROTOCOL://$HMDM_BASE_HOST"
+    if [ "$DEPLOY_MODE" = prod ]; then echo "  proxy    $HMDM_PROXY (external mode requires your own HTTPS configuration)"; fi
     echo "  devices  advertised as $HMDM_PROTOCOL://$HMDM_BASE_HOST, MQTT host port $MQTT_HOST_PORT"
     echo
 }

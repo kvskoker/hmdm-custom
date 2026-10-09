@@ -9,6 +9,7 @@ if (-not $bash) { throw 'Bash is required to test deploy.sh' }
 $pwsh = (Get-Process -Id $PID).Path
 $names = @('DEPLOY_MODE', 'HMDM_DOMAIN', 'LETSENCRYPT_EMAIL', 'SQL_PASS', 'COMPOSE_PROFILES', 'HMDM_PROTOCOL', 'HMDM_BASE_HOST', 'PANEL_PUBLISH', 'DB_PUBLISH', 'PROXY_ADDRESSES', 'PROXY_IP_HEADER', 'HMDM_HTTP_PORT', 'DB_HOST_PORT', 'MQTT_HOST_PORT', 'CADDY_HTTP_PORT', 'CADDY_HTTPS_PORT')
 $saved = @{}
+$names += 'HMDM_PROXY'
 foreach ($name in $names) {
     $saved[$name] = [Environment]::GetEnvironmentVariable($name)
     [Environment]::SetEnvironmentVariable($name, $null)
@@ -20,9 +21,14 @@ try {
         [IO.File]::WriteAllText((Join-Path $temp $file), $content)
     }
     foreach ($shell in @('powershell', 'bash')) {
-        foreach ($mode in @('dev', 'prod')) {
+        foreach ($scenario in @('dev', 'prod', 'external')) {
+            $mode = if ($scenario -eq 'external') { 'prod' } else { $scenario }
             foreach ($custom in @($false, $true)) {
                 $envText = "DEPLOY_MODE=$mode`nHMDM_DOMAIN=mdm.example.com`nLETSENCRYPT_EMAIL=test@example.com`nSQL_PASS=test-only`n"
+                if ($scenario -eq 'external') {
+                    $envText = $envText.Replace('LETSENCRYPT_EMAIL=test@example.com', 'LETSENCRYPT_EMAIL=')
+                    $envText += "HMDM_PROXY=external`n"
+                }
                 if ($custom) {
                     $envText += "HMDM_HTTP_PORT=8088`nDB_HOST_PORT=5434`nMQTT_HOST_PORT=31001`nCADDY_HTTP_PORT=8081`nCADDY_HTTPS_PORT=8443`n"
                 }
@@ -47,12 +53,16 @@ try {
                     Assert ($config.services.db.ports[0].published -eq $dbPort) 'Incorrect database port'
                     $mqttPort = if ($custom) { '31001' } else { '31000' }
                     Assert (($config.services.hmdm.ports | Where-Object target -eq 31000).published -eq $mqttPort) 'Incorrect MQTT port'
-                    if ($mode -eq 'prod') {
+                    if ($scenario -eq 'prod') {
                         $httpsPort = if ($custom) { '8443' } else { '443' }
                         Assert (($config.services.caddy.ports | Where-Object target -eq 443).published -eq $httpsPort) 'Incorrect HTTPS port'
                     }
+                    if ($scenario -eq 'external') {
+                        Assert ($null -eq $config.services.caddy) 'External mode must exclude Caddy'
+                        Assert ($config.services.hmdm.environment.PROTOCOL -eq 'https') 'External mode must advertise HTTPS'
+                    }
                 }
-                Write-Host "PASS $shell $mode custom=$custom (including second run)"
+                Write-Host "PASS $shell $scenario custom=$custom (including second run)"
             }
         }
         foreach ($invalid in @('0', '65536', 'abc', '8080:8080')) {
@@ -66,6 +76,15 @@ try {
             Assert (($output -join "`n") -match 'must be a port number') 'Unexpected validation failure'
         }
         Write-Host "PASS $shell invalid ports"
+        [IO.File]::WriteAllText((Join-Path $temp '.env'), "DEPLOY_MODE=prod`nHMDM_DOMAIN=mdm.example.com`nHMDM_PROXY=invalid`n")
+        if ($shell -eq 'bash') {
+            $output = & $bash (Join-Path $temp 'deploy.sh') config --format json 2>&1
+        } else {
+            $output = & $pwsh -NoProfile -File (Join-Path $temp 'deploy.ps1') config --format json 2>&1
+        }
+        Assert ($LASTEXITCODE -ne 0) "$shell accepted invalid proxy"
+        Assert (($output -join "`n") -match 'HMDM_PROXY must be') 'Unexpected proxy validation failure'
+        Write-Host "PASS $shell invalid proxy"
     }
 } finally {
     foreach ($name in $names) { [Environment]::SetEnvironmentVariable($name, $saved[$name]) }
