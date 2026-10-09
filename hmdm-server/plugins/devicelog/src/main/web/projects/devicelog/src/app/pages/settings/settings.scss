@@ -1,0 +1,32 @@
+.card {
+  &-content {
+    display: flex;
+    gap: 16px;
+    margin: 16px auto 0;
+    width: 400px;
+  }
+
+  &-input {
+    flex: 1;
+  }
+}
+
+.rules {
+  margin-top: 16px;
+
+  &-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    gap: 16px;
+  }
+
+  &-content {
+    margin-top: 16px;
+  }
+
+  &-btn {
+    text-wrap: nowrap;
+  }
+}

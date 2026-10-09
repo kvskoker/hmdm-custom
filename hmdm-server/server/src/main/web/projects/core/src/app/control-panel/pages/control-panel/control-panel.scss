@@ -1,0 +1,32 @@
+.cp-page {
+  height: 100%;
+}
+
+.cp-table {
+  margin: 16px 0;
+
+  &-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+  }
+
+  &-title {
+    margin: 0;
+  }
+
+  &-content {
+    padding: 0;
+    overflow: auto;
+  }
+
+  &-actions {
+    margin-left: auto;
+  }
+}
+
+.cp-search {
+  flex: 1;
+}

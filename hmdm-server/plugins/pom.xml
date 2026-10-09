@@ -38,10 +38,9 @@
     </parent>
 
     <modules>
-        <module>platform</module>
-        <module>devicelog</module>
         <module>audit</module>
         <module>deviceinfo</module>
+        <module>devicelog</module>
         <module>messaging</module>
         <module>push</module>
         <module>xtra</module>
@@ -50,12 +49,31 @@
         <module>devicelocation</module>
     </modules>
 
+    <repositories>
+        <repository>
+            <id>prod-public-maven</id>
+            <url>https://prod.h-mdm.com/api/v4/projects/21/packages/maven</url>
+        </repository>
+    </repositories>
+
     <dependencies>
+        <dependency>
+            <groupId>com.hmdm</groupId>
+            <artifactId>jwt</artifactId>
+            <version>0.2.0</version>
+        </dependency>
         <dependency>
             <groupId>com.hmdm</groupId>
             <artifactId>common</artifactId>
             <version>0.1.0</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.hmdm.plugin</groupId>
+            <artifactId>platform</artifactId>
+            <version>0.1.0</version>
+        </dependency>
+
     </dependencies>
 
 </project>

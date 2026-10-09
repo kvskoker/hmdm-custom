@@ -21,38 +21,40 @@
 
 package com.hmdm.rest.resource;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.inject.Named;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.headers.Header;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import jakarta.inject.Named;
 
 import com.hmdm.persistence.CustomerDAO;
 import com.hmdm.persistence.domain.*;
-import com.hmdm.rest.json.Response;
-import com.hmdm.security.SecurityContext;
 import com.hmdm.util.StringUtil;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.ResponseHeader;
-import net.glxn.qrgen.core.image.ImageType;
-import net.glxn.qrgen.javase.QRCode;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.qrcode.QRCodeWriter;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.hmdm.persistence.UnsecureDAO;
 import com.hmdm.util.CryptoUtil;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.StreamingOutput;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.StreamingOutput;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -66,7 +68,7 @@ import java.util.List;
  *
  * @author isv
  */
-@Api(tags = {"QR-code"})
+@Tag(name = "QR-code")
 @Singleton
 @Path("/public/qr")
 public class QRCodeResource {
@@ -108,24 +110,43 @@ public class QRCodeResource {
      * @return a response to client providing the QR code image.
      */
     // =================================================================================================================
-    @ApiOperation(
-            value = "Get a JSON",
-            notes = "Gets the JSON for the specified configuration.",
-            responseHeaders = {@ResponseHeader(name = "Content-Type")}
+    @Operation(
+            summary = "Get an enrollment JSON",
+            description = "Gets an enrollment JSON for the specified configuration."
     )
     @ApiResponses({
-            @ApiResponse(code = 500, message = "Internal server error"),
+            @ApiResponse(
+                    responseCode = "200",
+                    headers = {
+                            @Header(name = "Content-Type")
+                    }
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal server error"
+            )
     })
     @GET
     @Path("/json/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public javax.ws.rs.core.Response generateJSON(@PathParam("id") @ApiParam("Configuration ID") String id,
-                                                    @QueryParam("deviceId") @ApiParam("A device ID") String deviceID,
-                                                    @QueryParam("create") @ApiParam("Create on demand") String createOnDemand,
-                                                    @QueryParam("useId") @ApiParam("Which parameter to use as a device ID") String useId,
-                                                    @QueryParam("group") @ApiParam("Groups to assign when creating a device") List<String> groups,
+    public jakarta.ws.rs.core.Response generateJSON(@PathParam("id")
+                                                    @Parameter(description = "Configuration ID")
+                                                        String id,
+                                                    @QueryParam("deviceId")
+                                                    @Parameter(description = "A device ID")
+                                                        String deviceID,
+                                                    @QueryParam("create")
+                                                    @Parameter(description = "Create on demand")
+                                                        String createOnDemand,
+                                                    @QueryParam("useId")
+                                                    @Parameter(description = "Which parameter to use as a device ID")
+                                                        String useId,
+                                                    @QueryParam("group")
+                                                    @Parameter(description = "Groups to assign when creating a device",
+                                                               array = @ArraySchema(schema = @Schema(type = "string")))
+                                                        List<String> groups,
                                                     @Context HttpServletRequest req) {
-        logger.info("Generating JSON for configuration key: {}", id);
+        logger.debug("Generating JSON for configuration key: {}", id);
         try {
             Configuration configuration = this.unsecureDAO.getConfigurationByQRCodeKey(id);
             if (configuration != null) {
@@ -144,15 +165,15 @@ public class QRCodeResource {
                         useId,
                         req.getContextPath(),
                         miscExtrasEntry);
-                return javax.ws.rs.core.Response.ok(res).build();
+                return jakarta.ws.rs.core.Response.ok(res).build();
             } else {
                 logger.error("Configuration not found for key: {}", id);
-                return javax.ws.rs.core.Response.serverError().build();
+                return jakarta.ws.rs.core.Response.serverError().build();
             }
 
         } catch (Exception e) {
             logger.error("Unexpected error while generating the QR-code image", e);
-            return javax.ws.rs.core.Response.serverError().build();
+            return jakarta.ws.rs.core.Response.serverError().build();
         }
     }
 
@@ -164,25 +185,47 @@ public class QRCodeResource {
      * @return a response to client providing the QR code image.
      */
     // =================================================================================================================
-    @ApiOperation(
-            value = "Get QR-code",
-            notes = "Gets the QR code image for the specified configuration.",
-            responseHeaders = {@ResponseHeader(name = "Content-Type")}
+    @Operation(
+            summary = "Get the enrollment QR code",
+            description = "Gets the enrollment QR code image for the specified configuration."
     )
     @ApiResponses({
-            @ApiResponse(code = 500, message = "Internal server error"),
+            @ApiResponse(
+                    responseCode = "200",
+                    headers = {
+                            @Header(name = "Content-Type")
+                    }
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal server error"
+            )
     })
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    public javax.ws.rs.core.Response generateQRCode(@PathParam("id") @ApiParam("Configuration ID") String id,
-                                                    @QueryParam("size") @ApiParam("A size of the QR-code image") Integer size,
-                                                    @QueryParam("deviceId") @ApiParam("A device ID") String deviceID,
-                                                    @QueryParam("create") @ApiParam("Create on demand") String createOnDemand,
-                                                    @QueryParam("useId") @ApiParam("Which parameter to use as a device ID") String useId,
-                                                    @QueryParam("group") @ApiParam("Groups to assign when creating a device") List<String> groups,
+    public jakarta.ws.rs.core.Response generateQRCode(@PathParam("id")
+                                                    @Parameter(description = "Configuration ID")
+                                                        String id,
+                                                    @QueryParam("size")
+                                                    @Parameter(description = "A size of the QR-code image",
+                                                               schema = @Schema(type = "integer"))
+                                                        Integer size,
+                                                    @QueryParam("deviceId")
+                                                    @Parameter(description = "A device ID")
+                                                        String deviceID,
+                                                    @QueryParam("create")
+                                                    @Parameter(description = "Create on demand")
+                                                        String createOnDemand,
+                                                    @QueryParam("useId")
+                                                    @Parameter(description = "Which parameter to use as a device ID")
+                                                        String useId,
+                                                    @QueryParam("group")
+                                                    @Parameter(description = "Groups to assign when creating a device",
+                                                               array = @ArraySchema(schema = @Schema(type = "string")))
+                                                        List<String> groups,
                                                     @Context HttpServletRequest req) {
-        logger.debug("Generating QR-code image for configuration key: {}", id);
+        logger.info("Generating QR-code image for configuration key: {}", id);
         try {
             Configuration configuration = this.unsecureDAO.getConfigurationByQRCodeKey(id);
             if (configuration != null) {
@@ -267,15 +310,15 @@ public class QRCodeResource {
 
                         logger.debug("The base for QR code generation:\n{}", s);
 
-                        return javax.ws.rs.core.Response.ok( (StreamingOutput) output -> {
+                        return jakarta.ws.rs.core.Response.ok( (StreamingOutput) output -> {
                             int imageSize = 250;
                             if (size != null) {
                                 imageSize = size;
                             }
                             try {
-                                QRCode.from(s).withCharset("UTF-8").to(ImageType.PNG).withSize(imageSize, imageSize).writeTo(output);
+                                writeQrImage(s, imageSize, output);
                                 output.flush();
-                            } catch ( Exception e ) { e.printStackTrace(); }
+                            } catch ( Exception e ) { throw new jakarta.ws.rs.WebApplicationException(e); }
                         } )
                                 .header("Cache-Control", "no-cache")
                                 .header( "Content-Type", "image/png" ).build();
@@ -290,11 +333,11 @@ public class QRCodeResource {
                 logger.info("Configuration not found for QR-code key: {}", id);
             }
 
-            return javax.ws.rs.core.Response.ok().build();
+            return jakarta.ws.rs.core.Response.ok().build();
 
         } catch (Exception e) {
             logger.error("Unexpected error while generating the QR-code image", e);
-            return javax.ws.rs.core.Response.serverError().build();
+            return jakarta.ws.rs.core.Response.serverError().build();
         }
     }
 
@@ -394,6 +437,11 @@ public class QRCodeResource {
                 miscExtras +
                 "}\n";
         return bundle;
+    }
+
+    static void writeQrImage(String payload, int size, java.io.OutputStream output) throws Exception {
+        MatrixToImageWriter.writeToStream(new QRCodeWriter().encode(payload, BarcodeFormat.QR_CODE,
+                size, size, java.util.Map.of(EncodeHintType.CHARACTER_SET, "UTF-8")), "PNG", output);
     }
 
 }

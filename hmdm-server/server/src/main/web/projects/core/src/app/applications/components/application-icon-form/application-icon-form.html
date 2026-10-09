@@ -1,0 +1,28 @@
+<form [formGroup]="formGroup">
+  <hmdm-checkbox
+    formControlName="showIcon"
+    [label]="'form.application.showLabel' | translate"
+  ></hmdm-checkbox>
+
+  @if (isShowIcon()) {
+    <div class="form-icon">
+      <hmdm-text-input
+        formControlName="iconText"
+        [label]="'form.application.iconText' | translate"
+      ></hmdm-text-input>
+
+      <div class="form-line">
+        <hmdm-selector
+          formControlName="iconId"
+          [label]="'form.application.icon' | translate"
+          [options]="iconsOptions()"
+        ></hmdm-selector>
+
+        <button matButton="outlined" (click)="onNewIconClick()">
+          <mat-icon>add</mat-icon>
+          {{ 'form.application.icon.add' | translate }}
+        </button>
+      </div>
+    </div>
+  }
+</form>

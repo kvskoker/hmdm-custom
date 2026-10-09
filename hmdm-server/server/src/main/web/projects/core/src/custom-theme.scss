@@ -1,0 +1,300 @@
+// Include theming for Angular Material with `mat.theme()`.
+// This Sass mixin will define CSS variables that are used for styling Angular Material
+// components according to the Material 3 design spec.
+// Learn more about theming and how to use it for your application's
+// custom components at https://material.angular.dev/guide/theming
+@use '@angular/material' as mat;
+
+$primary: #7a9ab9;
+$accent: #4c788c;
+
+@include mat.form-field-density(-4);
+
+:root {
+  --mat-sys-primary: #7a9ab9;
+  --mat-sidenav-content-background-color: #e9eaf4;
+  --mat-ripple-color: #7a9ab9;
+  --mat-sys-success: #2e7d32;
+  --mat-sys-info: #4c788c;
+  --mat-dialog-container-max-width: 980px;
+}
+
+.mat-mdc-snack-bar-label.mdc-snackbar__label {
+  padding: 0;
+}
+
+html {
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$azure-palette,
+        tertiary: mat.$blue-palette,
+      ),
+      typography: Roboto,
+      density: 0,
+    )
+  );
+
+  @include mat.sidenav-overrides(
+    (
+      container-background-color: '#353a40',
+      container-text-color: var(--mat-sys-on-primary),
+      container-shape: 0px,
+      container-width: 280px,
+    )
+  );
+
+  @include mat.tree-overrides(
+    (
+      container-background-color: '#353a40',
+      node-text-color: var(--mat-sys-on-primary),
+      node-text-size: '1rem',
+    )
+  );
+
+  @include mat.table-overrides(
+    (
+      background-color: transparent,
+      header-headline-color: white,
+    )
+  );
+
+  @include mat.card-overrides(
+    (
+      elevated-container-color: #f6f8fc,
+    )
+  );
+
+  @include mat.toolbar-overrides(
+    (
+      container-background-color: var(--mat-sys-primary),
+      container-text-color: white,
+    )
+  );
+
+  @include mat.form-field-overrides(
+    (
+      outlined-hover-outline-color: $accent,
+    )
+  );
+
+  @include mat.menu-overrides(
+    (
+      container-shape: 8px,
+      item-hover-state-layer-color: #7a9ab9,
+      item-focus-state-layer-color: #7a9ab9,
+    )
+  );
+
+  @include mat.tabs-overrides(
+    (
+      background-color: rgb(246, 248, 252),
+    )
+  );
+}
+
+.table-action-cells {
+  width: 100%;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: nowrap;
+
+  @include mat.icon-button-overrides(
+    (
+      icon-color: var(--mat-sys-on-primary),
+      disabled-icon-color: var(--mat-sys-outline),
+    )
+  );
+}
+
+$danger: #d32f2f;
+$info: #9167a1;
+$success: #2e7d32;
+
+.mat-mdc-tab-group {
+  background-color: #f6f8fc;
+  border-radius: 10px;
+}
+
+.mat-mdc-tab-body {
+  padding: 16px;
+}
+
+.mdc-button {
+  &.cdk-focused:not(:hover) {
+    .mdc-button__ripple {
+      display: none;
+    }
+  }
+
+  @include mat.button-overrides(
+    (
+      text-container-shape: 8px,
+      filled-container-shape: 8px,
+      outlined-container-shape: 8px,
+    )
+  );
+
+  &.primary {
+    @include mat.button-overrides(
+      (
+        text-container-shape: 8px,
+
+        filled-container-shape: 8px,
+
+        protected-container-color: var(--mat-sys-on-primary),
+        protected-label-text-color: var(--mat-sys-primary),
+        outlined-outline-color: $primary,
+      )
+    );
+  }
+
+  &.info {
+    @include mat.button-overrides(
+      (
+        filled-container-shape: 8px,
+        filled-container-color: $accent,
+
+        outlined-container-shape: 8px,
+        outlined-outline-color: $accent,
+        outlined-label-text-color: $accent,
+      )
+    );
+  }
+
+  &.danger {
+    @include mat.button-overrides(
+      (
+        filled-container-shape: 8px,
+        filled-container-color: $danger,
+
+        outlined-container-shape: 8px,
+        outlined-outline-color: $danger,
+        outlined-label-text-color: $danger,
+      )
+    );
+  }
+}
+
+.cdk-no-data-row {
+  min-height: 300px;
+}
+
+.mat-mdc-table {
+  .mat-mdc-header-cell {
+    padding: 0 8px;
+  }
+
+  .mat-mdc-table-sticky-border-elem-right {
+    box-shadow: -2px 0 6px rgba(0, 0, 0, 0.336);
+  }
+
+  .mat-mdc-header-row {
+    background-color: var(--mat-sys-primary);
+
+    .mdc-checkbox__background {
+      background-color: white;
+    }
+
+    .mdc-checkbox:hover > .mdc-checkbox__native-control:not(:checked) ~ .mdc-checkbox__background,
+    .mdc-checkbox:hover
+      > .mdc-checkbox__native-control:not(:indeterminate)
+      ~ .mdc-checkbox__background {
+      background-color: white;
+    }
+
+    --mat-checkbox-unselected-icon-color: white;
+
+    @include mat.checkbox-overrides(
+      (
+        selected-icon-color: white,
+        selected-focus-icon-color: white,
+        selected-hover-icon-color: white,
+        selected-checkmark-color: var(--mat-sys-primary),
+        unselected-focus-icon-color: white,
+        unselected-hover-icon-color: white,
+        unselected-hover-state-layer-color: white,
+      )
+    );
+  }
+}
+
+.mat-mdc-paginator-container {
+  justify-content: flex-start !important;
+}
+
+div.mat-mdc-menu-content {
+  padding: 0;
+}
+
+div.mat-mdc-autocomplete-panel.mdc-menu-surface,
+div.mat-mdc-select-panel.mdc-menu-surface {
+  padding: 0;
+  border-radius: 8px;
+}
+
+button.mat-mdc-menu-item {
+  transition: all 0.3s;
+
+  &:hover {
+    color: var(--mat-sys-on-primary);
+
+    @include mat.icon-overrides(
+      (
+        color: var(--mat-sys-on-primary),
+      )
+    );
+  }
+}
+
+.mat-mdc-form-field-subscript-wrapper {
+  display: none;
+}
+
+td.mat-mdc-cell {
+  background-color: var(--mat-card-elevated-container-color);
+}
+
+td.mat-mdc-table-sticky {
+  background-color: var(--mat-sys-primary);
+}
+
+svg.mdc-checkbox__checkmark {
+  padding: 1px;
+}
+
+mat-card {
+  padding: 16px;
+}
+
+mat-card-title {
+  margin-bottom: 16px;
+}
+
+body {
+  // Default the application to a light color theme. This can be changed to
+  // `dark` to enable the dark color theme, or to `light dark` to defer to the
+  // user's system settings.
+  color-scheme: light;
+
+  // Set a default background, font and text colors for the application using
+  // Angular Material's system-level CSS variables. Learn more about these
+  // variables at https://material.angular.dev/guide/system-variables
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+
+  // Reset the user agent margin.
+  margin: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+}

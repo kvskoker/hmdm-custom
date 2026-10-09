@@ -1,0 +1,15 @@
+<hmdm-dialog-template title="{{ data?.title ?? '' | translate }}">
+  <p class="dialog-message" translate [translateParams]="data?.params ?? {}">
+    {{ data?.message ?? '' }}
+  </p>
+
+  <div class="dialog-actions" dialog-actions>
+    <button matButton class="dialog-btn primary" (click)="onCancel()">
+      {{ data?.cancelButtonText ?? 'button.cancel' | translate }}
+    </button>
+
+    <button matButton="filled" class="dialog-btn primary" (click)="onSave()">
+      {{ data?.confirmButtonText ?? 'button.ok' | translate }}
+    </button>
+  </div>
+</hmdm-dialog-template>

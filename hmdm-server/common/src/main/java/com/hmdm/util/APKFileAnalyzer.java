@@ -23,6 +23,7 @@ package com.hmdm.util;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import jakarta.inject.Named;
 import com.hmdm.persistence.ApplicationDAO;
 import com.hmdm.persistence.domain.Application;
 import com.hmdm.rest.json.APKFileDetails;
@@ -32,7 +33,6 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Named;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;

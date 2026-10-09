@@ -1,0 +1,15 @@
+{
+  "xtra.plugin.title": "Mais funcionalidades no Headwind MDM Enterprise!",
+  "xtra.plugin.content.description": "Atualizar a sua instância para uma versão de teste é muito fácil e absolutely GRATUITO!",
+  "xtra.plugin.content.button": "OBTER UM TESTE GRATUITO",
+  "xtra.plugin.kiosk-mode": "Modo quiosque (tarefa única)",
+  "xtra.plugin.device-location-tracking": "Rastreamento de localização do dispositivo",
+  "xtra.plugin.remote-management": "Reenício, bloqueio e reposição de fábrica remotos",
+  "xtra.plugin.upload-photos": "Carregar fotos a partir dos dispositivos",
+  "xtra.plugin.remote-control": "Controlo remoto",
+  "xtra.plugin.traffic-filtering": "Filtragem de tráfego de rede",
+  "xtra.plugin.two-factor-authentication": "Autenticação de dois fatores",
+  "xtra.plugin.export-import-devices": "Exportar e importar dispositivos",
+  "xtra.plugin.device-contacts-management": "Gestão de contactos do dispositivo",
+  "xtra.plugin.white-label": "Software white-label (rebranding)"
+}

@@ -2,9 +2,7 @@ package com.hmdm.rest.json.view.user;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.hmdm.persistence.domain.User;
-import com.hmdm.persistence.domain.UserRole;
 import com.hmdm.rest.json.LookupItem;
-import io.swagger.annotations.ApiModelProperty;
 
 import java.util.List;
 
@@ -81,4 +79,5 @@ public class UserView {
     public Integer getIdleLogout() {
         return user.getIdleLogout();
     }
+    public Integer getAlertLevel() { return user.getAlertLevel(); }
 }

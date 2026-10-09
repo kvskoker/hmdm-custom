@@ -1,0 +1,15 @@
+<hmdm-dialog-template>
+  <form [formGroup]="formGroup">
+    <hmdm-selector
+      formControlName="configurationId"
+      label="{{ 'form.configuration.title' | translate }}"
+      [options]="configurationOptions()"
+    ></hmdm-selector>
+  </form>
+
+  <hmdm-dialog-common-buttons
+    dialog-actions
+    (cancel)="onCancel()"
+    (save)="onSave()"
+  ></hmdm-dialog-common-buttons>
+</hmdm-dialog-template>

@@ -1,0 +1,110 @@
+@use 'custom-theme.scss';
+
+html {
+  box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+body {
+  height: calc(100vh - 64px);
+
+  &.global-loading {
+    pointer-events: none;
+  }
+}
+
+core-root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+  font-weight: 400;
+}
+
+fieldset {
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+// Loader directive styles
+.hmdm-loader-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 1000;
+}
+
+.scroll-wrap {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+}
+
+.scroll-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.scroll-table {
+  display: contents !important;
+}
+
+.scroll-scrollable {
+  overflow: auto;
+}
+
+// Global scrollbar styles for all browsers
+
+// Webkit browsers (Chrome, Safari, Edge)
+// * prefix ensures the rules apply to all scrollable overflow containers,
+// not just the viewport scrollbar
+*::-webkit-scrollbar {
+  width: 12px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 6px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 6px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+// Firefox
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #888 #f1f1f1;
+}
+
+// Allow newlines in Material tooltips
+.mat-mdc-tooltip .mdc-tooltip__surface {
+  white-space: pre-line;
+}

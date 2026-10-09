@@ -26,7 +26,30 @@ secure.enrollment=0
 
 # A hash secret used for validating the device IDs provided by requests
 # from devices
-hash.secret=changeme-C3z9vi54
+hash.secret=LXVoaKBbxZ
+
+# If set to 1, Strict-Transport-Security (HSTS) is turned on
+strict.transport.security=0
+
+# If set to 1, the device will not be enrolled if a device with the same number
+# was already enrolled. To enroll a device, delete it from the list and add back
+prevent.duplicate.enrollment=0
+
+# If set to 1, the password will be transmitted to the server using RSA encryption.
+# The clean-text password can be used to delegate the authorization to third party 
+# authorization services like LDAP. 
+# If set to 0 (default), just a MD5 hash will be sent to the server -->
+# Important! This shouldn't be set for "Local" authentication!
+transmit.password=0
+
+# Authentification class (available options: Local, default: Local)
+auth.class=Local
+
+# Session storage class (available options: Native, Db, default: Native)
+# Native is a Tomcat native session storage, which might be faster but won't work in plugins
+# delivered as WAR files. If third party plugins are used, set this parameter to Db
+# (Notice: letter case matters!
+session.class=Native
 
 # An ID of a record in userroles DB table representing an ORG_ADMIN role
 # Do not change this!
@@ -44,8 +67,14 @@ aapt.command=aapt
 # An URL for the file with configuration for loggers
 log4j.config=file:///log4j-hmdm.xml
 
+# The parameters specific to Photo plugin
+plugin.photo.enable.places=true
+
 # The parameters specific to Device Log plugin
 plugin.devicelog.persistence.config.class=com.hmdm.plugins.devicelog.persistence.postgres.DeviceLogPostgresPersistenceConfiguration
+
+# Display X-Forwarded-For instead of source IP
+plugin.audit.display.forwarded.ip=true
 
 # MQTT notification server local URI
 mqtt.server.uri=localhost:31000
@@ -59,6 +88,16 @@ mqtt.message.delay=1000
 # Fast device search by last characters, here's the length
 device.fast.search.chars=5
 
+# rebranding parameters
+rebranding.name=My MDM
+rebranding.vendor.name=My Company
+rebranding.vendor.link=https://mycompany.com
+# rebranding logo must be a 100x100 PNG file
+rebranding.logo=/home/launcher/logo.png
+rebranding.mobile.name=My MDM
+rebranding.signup.link=https://mycompany.com/signup/
+rebranding.terms.link=https://mycompany.com/terms/
+
 smtp.host=smtp.mailgun.org
 smtp.port=25
 smtp.ssl=0
@@ -71,3 +110,55 @@ smtp.from=noreply@example.com
 jwt.secretkey=20c68f0d9185b1d18cf6add1e8b491fd89529a44
 jwt.validity=86400
 jwt.validityrememberme=2592000
+
+# Script for the new database initialization at first start
+sql.init.script.path=C:/temp/hmdm/sql/hmdm_init.en.sql
+
+proxy.addresses=192.168.1.101
+proxy.ip.header=X-Forwarded-For
+
+# These are the customer email templates
+# Email paths may contain _LANGUAGE_ replaced to a two-letter language
+# The default language is en
+email.recovery.subj=C:/temp/hmdm/emails/_LANGUAGE_/recovery_subj.txt
+email.recovery.body=C:/temp/hmdm/emails/_LANGUAGE_/recovery_body.txt
+email.signup.subj=C:/temp/hmdm/emails/_LANGUAGE_/signup_subj.txt
+email.signup.body=C:/temp/hmdm/emails/_LANGUAGE_/signup_body.txt
+email.signup.complete.subj=C:/temp/hmdm/emails/_LANGUAGE_/signup_complete_subj.txt
+email.signup.complete.body=C:/temp/hmdm/emails/_LANGUAGE_/signup_complete_body.txt
+
+# Bind as admin to query for the user. This may be set to 0 if a user's CN is used to authenticate
+ldap.admin.bind=1
+ldap.host=hmdmtest.local
+ldap.port=389
+ldap.base.dn=DC=hmdmtest,DC=local
+# Should be used when ldap.admin.bind is set to 1
+ldap.admin.dn=CN=Administrator,CN=Users,DC=hmdmtest,DC=local
+ldap.admin.password=ChangeMe
+# For example, cn or sAMAccountName
+ldap.username.attribute=sAMAccountName
+# Should be used when ldap.admin.bind is set to 0. ${username} must present in this template
+# Example: CN=${username},CN=Users,DC=hmdmtest,DC=local
+ldap.user.dn=CN=${username},CN=Users,DC=hmdmtest,DC=local
+# User role is determined by the memberOf attribute. The group DN must start with CN=HMDM-...,
+# for example, CN=HMDM-Admin (the string after HMDM- should be a valid group name, cyrillic is allowed).
+# If no user role found, the default role is assigned (ldap.default.role contains the role name)
+ldap.default.role=User
+# In a multi-tenant setup, you may assign LDAP to another customer (the default customer ID is 1)
+ldap.customer.id=1
+
+# IP filters for devices and web panel UI users
+#device.allowed.address=192.168.0.0/16,127.0.0.1
+#ui.allowed.address=192.168.0.0/16,213.33.21.0/24,127.0.0.1
+
+# If the URL of an APK starts with this URL, the existing APK hash is not changed
+# This is important for deployment on the LAN
+apk.trusted.url=https://h-mdm.com
+
+# URL for internal API calls
+# Defaults to 127.0.0.1:8080 and the default filter is 127.0.0.1
+internal.url=http://127.0.0.1:8080
+internal.source.ip=127.0.0.1
+
+# Purchase link displayed in the main application when a license is expiring
+plugin.license.purchase.link=https://h-mdm.com/contact-us/

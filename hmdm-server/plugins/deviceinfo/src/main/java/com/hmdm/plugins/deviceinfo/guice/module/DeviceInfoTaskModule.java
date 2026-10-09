@@ -24,6 +24,9 @@ package com.hmdm.plugins.deviceinfo.guice.module;
 import com.google.inject.Inject;
 import com.hmdm.event.EventService;
 import com.hmdm.plugin.PluginTaskModule;
+import com.hmdm.plugin.persistence.PluginDAO;
+import com.hmdm.plugin.service.PluginVersionService;
+import com.hmdm.plugins.deviceinfo.DeviceInfoPluginConfigurationImpl;
 import com.hmdm.plugins.deviceinfo.persistence.CustomerCreatedEventListener;
 import com.hmdm.plugins.deviceinfo.persistence.DeviceInfoDAO;
 import com.hmdm.plugins.deviceinfo.persistence.DeviceInfoSettingsDAO;
@@ -47,11 +50,20 @@ public class DeviceInfoTaskModule implements PluginTaskModule {
      */
     private final DeviceInfoDAO deviceInfoDAO;
 
+    /**
+     * <p>An interface to plugin persistence layer.</p>
+     */
+    private final PluginDAO pluginDAO;
+
     private final DeviceInfoSettingsDAO settingsDAO;
     /**
      * <p>A runner for the repeatable tasks.</p>
      */
     private final BackgroundTaskRunnerService taskRunner;
+
+    private String getPluginId() {
+        return DeviceInfoPluginConfigurationImpl.PLUGIN_ID;
+    }
 
     /**
      * <p>Constructs new <code>DeviceInfoTaskModule</code> instance. This implementation does nothing.</p>
@@ -59,10 +71,12 @@ public class DeviceInfoTaskModule implements PluginTaskModule {
     @Inject
     public DeviceInfoTaskModule(EventService eventService,
                                 DeviceInfoDAO deviceInfoDAO,
+                                PluginDAO pluginDAO,
                                 DeviceInfoSettingsDAO settingsDAO,
                                 BackgroundTaskRunnerService taskRunner) {
         this.eventService = eventService;
         this.deviceInfoDAO = deviceInfoDAO;
+        this.pluginDAO = pluginDAO;
         this.settingsDAO = settingsDAO;
         this.taskRunner = taskRunner;
     }
@@ -73,6 +87,8 @@ public class DeviceInfoTaskModule implements PluginTaskModule {
      */
     @Override
     public void init() {
+        pluginDAO.updatePluginVersion(getPluginId(), PluginVersionService.getVersion(this.getClass(), getPluginId()));
+
         taskRunner.submitRepeatableTask(deviceInfoDAO::purgeDeviceInfoRecords, 1, 24, TimeUnit.HOURS);
 
         this.eventService.addEventListener(new CustomerCreatedEventListener(this.settingsDAO));

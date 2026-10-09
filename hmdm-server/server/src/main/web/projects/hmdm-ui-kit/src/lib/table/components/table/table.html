@@ -1,0 +1,84 @@
+@if (data().length > 0) {
+  <div class="table-wrapper">
+    @if (config().paginator) {
+      <mat-paginator
+        [length]="totalItems()"
+        [pageSizeOptions]="config().paginator?.pageSizeOptions || defaultPageSizeOptions"
+        [pageSize]="currentPageSize()"
+        [pageIndex]="currentPageIndex()"
+        [hidePageSize]="config().paginator?.hidePageSize"
+        (page)="onPageChange($event)"
+      >
+      </mat-paginator>
+    }
+
+    <div class="table-container">
+      <table mat-table [dataSource]="sortedData()" [trackBy]="trackByFn" class="table">
+        <ng-container matColumnDef="select">
+          <th mat-header-cell *matHeaderCellDef>
+            <mat-checkbox
+              (change)="$event ? toggleAllRows() : null"
+              [checked]="selection.hasValue() && isAllSelected()"
+              [indeterminate]="selection.hasValue() && !isAllSelected()"
+            >
+            </mat-checkbox>
+          </th>
+          <td mat-cell *matCellDef="let row">
+            <mat-checkbox
+              (click)="$event.stopPropagation()"
+              (change)="$event ? selection.toggle(row) : null"
+              [checked]="selection.isSelected(row)"
+            >
+            </mat-checkbox>
+          </td>
+        </ng-container>
+
+        <!-- Dynamic Columns -->
+        @for (column of config().columns; track $index) {
+          <ng-container
+            [matColumnDef]="getColumnDef(column)"
+            [sticky]="column.sticky"
+            [stickyEnd]="column.stickyEnd"
+          >
+            <th mat-header-cell *matHeaderCellDef class="table-header" [style.width]="column.width">
+              <div class="table-header-inner">
+                <div class="table-header-title">
+                  {{ column.title | translate }}
+                </div>
+
+                @if (column.sortable) {
+                  <button mat-icon-button class="table-sort" (click)="onChangeSort(column)">
+                    <mat-icon class="table-header-icon">
+                      {{ getSortIcon(getColumnDef(column)) }}
+                    </mat-icon>
+                  </button>
+                }
+              </div>
+            </th>
+
+            <td mat-cell *matCellDef="let element; let i = index" [style.width]="column.width">
+              <!-- Custom Cell Renderer -->
+              @if (column.cellRenderer) {
+                <ng-container
+                  *ngComponentOutlet="
+                    column.cellRenderer;
+                    inputs: getCellRendererInputs(element, column, i)
+                  "
+                ></ng-container>
+              } @else {
+                {{ getFieldValue(element, column.field) }}
+              }
+            </td>
+          </ng-container>
+        }
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
+    </div>
+  </div>
+} @else {
+  <div class="table-empty">
+    <p>{{ 'table.empty' | translate }}</p>
+  </div>
+}

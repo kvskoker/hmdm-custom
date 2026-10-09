@@ -162,4 +162,23 @@ public class CryptoUtil {
 
         return sb.toString();
     }
+
+
+    public static String randomString(int length) {
+        StringBuilder sb = new StringBuilder();
+        Random random = new Random();
+
+        for (int i = 0; i < length; i++) {
+            int r = random.nextInt(62);
+            if (r < 26) {
+                sb.append((char)('a' + r));
+            } else if (r < 52) {
+                sb.append((char)('A' + (r - 26)));
+            } else {
+                sb.append((char)('0' + (r - 52)));
+            }
+        }
+
+        return sb.toString();
+    }
 }

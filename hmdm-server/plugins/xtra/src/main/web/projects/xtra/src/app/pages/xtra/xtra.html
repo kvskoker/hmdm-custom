@@ -1,0 +1,27 @@
+<mat-card>
+  <mat-card-header>
+    <h3 class="title">{{'xtra.plugin.title' | translate}}</h3>
+  </mat-card-header>
+
+  <mat-divider></mat-divider>
+
+  <mat-card-content>
+    <mat-list>
+      @for (plugin of PLUGIN_TRANSLATION_KEYS; track $index) {
+        <mat-list-item>
+          <mat-icon matListItemIcon>circle</mat-icon>
+          <span>{{plugin | translate}}</span>
+        </mat-list-item>
+      }
+    </mat-list>
+
+    <span class="description">{{'xtra.plugin.content.description' | translate}}</span>
+
+    <a
+      target="_blank"
+      href="https://h-mdm.com/contact-us/#trial7"
+      matButton="filled"
+      class="button"
+    >{{'xtra.plugin.content.button' | translate}}</a>
+  </mat-card-content>
+</mat-card>

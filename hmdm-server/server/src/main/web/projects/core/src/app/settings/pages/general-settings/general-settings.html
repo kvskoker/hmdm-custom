@@ -1,0 +1,113 @@
+<div class="settings">
+  <mat-card>
+    <mat-card-title class="settings-header">
+      <h3>{{ 'tab.language' | translate }}</h3>
+
+      <button matButton="filled" class="primary" (click)="onSave()">
+        <mat-icon>check</mat-icon>
+        {{ 'button.save' | translate }}
+      </button>
+    </mat-card-title>
+  </mat-card>
+
+  <form class="settings-form" [formGroup]="formGroup">
+    <mat-card>
+      <mat-card-title class="settings-title">{{
+        'form.settings.lang.title' | translate
+      }}</mat-card-title>
+
+      <mat-divider></mat-divider>
+
+      <mat-card-content class="settings-content">
+        <div class="settings-line">
+          <hmdm-checkbox
+            formControlName="useDefaultLanguage"
+            [label]="'form.settings.lang.use.default' | translate"
+          ></hmdm-checkbox>
+
+          @if (!formGroupValue.useDefaultLanguage) {
+            <hmdm-selector
+              formControlName="language"
+              [label]="'form.settings.lang.use' | translate"
+              [options]="languageOptions"
+            ></hmdm-selector>
+          }
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card>
+      <mat-card-title class="settings-title">{{
+        'form.settings.misc.title' | translate
+      }}</mat-card-title>
+
+      <mat-divider></mat-divider>
+
+      <mat-card-content class="settings-content">
+        <hmdm-text-input
+          formControlName="phoneNumberFormat"
+          [label]="'form.settings.misc.phone.format' | translate"
+        ></hmdm-text-input>
+
+        @for (item of [1, 2, 3]; track $index) {
+          <div class="settings-property">
+            <hmdm-text-input
+              [formControlName]="'customPropertyName' + item"
+              [label]="`form.settings.misc.custom.property.name.${item}` | translate"
+            ></hmdm-text-input>
+
+            <hmdm-checkbox
+              [formControlName]="'customMultiline' + item"
+              [label]="'form.settings.misc.custom.property.multiline' | translate"
+            ></hmdm-checkbox>
+
+            <hmdm-checkbox
+              [formControlName]="'customSend' + item"
+              [label]="'form.settings.misc.custom.property.send' | translate"
+            ></hmdm-checkbox>
+          </div>
+        }
+
+        <hmdm-checkbox
+          formControlName="sendDescription"
+          [label]="'form.settings.misc.send.description' | translate"
+        ></hmdm-checkbox>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card>
+      <mat-card-title class="settings-title">{{
+        'form.settings.security.title' | translate
+      }}</mat-card-title>
+
+      <mat-divider></mat-divider>
+
+      <mat-card-content class="settings-content">
+        <div class="settings-double">
+          <hmdm-text-input
+            inputType="number"
+            formControlName="passwordLength"
+            [label]="'form.settings.misc.password.length' | translate"
+          ></hmdm-text-input>
+
+          <hmdm-selector
+            formControlName="passwordStrength"
+            [label]="'form.settings.misc.password.strength' | translate"
+            [options]="passwordStrengthOptions"
+          ></hmdm-selector>
+
+          <hmdm-checkbox
+            formControlName="passwordReset"
+            [label]="'form.settings.misc.password.reset' | translate"
+          ></hmdm-checkbox>
+
+          <hmdm-selector
+            formControlName="idleLogout"
+            [label]="'form.settings.misc.idle.logout' | translate"
+            [options]="logoutOptions"
+          ></hmdm-selector>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </form>
+</div>

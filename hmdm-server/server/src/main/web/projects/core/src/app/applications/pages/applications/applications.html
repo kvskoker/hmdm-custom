@@ -1,0 +1,35 @@
+<div class="applications">
+  <mat-card class="card scroll-wrap" [hmdmLoader]="isLoadingApplications()">
+    <mat-card-title class="card-title">
+      <h3>{{ 'breadcrumb.applications' | translate }}</h3>
+
+      <hmdm-search-container
+        persistKey="applications-search-control"
+        [searchControl]="tableSearchControl"
+        [filtersTemplate]="filtersTemplate"
+        [activeFiltersCount]="activeFiltersCount()"
+        [showSearchButton]="false"
+      ></hmdm-search-container>
+
+      <ng-template #filtersTemplate>
+        <core-applications-search-form [formGroup]="formGroup"></core-applications-search-form>
+      </ng-template>
+
+      <button
+        matButton="filled"
+        class="card-btn primary"
+        *hmdmHasPermission="'edit_applications'"
+        (click)="onAddApplicationClick()"
+      >
+        <mat-icon>add</mat-icon>
+        {{ 'button.add' | translate }}
+      </button>
+    </mat-card-title>
+
+    <mat-divider></mat-divider>
+
+    <mat-card-content class="card-content">
+      <core-applications-table></core-applications-table>
+    </mat-card-content>
+  </mat-card>
+</div>

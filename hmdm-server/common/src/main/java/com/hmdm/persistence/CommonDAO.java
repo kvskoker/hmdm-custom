@@ -69,6 +69,11 @@ public class CommonDAO extends AbstractDAO<Settings> {
         }
     }
 
+    public void loadTotalDeviceCount(Settings settings) {
+        Long deviceCount = deviceMapper.countTotalDevices();
+        settings.setDeviceCount(deviceCount.intValue());
+    }
+
     public void saveDefaultDesignSettings(Settings settings) {
         insertRecord(settings, this.mapper::saveDefaultDesignSettings);
     }

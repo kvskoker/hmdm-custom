@@ -1,0 +1,9 @@
+<hmdm-dialog-template>
+  <core-role-form [formGroup]="formGroup"></core-role-form>
+
+  <hmdm-dialog-common-buttons
+    (save)="onSave()"
+    (cancel)="onCancel()"
+    [isSaveDisabled]="formGroup.invalid"
+  ></hmdm-dialog-common-buttons>
+</hmdm-dialog-template>

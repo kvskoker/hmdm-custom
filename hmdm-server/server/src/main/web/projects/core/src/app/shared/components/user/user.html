@@ -1,0 +1,44 @@
+<div class="user">
+  <mat-icon>account_circle</mat-icon>
+  <span class="user-name">{{ currentUser()?.name }}</span>
+
+  <button matIconButton [matMenuTriggerFor]="menu">
+    <mat-icon>more_vert</mat-icon>
+  </button>
+
+  <mat-menu #menu="matMenu">
+    <button mat-menu-item (click)="onAboutClick()">
+      <mat-icon>info</mat-icon>
+      <span>{{ 'menu.about' | translate }}</span>
+    </button>
+
+    <button mat-menu-item (click)="onProfileClick()">
+      <mat-icon>person</mat-icon>
+      <span>{{ 'menu.profile' | translate }}</span>
+    </button>
+
+    @if (isSuperAdmin()) {
+      <button mat-menu-item (click)="onControlPanelClick()">
+        <mat-icon>admin_panel_settings</mat-icon>
+        <span>{{ (isOnControlPanel() ? 'menu.panel.main' : 'menu.panel.master') | translate }}</span>
+      </button>
+    }
+
+    @if (isSuperAdminOrAdmin()) {
+      <button mat-menu-item (click)="onLicensesClick()">
+        <mat-icon>description</mat-icon>
+        <span>{{ 'menu.licenses' | translate }}</span>
+      </button>
+
+      <button mat-menu-item (click)="onUpdatesClick()">
+        <mat-icon>update</mat-icon>
+        <span>{{ 'menu.updates' | translate }}</span>
+      </button>
+    }
+
+    <button mat-menu-item (click)="onLogOut()">
+      <mat-icon>logout</mat-icon>
+      <span>{{ 'menu.logout' | translate }}</span>
+    </button>
+  </mat-menu>
+</div>

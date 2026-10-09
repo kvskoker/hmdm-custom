@@ -22,8 +22,12 @@
 package com.hmdm.plugins.deviceinfo.guice.module;
 
 import com.google.inject.servlet.ServletModule;
+import com.hmdm.plugin.guice.module.AbstractPluginRestModule;
 import com.hmdm.plugin.rest.PluginAccessFilter;
+import com.hmdm.plugins.deviceinfo.DeviceInfoPluginConfigurationImpl;
+import com.hmdm.plugins.deviceinfo.rest.DeviceInfoLicenseResource;
 import com.hmdm.plugins.deviceinfo.rest.DeviceInfoPluginSettingsResource;
+import com.hmdm.plugins.deviceinfo.rest.DeviceInfoPublicResource;
 import com.hmdm.plugins.deviceinfo.rest.DeviceInfoResource;
 import com.hmdm.rest.filter.AuthFilter;
 import com.hmdm.rest.filter.PrivateIPFilter;
@@ -38,22 +42,33 @@ import java.util.List;
  *
  * @author isv
  */
-public class DeviceInfoRestModule extends ServletModule {
+public class DeviceInfoRestModule extends AbstractPluginRestModule {
 
     /**
      * <p>A list of patterns for URIs for plugin resources which prohibit anonymous access.</p>
      */
-    private static final List<String> protectedResources = Arrays.asList(
-            "/rest/plugins/deviceinfo/deviceinfo-plugin-settings/private",
-            "/rest/plugins/deviceinfo/deviceinfo/private/*"
-    );
+    @Override
+    protected List<String> getProtectedResources() {
+        return Arrays.asList(
+                "/rest/private/plugin-deviceinfo/*"
+        );
+    }
 
     /**
      * <p> A list of patterns for URIs for plugin resources available to devices</p>
      */
-    private static final List<String> publicResources = Arrays.asList(
-            "/rest/plugins/deviceinfo/deviceinfo/public/*"
-    );
+    @Override
+    protected List<String> getPublicResources() {
+        return Arrays.asList(
+                "/rest/plugins/deviceinfo/deviceinfo/public/*", // For backward compatibility
+                "/rest/public/plugin-deviceinfo/*"
+        );
+    }
+
+    @Override
+    protected String getPluginId() {
+        return DeviceInfoPluginConfigurationImpl.PLUGIN_ID;
+    }
 
     /**
      * <p>Constructs new <code>DeviceInfoRestModule</code> instance. This implementation does nothing.</p>
@@ -65,12 +80,10 @@ public class DeviceInfoRestModule extends ServletModule {
      * <p>Configures the <code>Device Info Plugin</code> REST resources.</p>
      */
     protected void configureServlets() {
-        this.filter(protectedResources).through(JWTFilter.class);
-        this.filter(protectedResources).through(AuthFilter.class);
-        this.filter(protectedResources).through(PluginAccessFilter.class);
-        this.filter(protectedResources).through(PrivateIPFilter.class);
-        this.filter(publicResources).through(PublicIPFilter.class);
+        super.configureServlets();
         this.bind(DeviceInfoPluginSettingsResource.class);
         this.bind(DeviceInfoResource.class);
+        this.bind(DeviceInfoPublicResource.class);
+        this.bind(DeviceInfoLicenseResource.class);
     }
 }

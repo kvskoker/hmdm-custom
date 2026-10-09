@@ -1,0 +1,15 @@
+<mat-toolbar class="cp-header">
+  <button matIconButton (click)="onBack()">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+
+  <span class="cp-title">{{ 'menu.panel.main' | translate }}</span>
+
+  <div class="cp-header-right">
+    <core-user></core-user>
+  </div>
+</mat-toolbar>
+
+<div class="cp-content">
+  <router-outlet></router-outlet>
+</div>

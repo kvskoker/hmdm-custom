@@ -1,0 +1,5 @@
+<div class="cell">
+  @if (params().value && params().data.status !== 'valid') {
+    <a matButton [href]="params().value" target="_blank">{{'button.renew.code' | translate}}</a>
+  }
+</div>

@@ -1,0 +1,29 @@
+<div class="cell">
+  <div class="cell-action" [matTooltip]="copyTooltip()" [matTooltipShowDelay]="500">
+    <button mat-icon-button (click)="onCopyClick()">
+      <mat-icon>content_copy</mat-icon>
+    </button>
+  </div>
+
+  <button *hmdmHasPermission="'edit_files'" mat-icon-button (click)="onConfigClick()">
+    <mat-icon>list</mat-icon>
+  </button>
+
+  <button
+    *hmdmHasPermission="'edit_files'"
+    mat-icon-button
+    (click)="onEditClick()"
+    [disabled]="isEditDisabled()"
+  >
+    <mat-icon>edit</mat-icon>
+  </button>
+
+  <button
+    *hmdmHasPermission="'edit_files'"
+    mat-icon-button
+    (click)="onDeleteClick()"
+    [disabled]="isDeleteDisabled()"
+  >
+    <mat-icon>delete</mat-icon>
+  </button>
+</div>

@@ -1,0 +1,60 @@
+<form class="device-form" [formGroup]="formGroup">
+  <hmdm-text-input
+    label="{{ 'table.heading.device.device.number' | translate }}"
+    formControlName="number"
+  ></hmdm-text-input>
+
+  <hmdm-textarea-input
+    label="{{ 'table.heading.device.desc' | translate }}"
+    formControlName="description"
+  ></hmdm-textarea-input>
+
+  <hmdm-selector
+    label="{{ 'table.heading.device.group' | translate }}"
+    [optional]="true"
+    [multi]="true"
+    [options]="groupOptions()"
+  ></hmdm-selector>
+
+  <hmdm-selector
+    label="{{ 'table.heading.device.configuration' | translate }}"
+    formControlName="configurationId"
+    [options]="configurationOptions()"
+  ></hmdm-selector>
+
+  <hmdm-text-input
+    label="{{ 'table.heading.device.imei' | translate }}"
+    formControlName="imei"
+    [mask]="MASKS.imei"
+  ></hmdm-text-input>
+
+  <hmdm-text-input
+    label="{{ 'table.heading.device.phone.number' | translate }}"
+    formControlName="phone"
+    [mask]="phoneMask()"
+  ></hmdm-text-input>
+
+  @if (settings()?.customPropertyName1) {
+    <hmdm-textarea-input
+      formControlName="custom1"
+      [rows]="settings()?.customMultiline1 ? 3 : 1"
+      [label]="settings()?.customPropertyName1 ?? ''"
+    ></hmdm-textarea-input>
+  }
+
+  @if (settings()?.customPropertyName2) {
+    <hmdm-textarea-input
+      formControlName="custom2"
+      [rows]="settings()?.customMultiline2 ? 3 : 1"
+      [label]="settings()?.customPropertyName2 ?? ''"
+    ></hmdm-textarea-input>
+  }
+
+  @if (settings()?.customPropertyName3) {
+    <hmdm-textarea-input
+      formControlName="custom3"
+      [rows]="settings()?.customMultiline3 ? 3 : 1"
+      [label]="settings()?.customPropertyName3 ?? ''"
+    ></hmdm-textarea-input>
+  }
+</form>

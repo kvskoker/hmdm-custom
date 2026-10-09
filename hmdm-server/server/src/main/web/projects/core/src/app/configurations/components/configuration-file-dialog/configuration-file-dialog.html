@@ -1,0 +1,104 @@
+<hmdm-dialog-template>
+  <div class="dialog">
+    @if (!isUploadMode() && !isEditMode) {
+      <hmdm-select-search
+        [label]="'form.configuration.file.select' | translate"
+        [formControl]="fileIdControl"
+        [options]="filesOptions()"
+      ></hmdm-select-search>
+    }
+
+    @if (!isEditMode) {
+      <hmdm-checkbox
+        [formControl]="uploadNewFileControl"
+        [label]="'form.configuration.file.upload.new' | translate"
+      ></hmdm-checkbox>
+    }
+
+    @if (isUploadMode()) {
+      <hmdm-checkbox
+        [formControl]="externalControl"
+        [label]="'form.file.external' | translate"
+      ></hmdm-checkbox>
+
+      @if (isExternal()) {
+        <hmdm-text-input
+          [formControl]="externalUrlControl"
+          [label]="'form.configuration.file.url' | translate"
+        ></hmdm-text-input>
+      } @else {
+        <hmdm-file-input
+          [formControl]="$any(fileControl)"
+          [showError]="false"
+          [label]="'form.configuration.file.file' | translate"
+        ></hmdm-file-input>
+        <p class="storage-warning">
+          @if (availableSpaceWarning() !== null) {
+            {{ 'form.file.available' | translate: { space: availableSpaceWarning() } }}
+          }
+        </p>
+      }
+    }
+
+    @if (!isExternal()) {
+      <hmdm-text-input
+        [formControl]="filePathControl"
+        [label]="'form.file.name' | translate"
+      ></hmdm-text-input>
+    }
+
+    <hmdm-text-input
+      [formControl]="devicePathControl"
+      [label]="'form.configuration.file.path' | translate"
+    ></hmdm-text-input>
+
+    @if (!isUploadMode()) {
+      <hmdm-checkbox
+        [formControl]="overridePathControl"
+        [label]="'form.configuration.file.override.path' | translate"
+      ></hmdm-checkbox>
+    }
+
+    <hmdm-text-input
+      [formControl]="descriptionControl"
+      [label]="'form.configuration.file.description' | translate"
+    ></hmdm-text-input>
+
+    @if (isUploadMode()) {
+      <hmdm-checkbox
+        [formControl]="replaceVariablesControl"
+        [label]="'form.configuration.files.variables' | translate"
+      ></hmdm-checkbox>
+    }
+
+    @if (isEditMode) {
+      <hmdm-checkbox
+        [formControl]="remove"
+        [label]="'table.heading.file.remove' | translate"
+      ></hmdm-checkbox>
+    }
+
+    <div class="progress-wrapper">
+      @if (isLoading()) {
+        @if (uploadProgress() !== null) {
+          <mat-progress-bar
+            mode="determinate"
+            [value]="uploadProgress()"
+            class="progress"
+          ></mat-progress-bar>
+          <span class="progress-label">{{ uploadProgress() }}%</span>
+        } @else {
+          <mat-progress-bar mode="indeterminate" class="progress"></mat-progress-bar>
+        }
+      }
+    </div>
+  </div>
+
+  <hmdm-dialog-common-buttons
+    dialog-actions
+    [isCancelDisabled]="isLoading()"
+    [isSaveDisabled]="isSaveDisabled()"
+    (cancel)="onCancel()"
+    (save)="onSave()"
+  ></hmdm-dialog-common-buttons>
+</hmdm-dialog-template>

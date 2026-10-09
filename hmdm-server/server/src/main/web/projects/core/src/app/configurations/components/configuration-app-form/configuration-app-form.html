@@ -1,0 +1,19 @@
+<form>
+  <hmdm-select-search
+    [formControl]="appFormControl"
+    [label]="'table.heading.application.name' | translate"
+    [options]="applicationsOptions()"
+  ></hmdm-select-search>
+
+  <hmdm-selector
+    [formControl]="actionFormControl"
+    [label]="'table.heading.application.actions' | translate"
+    [options]="actionOptions()"
+  ></hmdm-selector>
+
+  <hmdm-selector
+    [formControl]="iconFormControl"
+    [label]="'table.heading.application.label' | translate"
+    [options]="iconOptions"
+  ></hmdm-selector>
+</form>

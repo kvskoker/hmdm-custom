@@ -1,0 +1,39 @@
+@use '@angular/material' as mat;
+
+:host {
+  display: block; padding: 24px; min-width: 0;
+  // The upstream compact filled-field theme hides floating labels.
+  @include mat.form-field-density(0);
+}
+h1 { font-size: 24px; margin: 0 0 24px; }
+h2 { font-size: 18px; margin: 24px 0 16px; }
+.toolbar, .fields, .actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+.toolbar { justify-content: space-between; }
+.fields { align-items: flex-start; }
+mat-form-field { width: 250px; max-width: 100%; }
+button { white-space: normal; }
+.table-wrap { overflow: auto; margin-top: 16px; }
+table { width: 100%; border-collapse: collapse; text-align: left; }
+th, td { padding: 12px; border-bottom: 1px solid #d9dde1; }
+th { font-weight: 600; }
+.error { color: #a2212b; background: #fff0f0; padding: 12px; }
+.notice { background: #e7f3ed; color: #165337; padding: 12px; }
+.danger { color: #b4232d; }
+.muted { color: #59636b; }
+.map { width: 100%; height: 420px; margin: 16px 0; z-index: 0; }
+.qr { width: 260px; height: 260px; object-fit: contain; }
+.fields.search-fields { align-items: center; margin-bottom: 16px; }
+.search-fields mat-form-field { width: 360px; }
+.field-button { height: 56px; flex-shrink: 0; }
+.fields.inline-form { align-items: center; gap: 10px; }
+.inline-form mat-form-field { flex: 1 1 160px; width: auto; min-width: 0; }
+.inline-form .short-field { flex: 0.55 1 80px; }
+.inline-form .sequence-field { flex: 0.8 0 125px; }
+.inline-form mat-checkbox { flex-shrink: 0; }
+.history { margin-top: 28px; }
+.history-filters { margin-top: 18px; }
+.history-filters mat-form-field { width: 190px; }
+.history-table th, .history-table td { padding: 8px 12px; }
+.history-table td { overflow-wrap: anywhere; }
+@media (min-width: 1400px) { .inline-form { flex-wrap: nowrap; } }
+@media (max-width: 600px) { :host { padding: 12px; } .fields mat-form-field { width: 100%; } }

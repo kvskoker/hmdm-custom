@@ -34,17 +34,19 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.LinkedList;
 import java.util.List;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
+
+import com.hmdm.rest.resource.AlertWebsocketEndpoint;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletContextEvent;
 
 import com.hmdm.guice.module.*;
 import com.hmdm.notification.guice.module.*;
-import com.hmdm.plugin.PluginList;
+import com.hmdm.plugin.PluginJarList;
 import com.hmdm.plugin.PluginTaskModule;
-import com.hmdm.plugin.guice.module.PluginLiquibaseModule;
-import com.hmdm.plugin.guice.module.PluginPersistenceModule;
+import com.hmdm.plugin.guice.module.PluginPlatformLiquibaseModule;
+import com.hmdm.plugin.guice.module.PluginPlatformPersistenceModule;
 import com.hmdm.plugin.guice.module.PluginPlatformTaskModule;
-import com.hmdm.plugin.guice.module.PluginRestModule;
+import com.hmdm.plugin.guice.module.PluginPlatformRestModule;
 
 public final class Initializer extends GuiceServletContextListener {
     private ServletContext context;
@@ -60,6 +62,7 @@ public final class Initializer extends GuiceServletContextListener {
         PrintWriter errorWriter = new PrintWriter(errorOut);
         try {
             this.injector = Guice.createInjector(Stage.PRODUCTION, this.getModules());
+            AlertWebsocketEndpoint.AppInjectorProvider.setInjector(this.injector);
             success = true;
         } catch (Exception e){
             System.err.println("[HMDM-INITIALIZER]: Unexpected error during injector initialization: " + e);
@@ -122,13 +125,20 @@ public final class Initializer extends GuiceServletContextListener {
         } else {
             System.out.println("[HMDM-LOGGING] Using log4j configuration from build");
         }
+        AlertWebsocketEndpoint.start();
 
         super.contextInitialized(servletContextEvent);
 
         initTasks();
     }
 
+    public void contextDestroyed(ServletContextEvent servletContextEvent) {
+        AlertWebsocketEndpoint.stop();
+    }
+
     private List<Module> getModules() {
+        Injector baseInjector = Guice.createInjector(new PluginPlatformPersistenceModule(this.context));
+
         List<Module> modules = new LinkedList<>();
         modules.add(new PersistenceModule(this.context));
         modules.add(new LiquibaseModule(this.context));
@@ -141,13 +151,13 @@ public final class Initializer extends GuiceServletContextListener {
         modules.add(new NotificationRestModule());
         modules.add(new NotificationEngineSelectorModule());
         modules.add(new NotificationMqttConfigModule(this.context));
-        modules.add(new PluginPersistenceModule(this.context));
-        modules.add(new PluginLiquibaseModule(this.context));
-        modules.add(new PluginRestModule());
+        modules.add(new PluginPlatformPersistenceModule(this.context));
+        modules.add(new PluginPlatformLiquibaseModule(this.context));
+        modules.add(baseInjector.getInstance(PluginPlatformRestModule.class));
 
-        PluginList.init(this.context);
+        PluginJarList.init(this.context);
 
-        modules.addAll(PluginList.getPluginModules());
+        modules.addAll(PluginJarList.getPluginJarModules());
 
         return modules;
     }
@@ -162,7 +172,7 @@ public final class Initializer extends GuiceServletContextListener {
         final PluginPlatformTaskModule pluginPlatformTaskModule = this.injector.getInstance(PluginPlatformTaskModule.class);
         pluginPlatformTaskModule.init();
 
-        final List<Class<? extends PluginTaskModule>> pluginTaskModules = PluginList.getPluginTaskModules();
+        final List<Class<? extends PluginTaskModule>> pluginTaskModules = PluginJarList.getPluginTaskModules();
         if (pluginTaskModules != null) {
             pluginTaskModules.forEach(clazz -> {
                 try {

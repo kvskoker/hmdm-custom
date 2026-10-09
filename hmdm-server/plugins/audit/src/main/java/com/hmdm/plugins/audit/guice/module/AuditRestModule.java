@@ -22,20 +22,24 @@
 package com.hmdm.plugins.audit.guice.module;
 
 import com.google.inject.servlet.ServletModule;
+import com.hmdm.plugin.guice.module.AbstractPluginRestModule;
 import com.hmdm.plugin.rest.PluginAccessFilter;
+import com.hmdm.plugins.audit.AuditPluginConfigurationImpl;
 import com.hmdm.plugins.audit.rest.AuditResource;
 import com.hmdm.plugins.audit.rest.filter.AuditFilter;
 import com.hmdm.rest.filter.AuthFilter;
 import com.hmdm.rest.filter.PrivateIPFilter;
-import com.hmdm.rest.filter.PublicIPFilter;
 import com.hmdm.security.jwt.JWTFilter;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * <p>A <code>Guice</code> module for <code>Audit Plugin</code> REST resources.</p>
  *
  * @author isv
  */
-public class AuditRestModule extends ServletModule {
+public class AuditRestModule extends AbstractPluginRestModule {
 
     /**
      * <p>Constructs new <code>AuditRestModule</code> instance. This implementation does nothing.</p>
@@ -43,18 +47,35 @@ public class AuditRestModule extends ServletModule {
     public AuditRestModule() {
     }
 
+    @Override
+    protected List<String> getProtectedResources() {
+        return Arrays.asList(
+                "/rest/private/plugin-audit/*"
+        );
+    }
+
+    @Override
+    protected List<String> getPublicResources() {
+        return Arrays.asList(
+        );
+    }
+
+    @Override
+    protected String getPluginId() {
+        return AuditPluginConfigurationImpl.PLUGIN_ID;
+    }
+
     /**
      * <p>Configures the <code>Licensing Plugin</code> REST resources.</p>
      */
     protected void configureServlets() {
+        super.configureServlets();
+
+        // These filters won't work if the audit plugin is built as WAR!
         this.filter("/rest/private/*").through(AuditFilter.class);
         this.filter("/rest/public/*").through(AuditFilter.class);
         this.filter("/rest/plugins/*").through(AuditFilter.class);
-//        this.filter("/rest/plugins/audit/*").through(ApiOriginFilter.class);
-        this.filter("/rest/plugins/audit/private/*").through(JWTFilter.class);
-        this.filter("/rest/plugins/audit/private/*").through(AuthFilter.class);
-        this.filter("/rest/plugins/audit/private/*").through(PluginAccessFilter.class);
-        this.filter("/rest/plugins/audit/private/*").through(PrivateIPFilter.class);
+
         this.bind(AuditResource.class);
     }
 

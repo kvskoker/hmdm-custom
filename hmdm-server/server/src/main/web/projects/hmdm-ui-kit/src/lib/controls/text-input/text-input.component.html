@@ -1,0 +1,45 @@
+<div class="input-container">
+  <mat-form-field class="input-field" appearance="outline">
+    @if (showLabel()) {
+      <mat-label> {{ label() }}</mat-label>
+    }
+
+    <input
+      matInput
+      [formControl]="formControl"
+      [type]="type()"
+      [placeholder]="label()"
+      [mask]="mask()"
+      [maxLength]="maxLengthNum()"
+      (blur)="onTouched()"
+    />
+
+    @if (passwordToggle()) {
+      <button
+        type="button"
+        mat-icon-button
+        matSuffix
+        tabindex="-1"
+        [disabled]="isDisabled()"
+        (click)="togglePasswordVisibility()"
+      >
+        <mat-icon>{{ isPasswordVisible() ? 'visibility_off' : 'visibility' }}</mat-icon>
+      </button>
+    }
+
+    @if (help()) {
+      <hmdm-help-tooltip matSuffix [text]="help()" />
+    }
+  </mat-form-field>
+
+  @if (showError()) {
+    <div class="input-error">
+      @if (control && control.invalid && control.touched) {
+        <hmdm-error-message
+          [optionalValidationKey]="optionalValidationKey()"
+          [control]="control"
+        ></hmdm-error-message>
+      }
+    </div>
+  }
+</div>

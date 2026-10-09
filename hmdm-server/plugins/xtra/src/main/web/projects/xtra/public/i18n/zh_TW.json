@@ -1,0 +1,15 @@
+{
+  "xtra.plugin.title": "Headwind MDM Enterprise 中的更多功能！",
+  "xtra.plugin.content.description": "將您的實例升級到試用版非常簡單，而且完全免費！",
+  "xtra.plugin.content.button": "獲取免費試用",
+  "xtra.plugin.kiosk-mode": "Kiosk（單任務）模式",
+  "xtra.plugin.device-location-tracking": "裝置位置追蹤",
+  "xtra.plugin.remote-management": "遠端重啟、鎖定和恢復出廠設置",
+  "xtra.plugin.upload-photos": "從裝置上傳照片",
+  "xtra.plugin.remote-control": "遠端控制",
+  "xtra.plugin.traffic-filtering": "網路流量過濾",
+  "xtra.plugin.two-factor-authentication": "雙重認證",
+  "xtra.plugin.export-import-devices": "匯出和匯入裝置",
+  "xtra.plugin.device-contacts-management": "裝置聯絡人管理",
+  "xtra.plugin.white-label": "白標軟體（重新品牌化）"
+}

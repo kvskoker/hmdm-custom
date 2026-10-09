@@ -1,0 +1,22 @@
+.dialog {
+  overflow: hidden;
+  width: 400px;
+
+  &-content {
+    width: 100%;
+    margin-top: 24px;
+  }
+
+  &-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 4px;
+  }
+
+  &-title {
+    text-align: center;
+    font-size: 1.2em;
+    line-height: 1.5;
+  }
+}

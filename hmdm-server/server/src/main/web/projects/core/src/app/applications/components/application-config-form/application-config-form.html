@@ -1,0 +1,63 @@
+<form class="form">
+  <!-- Bulk Controls -->
+  <fieldset class="form-fieldset bulk-controls">
+    <div class="bulk-checkbox">
+      <mat-checkbox
+        type="checkbox"
+        id="selectAll"
+        [checked]="selectAll()"
+        (change)="onSelectAllChange($event.checked)"
+      >
+      </mat-checkbox>
+      <label for="selectAll">{{ 'table.filtering.check.all' | translate }}</label>
+    </div>
+
+    <div class="bulk-action">
+      <mat-form-field appearance="outline" class="action-select-field">
+        <mat-label>{{ 'form.configuration.file.action' | translate }}</mat-label>
+        <mat-select [value]="groupAction()" (selectionChange)="onGroupActionChange($event.value)">
+          @for (option of groupActionOptions(); track option.value) {
+            <mat-option [value]="option.value">{{ option.viewValue | translate }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </fieldset>
+
+  <div class="form-wrapper">
+    <div class="form-configs">
+      @for (config of configurations(); track $index) {
+        <fieldset class="form-fieldset config-row">
+          <div class="config-checkbox">
+            <mat-checkbox
+              [id]="'config-' + config.configurationId"
+              [checked]="config.selected || false"
+              (change)="onConfigurationSelectionChange(config.configurationId, $event.checked)"
+            >
+            </mat-checkbox>
+          </div>
+
+          <div class="config-action">
+            <mat-form-field appearance="outline" class="action-select-field">
+              <mat-label>{{ 'form.configuration.file.action' | translate }}</mat-label>
+              <mat-select
+                [value]="config.action"
+                (selectionChange)="
+                  onConfigurationActionChange(config.configurationId, $event.value)
+                "
+              >
+                @for (option of availableActions(); track option.value) {
+                  <mat-option [value]="option.value">{{ option.viewValue | translate }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="form-config">
+            <span class="config-name">{{ config.configurationName }}</span>
+          </div>
+        </fieldset>
+      }
+    </div>
+  </div>
+</form>

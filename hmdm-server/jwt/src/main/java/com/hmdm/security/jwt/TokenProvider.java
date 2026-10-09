@@ -26,6 +26,7 @@ import java.util.Date;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import com.hmdm.util.CryptoUtil;
 import com.hmdm.util.StringUtil;
 import io.jsonwebtoken.Claims;
@@ -39,8 +40,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.hmdm.persistence.domain.User;
-
-import javax.inject.Named;
 
 /**
  * <p>A provider for JWT tokens.</p>

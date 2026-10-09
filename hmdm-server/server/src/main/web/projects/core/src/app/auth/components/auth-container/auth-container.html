@@ -1,0 +1,40 @@
+<div class="container">
+  <div class="container-logo">
+    <img class="container-img" [src]="logoUrl" alt="App Logo" />
+    <h1>{{ rebranding().appName }}</h1>
+  </div>
+
+  <div class="container-block">
+    <ng-content></ng-content>
+  </div>
+
+  @if (rebranding().legacyUrl) {
+    <div class="legacy-url">
+      <span class="description">{{'legacy.url.description' | translate}}</span>
+      <a
+        [href]="rebranding().legacyUrl"
+        target="_blank"
+        matButton
+        class="button"
+      >{{'legacy.url.button' | translate}}</a>
+    </div>
+  }
+
+  <div class="container-footer">
+    <p>
+      {{ rebranding().appName }} {{ 'app.description' | translate }}. &copy; {{ currentYear }}
+      <a [href]="rebranding().vendorLink" target="_blank">{{ rebranding().vendorName }}</a>
+    </p>
+    <p>
+      @if (rebranding().termsLink) {
+        <a [href]="rebranding().termsLink" target="_blank" rel="noopener noreferrer">{{
+          'cookieNotice.footerLink' | translate
+        }}</a>
+      } @else {
+        <a routerLink="/privacy">{{ 'cookieNotice.footerLink' | translate }}</a>
+      }
+    </p>
+  </div>
+
+  <core-cookie-notice></core-cookie-notice>
+</div>

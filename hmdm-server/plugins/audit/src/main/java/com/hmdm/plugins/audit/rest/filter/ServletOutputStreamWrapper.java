@@ -21,7 +21,9 @@
 
 package com.hmdm.plugins.audit.rest.filter;
 
-import javax.servlet.ServletOutputStream;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.WriteListener;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -36,14 +38,14 @@ public class ServletOutputStreamWrapper extends ServletOutputStream {
     /**
      * <p>An original servlet response stream wrapped by this wrapper.</p>
      */
-    private OutputStream outputStream;
+    private ServletOutputStream outputStream;
 
     /**
      * <p>A copy of the response content collected while client code writes to response stream.</p>
      */
     private ByteArrayOutputStream copy;
 
-    public ServletOutputStreamWrapper(OutputStream outputStream) {
+    public ServletOutputStreamWrapper(ServletOutputStream outputStream) {
         this.outputStream = outputStream;
         this.copy = new ByteArrayOutputStream(1024);
     }
@@ -63,4 +65,13 @@ public class ServletOutputStreamWrapper extends ServletOutputStream {
         return copy.toByteArray();
     }
 
+    @Override
+    public boolean isReady() {
+        return outputStream.isReady();
+    }
+
+    @Override
+    public void setWriteListener(WriteListener writeListener) {
+        outputStream.setWriteListener(writeListener);
+    }
 }

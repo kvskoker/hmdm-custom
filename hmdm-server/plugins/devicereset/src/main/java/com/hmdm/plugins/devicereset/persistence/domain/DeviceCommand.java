@@ -3,7 +3,7 @@ package com.hmdm.plugins.devicereset.persistence.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.hmdm.persistence.domain.CustomerData;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.io.Serializable;
 
@@ -27,41 +27,41 @@ public class DeviceCommand implements CustomerData, Serializable {
     public static final int STATUS_DELIVERED = 1;
     public static final int STATUS_CONFIRMED = 2;
 
-    @ApiModelProperty("Record ID")
+    @Schema(description = "Record ID")
     private Integer id;
 
-    @ApiModelProperty("Customer ID")
+    @Schema(description = "Customer ID")
     private int customerId;
 
-    @ApiModelProperty("Device ID")
+    @Schema(description = "Device ID")
     private int deviceId;
 
-    @ApiModelProperty("Device number")
+    @Schema(description = "Device number")
     private String deviceNumber;
 
-    @ApiModelProperty("Command type: reboot or factoryreset")
+    @Schema(description = "Command type: reboot or factoryreset")
     private String commandType;
 
-    @ApiModelProperty("Login of the admin who issued the command")
+    @Schema(description = "Login of the admin who issued the command")
     private String requestedBy;
 
-    @ApiModelProperty("When the command was issued (ms since epoch)")
+    @Schema(description = "When the command was issued (ms since epoch)")
     private long requestTime;
 
-    @ApiModelProperty("When the command was handed to the device (ms since epoch)")
+    @Schema(description = "When the command was handed to the device (ms since epoch)")
     private Long deliverTime;
 
-    @ApiModelProperty("When the device acknowledged the command (ms since epoch)")
+    @Schema(description = "When the device acknowledged the command (ms since epoch)")
     private Long confirmTime;
 
-    @ApiModelProperty("0 = pending, 1 = sent to device, 2 = acknowledged")
+    @Schema(description = "0 = pending, 1 = sent to device, 2 = acknowledged")
     private int status;
 
     /**
      * What the device said about itself when it acknowledged: true if it has the
      * rights to carry the command out, false if it does not, null if it never said.
      */
-    @ApiModelProperty("Whether the device reported it can perform the command")
+    @Schema(description = "Whether the device reported it can perform the command")
     private Boolean deviceCapable;
 
     public DeviceCommand() {

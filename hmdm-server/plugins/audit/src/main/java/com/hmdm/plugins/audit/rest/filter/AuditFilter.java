@@ -23,22 +23,26 @@ package com.hmdm.plugins.audit.rest.filter;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.hmdm.persistence.domain.User;
 import com.hmdm.plugin.service.PluginStatusCache;
 import com.hmdm.plugins.audit.AuditPluginConfigurationImpl;
 import com.hmdm.plugins.audit.persistence.AuditDAO;
 import com.hmdm.plugins.audit.persistence.domain.AuditLogRecord;
+import com.hmdm.session.IHmdmSession;
+import com.hmdm.session.IHmdmSessionProvider;
 import com.hmdm.util.BackgroundTaskRunnerService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Named;
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.inject.Named;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Optional;
 
@@ -66,6 +70,11 @@ public class AuditFilter implements Filter {
     private final AuditDAO auditDAO;
 
     /**
+     * <p>Interface to instantiate the user storage session.</p>
+     */
+    private IHmdmSessionProvider sessionProvider;
+
+    /**
      * <p>A runner for the audit log record insertion tasks.</p>
      */
     private final BackgroundTaskRunnerService backgroundTaskRunnerService;
@@ -91,9 +100,11 @@ public class AuditFilter implements Filter {
     @Inject
     public AuditFilter(AuditDAO auditDAO, BackgroundTaskRunnerService backgroundTaskRunnerService,
                        PluginStatusCache pluginStatusCache,
+                       @Named("session.class") IHmdmSessionProvider sessionProvider,
                        @Named("proxy.addresses") String proxyIps,
                        @Named("proxy.ip.header") String ipHeader) {
         this.auditDAO = auditDAO;
+        this.sessionProvider = sessionProvider;
         this.backgroundTaskRunnerService = backgroundTaskRunnerService;
         this.pluginStatusCache = pluginStatusCache;
         this.proxyIps = proxyIps;
@@ -148,7 +159,8 @@ public class AuditFilter implements Filter {
             e.printStackTrace();
         } finally {
             if (needAudit && resourceAuditor != null) {
-                AuditLogRecord logRecord = resourceAuditor.getAuditLogRecord();
+                IHmdmSession session = sessionProvider.getSession((HttpServletRequest) request);
+                AuditLogRecord logRecord = resourceAuditor.getAuditLogRecord(session != null ? session.getUser() : null);
                 if (logRecord != null) {
                     auditLogger.info(logRecord.toLogString());
                     this.backgroundTaskRunnerService.submitTask(new Task(logRecord));

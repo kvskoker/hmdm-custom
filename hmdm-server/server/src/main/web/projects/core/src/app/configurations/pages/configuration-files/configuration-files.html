@@ -1,0 +1,23 @@
+<div class="applications scroll-content">
+  <mat-card class="card scroll-content">
+    <mat-card-title class="card-title">
+      <hmdm-search-container
+        persistKey="config-app-search-control"
+        [searchControl]="tableSearchControl"
+        [showSearchButton]="false"
+        [showFiltersButton]="false"
+      ></hmdm-search-container>
+
+      <button matButton="filled" class="card-btn primary" (click)="onAddFileClick()">
+        <mat-icon>add</mat-icon>
+        {{ 'button.add' | translate }}
+      </button>
+    </mat-card-title>
+
+    <mat-divider></mat-divider>
+
+    <mat-card-content class="card-content scroll-content">
+      <core-configuration-file-table class="scroll-table"></core-configuration-file-table>
+    </mat-card-content>
+  </mat-card>
+</div>

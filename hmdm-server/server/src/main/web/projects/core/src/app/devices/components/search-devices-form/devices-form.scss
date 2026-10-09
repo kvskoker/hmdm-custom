@@ -1,0 +1,46 @@
+.devices {
+  &-params {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  &-block {
+    flex-grow: 1;
+    column-gap: 16px;
+    row-gap: 4px;
+    justify-content: space-between;
+
+    &.grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+  }
+
+  &-form {
+    .full-width {
+      width: 100%;
+    }
+  }
+
+  &-fieldset {
+    width: 100%;
+    display: flex;
+    gap: 16px;
+
+    > * {
+      width: 100%;
+    }
+  }
+
+  &-search {
+    margin-top: 8px;
+    width: 100%;
+    display: flex;
+    gap: 16px;
+
+    hmdm-text-input {
+      flex: 1;
+    }
+  }
+}

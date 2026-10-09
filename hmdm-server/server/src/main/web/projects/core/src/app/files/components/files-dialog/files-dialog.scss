@@ -1,0 +1,20 @@
+mat-progress-bar {
+  margin-bottom: 4px;
+}
+
+.progress-wrapper {
+  height: 36px;
+}
+
+.progress-label {
+  display: block;
+  font-size: 12px;
+  text-align: right;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.storage-warning {
+  padding: 8px;
+  border-radius: 8px;
+  border: 2px solid var(--mat-sys-primary, #b00020);
+}

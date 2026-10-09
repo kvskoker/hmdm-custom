@@ -1,0 +1,80 @@
+@if (isLoading) {
+  <div class="auth-loading">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+} @else if (!tokenValid) {
+  <div class="auth-form">
+    <h1 class="auth-title">{{ 'signup.token.invalid.title' | translate }}</h1>
+    <p class="auth-description">{{ 'signup.token.invalid.description' | translate }}</p>
+    <a matButton="outlined" routerLink="/auth/sign-up">
+      {{ 'login.signup' | translate }}
+    </a>
+  </div>
+} @else if (isComplete) {
+  <div class="auth-form">
+    <h1 class="auth-title">{{ 'signup.finalized.title' | translate }}</h1>
+    <p class="auth-description">{{ 'signup.finalized.description' | translate }}</p>
+    <a matButton="filled" class="primary" routerLink="/auth/sign-in">
+      {{ 'button.login' | translate }}
+    </a>
+  </div>
+} @else {
+  <form class="auth-form" [formGroup]="formGroup!">
+    <h1 class="auth-title">{{ 'signup.complete.title' | translate }}</h1>
+
+    <div class="auth-row">
+      <hmdm-text-input
+        [label]="'signup.customer.id' | translate"
+        [placeholder]="'signup.customer.id.placeholder' | translate"
+        formControlName="customerId"
+      ></hmdm-text-input>
+
+      <hmdm-text-input
+        [label]="'signup.company' | translate"
+        [placeholder]="'signup.company.placeholder' | translate"
+        formControlName="company"
+      ></hmdm-text-input>
+    </div>
+
+    <div class="auth-row">
+      <hmdm-text-input
+        [label]="'signup.first.name' | translate"
+        [placeholder]="'signup.first.name.placeholder' | translate"
+        formControlName="firstName"
+      ></hmdm-text-input>
+
+      <hmdm-text-input
+        [label]="'signup.last.name' | translate"
+        [placeholder]="'signup.last.name.placeholder' | translate"
+        formControlName="lastName"
+      ></hmdm-text-input>
+    </div>
+
+    <div class="auth-row">
+      <hmdm-text-input
+        inputType="password"
+        [label]="'signup.password' | translate"
+        [placeholder]="'signup.password.placeholder' | translate"
+        formControlName="newPassword"
+      ></hmdm-text-input>
+
+      <hmdm-text-input
+        inputType="password"
+        [label]="'signup.password.repeat' | translate"
+        [placeholder]="'signup.password.placeholder' | translate"
+        formControlName="confirm"
+      ></hmdm-text-input>
+    </div>
+
+    <hmdm-textarea-input
+      [label]="'signup.description' | translate"
+      [placeholder]="'signup.description.placeholder' | translate"
+      [rows]="2"
+      formControlName="description"
+    ></hmdm-textarea-input>
+
+    <button matButton="filled" class="primary" (click)="onSubmit()" [disabled]="isSubmitting">
+      {{ (isSubmitting ? 'signup.progress' : 'signup.submit') | translate }}
+    </button>
+  </form>
+}

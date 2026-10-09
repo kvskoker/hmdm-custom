@@ -21,8 +21,11 @@
 
 package com.hmdm.rest.resource;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import com.google.inject.name.Named;
+import com.hmdm.session.IHmdmSession;
+import com.hmdm.session.IHmdmSessionProvider;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import com.hmdm.persistence.CustomerDAO;
 import com.hmdm.persistence.UnsecureDAO;
 import com.hmdm.persistence.UserDAO;
@@ -37,22 +40,20 @@ import com.hmdm.util.PasswordUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -71,6 +72,7 @@ public class CustomerResource {
     private UnsecureDAO unsecureDAO;
     private UserDAO userDAO;
     private MailchimpService mailchimpService;
+    private IHmdmSessionProvider sessionProvider;
 
     public CustomerResource() {
     }
@@ -79,11 +81,16 @@ public class CustomerResource {
      * <p>Constructs new <code>CustomerResource</code> instance. This implementation does nothing.</p>
      */
     @Inject
-    public CustomerResource(CustomerDAO customerDAO, UnsecureDAO unsecureDAO, UserDAO userDAO, MailchimpService mailchimpService) {
+    public CustomerResource(CustomerDAO customerDAO,
+                            UnsecureDAO unsecureDAO,
+                            UserDAO userDAO,
+                            MailchimpService mailchimpService,
+                            @Named("session.class") IHmdmSessionProvider sessionProvider) {
         this.customerDAO = customerDAO;
         this.unsecureDAO = unsecureDAO;
         this.userDAO = userDAO;
         this.mailchimpService = mailchimpService;
+        this.sessionProvider = sessionProvider;
     }
 
     @GET
@@ -236,16 +243,14 @@ public class CustomerResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response impersonateCustomer(@PathParam("id") Integer id,
                                         @Context HttpServletRequest req,
-                                        @Context HttpServletResponse res) throws IOException {
+                                        @Context HttpServletResponse resp) throws IOException {
         try {
             if (SecurityContext.get().isSuperAdmin()) {
                 Customer customer = this.customerDAO.findById(id);
                 User orgAdmin = this.userDAO.findOrgAdmin(customer.getId());
                 if (orgAdmin != null) {
-                    HttpSession session = req.getSession( false );
-                    if ( session != null ) {
-                        session.invalidate();
-                    }
+                    IHmdmSession session = sessionProvider.getSession(req);
+                    session.invalidate();
 
                     // If the org admin didn't log in, we need to generate a token for him
                     if (orgAdmin.getAuthToken() == null || orgAdmin.getAuthToken().length() == 0) {
@@ -264,8 +269,8 @@ public class CustomerResource {
 
                     orgAdmin.setPassword(null);
 
-                    HttpSession userSession = req.getSession(true);
-                    userSession.setAttribute( sessionCredentials, orgAdmin );
+                    IHmdmSession userSession = sessionProvider.getOrCreateSession(req, resp, true);
+                    userSession.setUser(orgAdmin);
 
                     return Response.OK( orgAdmin );
                 } else {

@@ -1,0 +1,33 @@
+name: hmdm-v7-test
+services:
+  db:
+    image: postgres:14
+    environment:
+      POSTGRES_DB: hmdm
+      POSTGRES_USER: hmdm
+      POSTGRES_PASSWORD: local-test-only
+    volumes:
+      - testpg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hmdm"]
+      interval: 3s
+      retries: 30
+  hmdm:
+    image: ${HMDM_TEST_IMAGE:-hmdm-custom:7.03.1}
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SQL_HOST: db
+      SQL_PASS: local-test-only
+      BASE_HOST: localhost:8087
+      BASE_DOMAIN: localhost
+      MQTT_AUTH: "1"
+      FORCE_RECONFIGURE: "1"
+    ports:
+      - "127.0.0.1:8087:8080"
+    volumes:
+      - testdata:/opt/hmdm
+volumes:
+  testpg:
+  testdata:

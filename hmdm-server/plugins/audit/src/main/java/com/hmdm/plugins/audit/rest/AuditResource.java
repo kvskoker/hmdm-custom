@@ -21,24 +21,29 @@
 
 package com.hmdm.plugins.audit.rest;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import com.hmdm.plugin.rest.json.LicenseResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import com.hmdm.plugins.audit.persistence.AuditDAO;
 import com.hmdm.plugins.audit.persistence.domain.AuditLogRecord;
 import com.hmdm.plugins.audit.rest.json.AuditLogFilter;
 import com.hmdm.rest.json.PaginatedData;
 import com.hmdm.rest.json.Response;
 import com.hmdm.security.SecurityContext;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.Authorization;
+import jakarta.ws.rs.GET;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 import java.util.List;
 
 /**
@@ -47,8 +52,8 @@ import java.util.List;
  * @author isv
  */
 @Singleton
-@Path("/plugins/audit")
-@Api(tags = {"Audit"})
+@Path("/private/plugin-audit")
+@Tag(name = "Audit")
 public class AuditResource {
 
     private static final Logger logger = LoggerFactory.getLogger(AuditResource.class);
@@ -75,14 +80,23 @@ public class AuditResource {
      * @param filter a filter to be used for filtering the records.
      * @return a response with list of audit log records matching the specified filter.
      */
-    @ApiOperation(
-            value = "Search logs",
-            notes = "Gets the list of audit log records matching the specified filter",
-            response = PaginatedData.class,
-            authorizations = {@Authorization("Bearer Token")}
+    @Operation(
+            summary = "Search logs",
+            description = "Gets the list of audit log records matching the specified filter",
+            security = @SecurityRequirement(name = "Bearer Token"),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "OK",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = PaginatedData.class)
+                            )
+                    )
+            }
     )
     @POST
-    @Path("/private/log/search")
+    @Path("/search")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getLogs(AuditLogFilter filter) {
         if (!SecurityContext.get().hasPermission("plugin_audit_access")) {
@@ -99,6 +113,33 @@ public class AuditResource {
             logger.error("Failed to search the audit log records due to unexpected error. Filter: {}", filter, e);
             return Response.INTERNAL_ERROR();
         }
+    }
+
+    /**
+     * <p>Checks for valid license for a plugin</p>
+     *
+     * @return {@link LicenseResponse} indicating whether the license is valid .
+     */
+    @Operation(
+            summary = "Checks for a plugin license",
+            description = "Checks for valid license for a plugin",
+            security = @SecurityRequirement(name = "Bearer Token"),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "OK",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = LicenseResponse.class)
+                            )
+                    )
+            }
+    )
+    @GET
+    @Path("/license")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response license() {
+        return Response.OK(LicenseResponse.genericValidResponse());
     }
 
 }

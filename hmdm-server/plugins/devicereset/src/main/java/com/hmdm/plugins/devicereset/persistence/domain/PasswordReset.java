@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.hmdm.persistence.domain.CustomerData;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.io.Serializable;
 
@@ -24,16 +24,16 @@ public class PasswordReset implements CustomerData, Serializable {
     /** The device confirmed it applied the new PIN. */
     public static final int STATUS_CONFIRMED = 2;
 
-    @ApiModelProperty("Record ID")
+    @Schema(description = "Record ID")
     private Integer id;
 
-    @ApiModelProperty("Customer ID")
+    @Schema(description = "Customer ID")
     private int customerId;
 
-    @ApiModelProperty("Device ID")
+    @Schema(description = "Device ID")
     private int deviceId;
 
-    @ApiModelProperty("Device number")
+    @Schema(description = "Device number")
     private String deviceNumber;
 
     /**
@@ -43,19 +43,19 @@ public class PasswordReset implements CustomerData, Serializable {
     @JsonIgnore
     private String newPassword;
 
-    @ApiModelProperty("Login of the admin who requested the reset")
+    @Schema(description = "Login of the admin who requested the reset")
     private String requestedBy;
 
-    @ApiModelProperty("When the reset was requested (ms since epoch)")
+    @Schema(description = "When the reset was requested (ms since epoch)")
     private long requestTime;
 
-    @ApiModelProperty("When the PIN was handed to the device (ms since epoch)")
+    @Schema(description = "When the PIN was handed to the device (ms since epoch)")
     private Long deliverTime;
 
-    @ApiModelProperty("When the device confirmed it applied the PIN (ms since epoch)")
+    @Schema(description = "When the device confirmed it applied the PIN (ms since epoch)")
     private Long confirmTime;
 
-    @ApiModelProperty("0 = pending, 1 = delivered, 2 = confirmed")
+    @Schema(description = "0 = pending, 1 = delivered, 2 = confirmed")
     private int status;
 
     public PasswordReset() {

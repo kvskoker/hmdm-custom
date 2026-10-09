@@ -1,0 +1,12 @@
+.card {
+  &-content {
+    display: flex;
+    gap: 16px;
+    margin: 16px auto 0;
+    width: 400px;
+  }
+
+  &-input {
+    flex: 1;
+  }
+}

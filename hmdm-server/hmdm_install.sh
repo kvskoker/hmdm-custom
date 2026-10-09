@@ -1,21 +1,21 @@
 #!/bin/bash
 #
 # Headwind MDM installer script
-# Tested on Ubuntu Linux 18.04 - 24.04, Ubuntu 22.04 is recommended
+# Tested on Ubuntu Linux 24.04
 #
 REPOSITORY_BASE=https://h-mdm.com/files
-CLIENT_VERSION=5.19
+CLIENT_VERSION=6.37
 DEFAULT_SQL_HOST=localhost
 DEFAULT_SQL_PORT=5432
 DEFAULT_SQL_BASE=hmdm
 DEFAULT_SQL_USER=hmdm
 DEFAULT_SQL_PASS=
-DEFAULT_LOCATION="/opt/hmdm"
-DEFAULT_SCRIPT_LOCATION="/opt/hmdm"
 TOMCAT_HOME=$(ls -d /var/lib/tomcat* | tail -n1)
 TOMCAT_SERVICE=$(echo $TOMCAT_HOME | awk '{n=split($1,A,"/"); print A[n]}')
 TOMCAT_ENGINE="Catalina"
 TOMCAT_HOST="localhost"
+DEFAULT_LOCATION="$TOMCAT_HOME/work"
+DEFAULT_SCRIPT_LOCATION="/opt/hmdm"
 DEFAULT_PROTOCOL=https
 DEFAULT_BASE_DOMAIN=
 DEFAULT_BASE_PATH="ROOT"
@@ -41,15 +41,10 @@ install_soft() {
         exit 1
     fi
     apt update
-    apt install -y aapt tomcat9 postgresql vim
+    apt install -y tomcat10 postgresql vim
     TOMCAT_HOME=$(ls -d /var/lib/tomcat* | tail -n1)
     TOMCAT_USER=$(ls -ld $TOMCAT_HOME/webapps | awk '{print $3}')
 }
-
-# Use sandbox directory for tomcat 9
-if [ "$TOMCAT_HOME" == "/var/lib/tomcat9" ]; then
-    DEFAULT_LOCATION="/var/lib/tomcat9/work"
-fi
 
 # Check if we are root
 CURRENTUSER=$(whoami)
@@ -67,12 +62,6 @@ if [ ! -d "./install" ]; then
     echo "Cannot find installation directory (install)"
     echo "Please cd to the installation directory before running script!"
     exit 1
-fi
-
-# Check if there's aapt tool installed
-if ! which aapt > /dev/null; then
-    echo "Android App Packaging Tool is not installed!"
-    install_soft aapt
 fi
 
 # Check PostgreSQL installation
@@ -93,34 +82,6 @@ if [ "$?" -ne 0 ]; then
         echo "If you're running Tomcat as different user,"
         echo "please edit this script and update the TOMCAT_USER variable."
         exit 1
-    fi
-fi
-
-# Check for Tomcat version in Ubuntu 20.04
-OUTDATED_TOMCAT=$(/usr/share/tomcat9/bin/version.sh 2>&1 | grep "Server number" | grep "9.0.31")
-if [ ! -z "$OUTDATED_TOMCAT" ]; then
-    echo "Tomcat $OUTDATED_TOMCAT requires updating!"
-    read -e -p "Update it now [Y/n]?: " -i "Y" REPLY
-    if [[ "$REPLY" =~ ^[Yy]$ ]]; then
-        # This clause is only for tomcat 9 so do not bother for the major version
-        VERSION=9.0.40
-        wget https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.40/bin/apache-tomcat-${VERSION}.tar.gz
-        tar -zxf apache-tomcat-${VERSION}.tar.gz
-        cd apache-tomcat-${VERSION}
-        chmod a+x bin
-        chmod a+x lib
-        chmod -R a+r bin
-        chmod -R a+r lib
-        chmod a+x bin/*.sh
-        mv /usr/share/tomcat9/bin /usr/share/tomcat9/bin~
-        mv /usr/share/tomcat9/lib /usr/share/tomcat9/lib~
-        cp -r bin /usr/share/tomcat9
-        cp -r lib /usr/share/tomcat9
-        service tomcat9 restart
-	cd ..
-	rm -rf apache-tomcat-${VERSION}
-	rm -f apache-tomcat-${VERSION}.tar.gz
-        apt-mark hold tomcat9
     fi
 fi
 
@@ -148,9 +109,9 @@ fi
 #read -p "Are you installing an open-source version? (Y/n)? " -n 1 -r
 #echo
 #if [[ $REPLY =~ ^[Yy]$ ]]; then
-    CLIENT_VARIANT="os"
+#    CLIENT_VARIANT="os"
 #else
-#    CLIENT_VARIANT="master"
+    CLIENT_VARIANT="master"
 #fi
 
 CLIENT_APK="hmdm-$CLIENT_VERSION-$CLIENT_VARIANT.apk"
@@ -195,7 +156,7 @@ if [ ! -z "$TABLE_EXISTS" ]; then
     echo "Clear the database? ALL DATA WILL BE LOST!"
     read -e -p "Type \"erase\" to clear the database and continue setup: " RESPONSE
     if [ "$RESPONSE" == "erase" ]; then
-        echo "DROP TABLE IF EXISTS applicationfilestocopytemp, applications, applicationversions, applicationversionstemp, configurationapplicationparameters, configurationapplications, configurationapplicationsettings, configurationfiles, configurations, customers, databasechangelog, databasechangeloglock, deviceapplicationsettings, devicegroups, devices, devicestatuses, groups, icons, pendingpushes, pendingsignup, permissions, plugin_apuppet_data, plugin_apuppet_settings, plugin_audit_log, plugin_deviceinfo_deviceparams, plugin_deviceinfo_deviceparams_device, plugin_deviceinfo_deviceparams_gps, plugin_deviceinfo_deviceparams_mobile, plugin_deviceinfo_deviceparams_mobile2, plugin_deviceinfo_deviceparams_wifi, plugin_deviceinfo_settings, plugin_devicelocations_history, plugin_devicelocations_latest, plugin_devicelocations_settings, plugin_devicelog_log, plugin_devicelog_setting_rule_devices, plugin_devicelog_settings, plugin_devicelog_settings_rules, plugin_devicereset_status, plugin_knox_rules, plugin_messaging_messages, plugin_openvpn_defaults, plugin_photo_photo, plugin_photo_photo_places, plugin_photo_places, plugin_photo_settings, plugin_push_messages, plugin_push_schedule, plugin_urlfilter_lists, plugins, pluginsdisabled, pushmessages, settings, trialkey, uploadedfiles, usagestats, userconfigurationaccess, userdevicegroupsaccess, userhints, userhinttypes, userrolepermissions, userroles, userrolesettings, users CASCADE" |  psql $PSQL_CONNSTRING >/dev/null 2>&1
+        echo "DROP TABLE IF EXISTS alerts, applicationfilestocopytemp, applications, applicationversions, applicationversionstemp, configurationapplicationparameters, configurationapplications, configurationapplicationsettings, configurationfiles, configurations, customers, databasechangelog, databasechangeloglock, deviceapplicationsettings, devicegroups, devices, devicestatuses, groups, icons, licenses, pendingpushes, pendingsignup, permissions, plugin_apuppet_data, plugin_apuppet_settings, plugin_audit_log, plugin_deviceinfo_deviceparams, plugin_deviceinfo_deviceparams_device, plugin_deviceinfo_deviceparams_gps, plugin_deviceinfo_deviceparams_mobile, plugin_deviceinfo_deviceparams_mobile2, plugin_deviceinfo_deviceparams_wifi, plugin_deviceinfo_settings, plugin_devicelocations_history, plugin_devicelocations_latest, plugin_devicelocations_settings, plugin_devicelog_log, plugin_devicelog_setting_rule_devices, plugin_devicelog_settings, plugin_devicelog_settings_rules, plugin_devicereset_status, plugin_knox_rules, plugin_messaging_messages, plugin_openvpn_defaults, plugin_photo_photo, plugin_photo_photo_places, plugin_photo_places, plugin_photo_settings, plugin_push_messages, plugin_push_schedule, plugin_urlfilter_lists, plugins, pluginsdisabled, pushmessages, sessions, settings, trialkey, usagestats, uploadedfiles, userconfigurationaccess, userdevicegroupsaccess, userhints, userhinttypes, userrolepermissions, userroles, userrolesettings, users CASCADE" |  psql $PSQL_CONNSTRING >/dev/null 2>&1
 	echo "Database has been cleared."
     else
         echo "Headwind MDM installation aborted"
@@ -208,7 +169,7 @@ echo "File storage setup"
 echo "=================="
 echo "Please choose where the files uploaded to Headwind MDM will be stored"
 echo "If the directory doesn't exist, it will be created"
-echo "##### FOR TOMCAT 9, USE SANDBOXED DIR: /var/lib/tomcat9/work #####"
+echo "##### IT MUST BE IN THE $TOMCAT_HOME DIRECTORY! #####"
 echo
 
 read -e -p "Headwind MDM storage directory [$DEFAULT_LOCATION]: " -i "$DEFAULT_LOCATION" LOCATION
@@ -237,6 +198,9 @@ INSTALL_FLAG_FILE="$LOCATION/hmdm_install_flag"
 cat ./install/log4j_template.xml | sed "s|_BASE_DIRECTORY_|$LOCATION|g" > $LOCATION/log4j-hmdm.xml
 chown $TOMCAT_USER:$TOMCAT_USER $LOCATION/log4j-hmdm.xml
 
+cp -r ./install/emails $LOCATION
+chown -R $TOMCAT_USER:$TOMCAT_USER $LOCATION/emails
+
 echo
 echo "Please choose the directory where supply scripts will be located."
 echo
@@ -244,6 +208,8 @@ read -e -p "Headwind MDM scripts directory [$DEFAULT_SCRIPT_LOCATION]: " -i "$DE
 if [ ! -d $SCRIPT_LOCATION ]; then
     mkdir -p $SCRIPT_LOCATION || exit 1
 fi
+cp ./cpu_monitor.sh $SCRIPT_LOCATION
+cp ./update-web-app.sh $SCRIPT_LOCATION
 
 echo
 echo "Web application setup"
@@ -269,7 +235,7 @@ read -e -p "Project path on server (e.g. /hmdm) or ROOT: " -i "$DEFAULT_BASE_PAT
 echo
 echo "To enable password recovery function, Headwind MDM must be connected to SMTP."
 echo "Password recovery is an optional but recommended feature."
-read -e -p "Setup SMTP credentials [Y/n]?: " -i "Y" REPLY
+read -e -p "Setup SMTP credentials [Y/n]?: " -i "n" REPLY
 
 if [[ "$REPLY" =~ ^[Yy]$ ]]; then
     read -e -p "E-mail of the admin account: " ADMIN_EMAIL
@@ -322,6 +288,17 @@ if [ -d $TOMCAT_HOME/webapps/$TOMCAT_DEPLOY_PATH ]; then
     done
     echo
 fi
+
+echo "Copying required libraries to $TOMCAT_HOME/lib ..."
+if [ -d "./target/shared-libs" ]; then
+    LIB_DIR=./target/shared-libs
+else
+    LIB_DIR=./lib
+fi
+cp $LIB_DIR/* $TOMCAT_HOME/lib
+# Restart to load new libraries
+service $TOMCAT_SERVICE restart
+sleep 5
 
 TOMCAT_CONFIG_PATH=$TOMCAT_HOME/conf/$TOMCAT_ENGINE/$TOMCAT_HOST
 if [ ! -d $TOMCAT_CONFIG_PATH ]; then
@@ -376,6 +353,31 @@ if [ "$?" -ne 0 ]; then
 fi
 rm -f $TEMP_SQL_FILE > /dev/null 2>&1
 
+
+# Restarting Tomcat to initialize plugins properly
+echo "Reloading the database..."
+service $TOMCAT_SERVICE restart
+SUCCESSFUL_DEPLOY=0
+for i in {1..120}; do
+    if [ -f $INSTALL_FLAG_FILE ]; then
+        if [[ $(< $INSTALL_FLAG_FILE) == "OK" ]]; then
+            SUCCESSFUL_DEPLOY=1
+        else
+            SUCCESSFUL_DEPLOY=0
+        fi
+        break
+    fi
+    echo -n "."
+    sleep 1
+done
+echo
+rm -f $INSTALL_FLAG_FILE > /dev/null 2>&1
+if [ $SUCCESSFUL_DEPLOY -ne 1 ]; then
+    echo "ERROR: failed to start Headwind MDM!"
+    echo "Please check $TOMCAT_HOME/logs/catalina.out for details."
+    exit 1
+fi
+
 echo
 echo "======================================"
 echo "Minimal installation of Headwind MDM has been done!"
@@ -397,42 +399,45 @@ if [[ "$REPLY" =~ ^[Yy]$ ]]; then
     chmod +x $SCRIPT_LOCATION/letsencrypt-ssl.sh
     $SCRIPT_LOCATION/letsencrypt-ssl.sh
 
-    echo
-    echo "======================================"
-    echo "The installer can try to update Tomcat config automatically."
-    echo "Use this feature with care, ONLY IF YOU DIDN'T TOUCH server.xml"
-    echo "If Tomcat won't work after update, please revert the config back:"
-    echo "cp $TOMCAT_HOME/conf/server.xml~ $TOMCAT_HOME/conf/server.xml"
-    echo "======================================"
-    echo
-    read -e -p "Update Tomcat config automatically [Y/n]?: " -i "Y" REPLY
-    if [[ "$REPLY" =~ ^[Yy]$ ]]; then
-        cp $TOMCAT_HOME/conf/server.xml $TOMCAT_HOME/conf/server.xml~
-	# EPIC MAGIC!!!
-        sed -z -e "s^<\!\-\-\n    <Connector port=\"8443\" protocol=\"org.apache.coyote.http11.Http11NioProtocol\"^<Connector port=\"8443\" protocol=\"org.apache.coyote.http11.Http11NioProtocol\"^" -e "s^\-\->\n    <\!\-\- Define an SSL/TLS HTTP/1.1 Connector on port 8443 with HTTP/2^<\!\-\- Define an SSL/TLS HTTP/1.1 Connector on port 8443 with HTTP/2^" -e "s^certificateKeystoreFile=\"conf/localhost-rsa.jks\"^certificateKeystoreFile=\"/var/lib/tomcat9/ssl/$BASE_DOMAIN.jks\" certificateKeystorePassword=\"123456\"^" $TOMCAT_HOME/conf/server.xml~ > $TOMCAT_HOME/conf/server.xml
-        CERTBOT_VERSION=`certbot --version | awk '{print $2}' | awk '{n=split($1,A,"."); print A[1]}'`
-        if [ "$CERTBOT_VERSION" != "" ] && [ "$CERTBOT_VERSION" -ge "2" ]; then
-        # In certbot 2, default encryption is ECDSA so we need to adjust it in Tomcat config
-            cp $TOMCAT_HOME/conf/server.xml $TOMCAT_HOME/conf/server.xml.1
-            sed -z -e "s^type=\"RSA\" />^type=\"EC\" />^" $TOMCAT_HOME/conf/server.xml.1 > $TOMCAT_HOME/conf/server.xml
-            rm -f $TOMCAT_HOME/conf/server.xml.1
+    TOMCAT_UPDATED=$(grep $BASE_DOMAIN.jks $TOMCAT_HOME/conf/server.xml)
+    if [ -z "$TOMCAT_UPDATED" ]; then
+        echo
+        echo "======================================"
+        echo "The installer can try to update Tomcat config automatically."
+        echo "Use this feature with care, ONLY IF YOU DIDN'T TOUCH server.xml"
+        echo "If Tomcat won't work after update, please revert the config back:"
+        echo "cp $TOMCAT_HOME/conf/server.xml~ $TOMCAT_HOME/conf/server.xml"
+        echo "======================================"
+        echo
+        read -e -p "Update Tomcat config automatically [Y/n]?: " -i "Y" REPLY
+        if [[ "$REPLY" =~ ^[Yy]$ ]]; then
+            cp $TOMCAT_HOME/conf/server.xml $TOMCAT_HOME/conf/server.xml~
+            CERTBOT_VERSION=`certbot --version | awk '{print $2}' | awk '{n=split($1,A,"."); print A[1]}'`
+            if [ "$CERTBOT_VERSION" != "" ] && [ "$CERTBOT_VERSION" -ge "2" ]; then
+            # In certbot 2, default encryption is ECDSA so we need to adjust it in Tomcat config
+	        ENCRYPTION_TYPE="EC"
+            else
+                ENCRYPTION_TYPE="RSA"
+            fi
+            # Add Headwind MDM section assuming SSL section is commmented
+	    sed -z -e "s^<\!\-\-\n    <Connector port=\"8443\"^<Connector port=\"8443\" protocol=\"org.apache.coyote.http11.Http11NioProtocol\" maxThreads=\"150\" SSLEnabled=\"true\" maxParameterCount=\"1000\">\n        <UpgradeProtocol className=\"org.apache.coyote.http2.Http2Protocol\" />\n        <SSLHostConfig>\n            <Certificate certificateKeystoreFile=\"$TOMCAT_HOME/ssl/$BASE_DOMAIN.jks\" certificateKeystorePassword=\"123456\" type=\"$ENCRYPTION_TYPE\" />\n        </SSLHostConfig>\n    </Connector>\n\n<\!\-\-\n    <Connector port=\"8443\"^" $TOMCAT_HOME/conf/server.xml~ > $TOMCAT_HOME/conf/server.xml
+           service $TOMCAT_SERVICE restart
         fi
-        service $TOMCAT_SERVICE restart
-    fi
 
-    echo
-    echo "======================================"
-    echo "Secure installation of Headwind MDM has been done!"
-    echo "At this step, you can open in your web browser:"
-    echo "https://$BASE_DOMAIN:8443$BASE_PATH"
-    echo
-    echo "Notice: if Tomcat starts slowly:"
-    echo "Open a file /etc/java-11-openjdk/security/java.security"
-    echo "Replace securerandom.source=file:/dev/random"
-    echo "to securerandom.source=file:/dev/urandom"
-    echo "and restart Tomcat."
-    echo "======================================"
-    echo
+        echo
+        echo "======================================"
+        echo "Secure installation of Headwind MDM has been done!"
+        echo "At this step, you can open in your web browser:"
+        echo "https://$BASE_DOMAIN:8443$BASE_PATH"
+        echo
+        echo "Notice: if Tomcat starts slowly:"
+        echo "Open a file /etc/java-11-openjdk/security/java.security"
+        echo "Replace securerandom.source=file:/dev/random"
+        echo "to securerandom.source=file:/dev/urandom"
+        echo "and restart Tomcat."
+        echo "======================================"
+        echo
+    fi
 
     CERTBOT_RENEWAL=$(crontab -l | grep letsencrypt-ssl.sh)
     if [ -z "$CERTBOT_RENEWAL" ]; then 

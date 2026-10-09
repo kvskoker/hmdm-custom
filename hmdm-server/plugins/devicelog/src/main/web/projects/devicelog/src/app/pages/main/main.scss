@@ -1,0 +1,33 @@
+.logs {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card {
+  &-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    gap: 16px;
+  }
+
+  &-content {
+    margin-top: 16px;
+  }
+
+  &-btn {
+    text-wrap: nowrap;
+  }
+
+  &-inner {
+    position: relative;
+  }
+}
+
+.update-spinner {
+  position: absolute;
+  top: 18px;
+  right: 8px;
+}

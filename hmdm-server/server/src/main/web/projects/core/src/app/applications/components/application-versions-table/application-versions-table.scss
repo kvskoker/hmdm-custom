@@ -1,0 +1,32 @@
+.card {
+  &-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  // Same look as the breadcrumb on the configuration details page, at the title size
+  &-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  &-breadcrumb-link {
+    color: var(--mat-sys-primary);
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &-breadcrumb-current {
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  &-content {
+    margin-top: 16px;
+  }
+}

@@ -1,0 +1,50 @@
+<!DOCTYPE web-app PUBLIC
+        "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+        "http://java.sun.com/dtd/web-app_2_3.dtd" >
+
+<web-app>
+    <display-name>Detailed Information Plugin for Headwind MDM</display-name>
+
+    <filter>
+        <filter-name>SpaFilter</filter-name>
+        <filter-class>com.hmdm.rest.filter.SpaFilter</filter-class>
+    </filter>
+
+    <filter>
+        <filter-name>guice-filter</filter-name>
+        <filter-class>com.google.inject.servlet.GuiceFilter</filter-class>
+    </filter>
+
+    <filter>
+        <filter-name>DeviceInfoPlugin</filter-name>
+        <filter-class>org.glassfish.jersey.servlet.ServletContainer</filter-class>
+        <init-param>
+            <param-name>jakarta.ws.rs.Application</param-name>
+            <param-value>com.hmdm.plugins.deviceinfo.DeviceInfoPluginApplication</param-value>
+        </init-param>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>SpaFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>guice-filter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>DeviceInfoPlugin</filter-name>
+        <url-pattern>/rest/*</url-pattern>
+    </filter-mapping>
+
+    <listener>
+        <listener-class>com.hmdm.plugins.deviceinfo.guice.Initializer</listener-class>
+    </listener>
+
+    <session-config>
+        <session-timeout>1440</session-timeout>
+    </session-config>
+</web-app>

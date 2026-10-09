@@ -30,3 +30,10 @@ server/build.properties
 # Backup copies
 server/pom.xml.bak
 plugins/pom.xml.bak
+
+# Angular 2+ files
+test/
+webtarget/
+
+# Native federation files
+**/tsconfig.federation.json

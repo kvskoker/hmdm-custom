@@ -1,0 +1,13 @@
+mat-form-field {
+  width: 100%;
+}
+
+.date {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+
+  &-control {
+    flex: 1;
+  }
+}

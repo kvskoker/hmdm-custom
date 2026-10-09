@@ -8,7 +8,7 @@ import com.hmdm.plugins.devicelocation.guice.module.DeviceLocationPersistenceMod
 import com.hmdm.plugins.devicelocation.guice.module.DeviceLocationRestModule;
 import com.hmdm.plugins.devicelocation.guice.module.DeviceLocationTaskModule;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

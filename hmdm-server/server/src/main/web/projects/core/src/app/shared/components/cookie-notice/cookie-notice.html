@@ -1,0 +1,33 @@
+@if (!dismissed()) {
+  <div
+    class="cookie-notice"
+    role="region"
+    [attr.aria-label]="'cookieNotice.banner.ariaLabel' | translate"
+  >
+    <h2 class="cookie-notice-header">{{ 'cookieNotice.banner.ariaLabel' | translate }}</h2>
+
+    <p class="cookie-notice-text">{{ 'cookieNotice.banner.message' | translate }}</p>
+
+    <div class="cookie-notice-actions">
+      @if (termsLink()) {
+        <a
+          matButton="outlined"
+          class="cookie-notice-action"
+          [href]="termsLink()"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {{ 'cookieNotice.banner.learnMore' | translate }}
+        </a>
+      } @else {
+        <a matButton="outlined" class="cookie-notice-action" routerLink="/privacy">
+          {{ 'cookieNotice.banner.learnMore' | translate }}
+        </a>
+      }
+
+      <button matButton="filled" class="cookie-notice-action" type="button" (click)="onDismiss()">
+        {{ 'cookieNotice.banner.dismiss' | translate }}
+      </button>
+    </div>
+  </div>
+}

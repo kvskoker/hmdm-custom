@@ -1,0 +1,17 @@
+<hmdm-dialog-template class="dialog">
+  <div class="dialog-content" mat-typography>
+    <p class="dialog-text">{{ 'qrcode.help.line1' | translate }}</p>
+    <ol>
+      <li>{{ 'qrcode.help.line2' | translate }}</li>
+      <li>{{ 'qrcode.help.line3' | translate }}</li>
+      <li>{{ 'qrcode.help.line4' | translate }}</li>
+      <li>{{ 'qrcode.help.line5' | translate }}</li>
+    </ol>
+  </div>
+
+  <div class="dialog-actions" dialog-actions>
+    <button matButton="filled" class="dialog-btn primary" (click)="onCancel()">
+      {{ 'button.close' | translate }}
+    </button>
+  </div>
+</hmdm-dialog-template>

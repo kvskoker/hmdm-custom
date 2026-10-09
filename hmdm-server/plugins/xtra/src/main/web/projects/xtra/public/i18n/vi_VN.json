@@ -1,0 +1,15 @@
+{
+  "xtra.plugin.title": "Nhiều tính năng hơn trong Headwind MDM Enterprise!",
+  "xtra.plugin.content.description": "Nâng cấp phiên bản của bạn lên bản dùng thử rất dễ dàng và hoàn toàn MIỄN PHÍ!",
+  "xtra.plugin.content.button": "NHẬN BẢN DÙNG THỬ MIỄN PHÍ",
+  "xtra.plugin.kiosk-mode": "Chế độ Kiosk (đơn nhiệm)",
+  "xtra.plugin.device-location-tracking": "Theo dõi vị trí thiết bị",
+  "xtra.plugin.remote-management": "Khởi động lại, khóa và khôi phục cài đặt gốc từ xa",
+  "xtra.plugin.upload-photos": "Tải ảnh lên từ thiết bị",
+  "xtra.plugin.remote-control": "Điều khiển từ xa",
+  "xtra.plugin.traffic-filtering": "Lọc lưu lượng mạng",
+  "xtra.plugin.two-factor-authentication": "Xác thực hai yếu tố",
+  "xtra.plugin.export-import-devices": "Xuất và nhập thiết bị",
+  "xtra.plugin.device-contacts-management": "Quản lý danh bạ thiết bị",
+  "xtra.plugin.white-label": "Phần mềm White-label (thay đổi thương hiệu)"
+}

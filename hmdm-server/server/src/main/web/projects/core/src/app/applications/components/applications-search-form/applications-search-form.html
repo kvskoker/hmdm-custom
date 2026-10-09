@@ -1,0 +1,16 @@
+<form
+  class="form"
+  persistFormKey="applications-search-form"
+  [formGroup]="formGroup()"
+  [hmdmPersistForm]="formGroup()"
+>
+  <hmdm-checkbox
+    [label]="'form.configuration.apps.show.system.apps' | translate"
+    formControlName="showSystem"
+  ></hmdm-checkbox>
+
+  <hmdm-checkbox
+    [label]="'box.show.my.apps.only' | translate"
+    formControlName="showMy"
+  ></hmdm-checkbox>
+</form>

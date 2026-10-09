@@ -1,0 +1,23 @@
+<div class="input-container">
+  <mat-form-field appearance="outline">
+    <mat-label> {{ label() }}</mat-label>
+    <textarea
+      matInput
+      [placeholder]="placeholder()"
+      [formControl]="formControl"
+      [rows]="rows()"
+    ></textarea>
+
+    @if (help()) {
+      <hmdm-help-tooltip matSuffix [text]="help()" />
+    }
+  </mat-form-field>
+
+  @if (showError()) {
+    <div class="input-error">
+      @if (control && control.invalid && control.touched) {
+        <hmdm-error-message [control]="control"></hmdm-error-message>
+      }
+    </div>
+  }
+</div>

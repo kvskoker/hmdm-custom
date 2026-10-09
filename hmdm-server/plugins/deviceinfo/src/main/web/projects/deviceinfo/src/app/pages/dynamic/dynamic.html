@@ -1,0 +1,26 @@
+<mat-card class="card scroll-content" [hmdmLoader]="isLoadingDetails()">
+  <mat-card-header class="card-header">
+    <mat-card-title>{{ 'plugin.deviceinfo.dynamic.tab.title' | translate }}</mat-card-title>
+
+    <button matButton="filled" class="primary" (click)="onExport()">
+      <mat-icon>file_upload</mat-icon>
+      {{ 'button.plugin.deviceinfo.export' | translate }}
+    </button>
+  </mat-card-header>
+
+  <mat-card-content class="card-content scroll-scrollable">
+    <di-search-form [formGroup]="formGroup"></di-search-form>
+
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>{{ 'plugin.deviceinfo.dynamic.params.all' | translate }}</mat-panel-title>
+      </mat-expansion-panel-header>
+
+      <div class="panel-content">
+        <di-displayed-columns></di-displayed-columns>
+      </div>
+    </mat-expansion-panel>
+
+    <di-dynamic-table #table class="card-table"></di-dynamic-table>
+  </mat-card-content>
+</mat-card>

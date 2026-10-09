@@ -236,4 +236,24 @@
             ALTER TABLE plugin_deviceinfo_deviceparams_device DROP COLUMN memoryAvailable;
         </rollback>
     </changeSet>
+
+    <changeSet id="plugin-deviceinfo-19.01.2026-17:30" author="seva" context="common">
+        <comment>Adapt plugin settings to version 6</comment>
+        <sql>
+            UPDATE plugins SET
+                               name='Detailed Information',
+                               description='Detailed information about the device and dynamic data',
+                               icon='manage_search',
+                               javascriptModuleFile=null,
+                               functionsViewTemplate=null,
+                               settingsViewTemplate=null,
+                               baseUrl='/plugins/deviceinfo',
+                               baseUrlDev='http://localhost:4204',
+                               hasSettingsPage=true
+            WHERE identifier='deviceinfo';
+        </sql>
+        <rollback>
+        </rollback>
+    </changeSet>
+
 </databaseChangeLog>

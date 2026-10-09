@@ -1,0 +1,25 @@
+<div class="audit scroll-content">
+  <mat-card class="card scroll-content" [hmdmLoader]="isLoadingAudits()">
+    <mat-card-title class="card-title">
+      <h3>{{ 'plugin.audit.tab.title' | translate }}</h3>
+
+      <hmdm-search-container
+        persistKey="audit-search-control"
+        [searchControl]="tableSearchControl"
+        [filtersTemplate]="filtersTemplate"
+        [activeFiltersCount]="activeFiltersCount()"
+        [showSearchButton]="false"
+      ></hmdm-search-container>
+
+      <ng-template #filtersTemplate>
+        <audit-form [formGroup]="formGroup"></audit-form>
+      </ng-template>
+    </mat-card-title>
+
+    <mat-divider></mat-divider>
+
+    <mat-card-content class="card-content scroll-content">
+      <audit-table class="scroll-table"></audit-table>
+    </mat-card-content>
+  </mat-card>
+</div>

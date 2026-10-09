@@ -26,7 +26,7 @@ if [ ! -d $SSL_DIR ]; then
     mkdir -p $SSL_DIR
 fi
 
-certbot certonly --agree-tos --no-eff-email --standalone --force-renewal -d $DOMAIN
+certbot certonly --agree-tos --no-eff-email --standalone --keep-until-expiring -d $DOMAIN
 
 # Add the HTTP rule back
 if [ "$HTTP_REDIRECT" = "1" ]; then

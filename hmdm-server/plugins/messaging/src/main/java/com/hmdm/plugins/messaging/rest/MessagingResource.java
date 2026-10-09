@@ -27,6 +27,7 @@ import com.hmdm.persistence.DeviceDAO;
 import com.hmdm.persistence.UnsecureDAO;
 import com.hmdm.persistence.domain.Device;
 import com.hmdm.persistence.domain.DeviceSearchRequest;
+import com.hmdm.plugin.rest.json.LicenseResponse;
 import com.hmdm.plugin.service.PluginStatusCache;
 import com.hmdm.plugins.messaging.persistence.MessagingDAO;
 import com.hmdm.plugins.messaging.persistence.domain.Message;
@@ -36,17 +37,20 @@ import com.hmdm.rest.json.PaginatedData;
 import com.hmdm.rest.json.Response;
 import com.hmdm.security.SecurityContext;
 import com.hmdm.security.SecurityException;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.Authorization;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -57,8 +61,8 @@ import java.util.List;
  * @author isv
  */
 @Singleton
-@Path("/plugins/messaging")
-@Api(tags = {"Messaging plugin"})
+@Path("/private/plugin-messaging")
+@Tag(name = "Messaging plugin")
 public class MessagingResource {
 
     private static final Logger logger = LoggerFactory.getLogger(MessagingResource.class);
@@ -115,14 +119,23 @@ public class MessagingResource {
      * @param filter a filter to be used for filtering the records.
      * @return a response with list of device log records matching the specified filter.
      */
-    @ApiOperation(
-            value = "Search messages",
-            notes = "Gets the list of message records matching the specified filter",
-            response = PaginatedData.class,
-            authorizations = {@Authorization("Bearer Token")}
+    @Operation(
+            summary = "Search messages",
+            description = "Gets the list of message records matching the specified filter",
+            security = @SecurityRequirement(name = "Bearer Token"),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "OK",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = PaginatedData.class)
+                            )
+                    )
+            }
     )
     @POST
-    @Path("/private/search")
+    @Path("/search")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getMessages(MessageFilter filter) {
         try {
@@ -137,13 +150,13 @@ public class MessagingResource {
     }
 
     // =================================================================================================================
-    @ApiOperation(
-            value = "Send new message",
-            notes = "Sends a new message to a specified device.",
-            authorizations = {@Authorization("Bearer Token")}
+    @Operation(
+            summary = "Send new message",
+            description = "Sends a new message to a specified device.",
+            security = @SecurityRequirement(name = "Bearer Token")
     )
     @POST
-    @Path("/private/send")
+    @Path("/send")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response sendMessage(SendRequest sendRequest) {
@@ -239,14 +252,15 @@ public class MessagingResource {
     }
 
     // =================================================================================================================
-    @ApiOperation(
-            value = "Delete message",
-            notes = "Delete an existing message"
+    @Operation(
+            summary = "Delete message",
+            description = "Delete an existing message"
     )
     @DELETE
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response removeDevice(@PathParam("id") @ApiParam("Message ID") Integer id) {
+    public Response removeDevice(@PathParam("id")
+        @Parameter(description = "Message ID", schema = @Schema(type = "integer")) Integer id) {
         final boolean canSendMessages = SecurityContext.get().hasPermission("plugin_messaging_delete");
 
         if (!(canSendMessages)) {
@@ -261,13 +275,13 @@ public class MessagingResource {
 
 
     // =================================================================================================================
-    @ApiOperation(
-            value = "Purge old messages",
-            notes = "Deletes all messages older than a specified number of days.",
-            authorizations = {@Authorization("Bearer Token")}
+    @Operation(
+            summary = "Purge old messages",
+            description = "Deletes all messages older than a specified number of days.",
+            security = @SecurityRequirement(name = "Bearer Token")
     )
     @GET
-    @Path("/private/purge/{days}")
+    @Path("/purge/{days}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response purgeMessages(@PathParam("days") Integer days) {
         try {
@@ -289,24 +303,31 @@ public class MessagingResource {
     }
 
     // =================================================================================================================
-    @ApiOperation(
-            value = "Sets the message status",
-            notes = "Marks message as delivered or read."
+    /**
+     * <p>Checks for valid license for a plugin</p>
+     *
+     * @return {@link LicenseResponse} indicating whether the license is valid .
+     */
+    @Operation(
+            summary = "Checks for a plugin license",
+            description = "Checks for valid license for a plugin",
+            security = @SecurityRequirement(name = "Bearer Token"),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "OK",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = LicenseResponse.class)
+                            )
+                    )
+            }
     )
     @GET
-    @Path("/public/status/{id}/{status}")
+    @Path("/license")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response setMessageStatus(@PathParam("id") Integer id, @PathParam("status") Integer status) {
-        if (status == null || status < 0 || status > Message.STATUS_READ) {
-            logger.error("Wrong status " + status + " for message id " + id);
-            return Response.ERROR();
-        }
-        try {
-            this.messagingDAO.updateMessageStatus(id, status);
-            return Response.OK();
-        } catch (Exception e) {
-            logger.error("Unexpected error when marking the message " + id + " as read", e);
-            return Response.ERROR();
-        }
+    public Response license() {
+        return Response.OK(LicenseResponse.genericValidResponse());
     }
+
 }

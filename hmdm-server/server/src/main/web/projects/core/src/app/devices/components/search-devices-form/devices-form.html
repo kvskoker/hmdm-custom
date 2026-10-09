@@ -1,0 +1,119 @@
+<form
+  class="devices-form"
+  persistFormKey="devices-search-form"
+  [formGroup]="devicesForm"
+  [hmdmPersistForm]="devicesForm"
+>
+  <div class="devices-params">
+    <div class="devices-block">
+      <fieldset class="devices-fieldset">
+        <hmdm-selector
+          class="full-width"
+          formControlName="groupId"
+          label="{{ 'form.settings.common.group' | translate }}"
+          [options]="groups()"
+          [optional]="true"
+        ></hmdm-selector>
+      </fieldset>
+
+      <fieldset class="devices-fieldset">
+        <hmdm-selector
+          formControlName="status"
+          label="{{ 'form.settings.common.status' | translate }}"
+          [options]="onlineStatusOptions"
+          [optional]="true"
+        ></hmdm-selector>
+
+        <hmdm-selector
+          formControlName="time"
+          label="{{ 'form.devices.selection.online.status.custom' | translate }}"
+          [options]="timeOptions"
+          [optional]="true"
+        ></hmdm-selector>
+
+        @if (isCustomTime()) {
+          <hmdm-text-input
+            formControlName="customTime"
+            inputType="number"
+            label="{{ 'form.devices.selection.number' | translate }}"
+            help="{{ 'form.devices.selection.online.status.label' | translate }}"
+          ></hmdm-text-input>
+        }
+      </fieldset>
+
+      <fieldset class="devices-fieldset">
+        <hmdm-date-range
+          formControlName="enrollmentDate"
+          label="{{ 'form.settings.common.enrollment.date' | translate }}"
+        ></hmdm-date-range>
+      </fieldset>
+    </div>
+
+    <div class="devices-block">
+      <fieldset class="devices-fieldset">
+        <hmdm-selector
+          class="full-width"
+          formControlName="configurationId"
+          label="{{ 'form.settings.common.config' | translate }}"
+          [options]="configurations()"
+          [optional]="true"
+        ></hmdm-selector>
+      </fieldset>
+
+      <fieldset class="devices-fieldset">
+        <hmdm-selector
+          formControlName="installationStatus"
+          label="{{ 'form.devices.selection.install.status.default' | translate }}"
+          [options]="statusOptions"
+          [optional]="true"
+        ></hmdm-selector>
+
+        <hmdm-checkbox
+          label="{{ 'form.devices.selection.imei.changed' | translate }}"
+          formControlName="imeiChanged"
+        ></hmdm-checkbox>
+      </fieldset>
+
+      <fieldset class="devices-fieldset">
+        <hmdm-selector
+          formControlName="mdmMode"
+          label="{{ 'form.settings.common.mdm.mode' | translate }}"
+          [options]="mdmModeOptions"
+          [optional]="true"
+        ></hmdm-selector>
+
+        <hmdm-selector
+          formControlName="kioskMode"
+          label="{{ 'form.settings.common.kiosk.mode' | translate }}"
+          [options]="kioskModeOptions"
+          [optional]="true"
+        ></hmdm-selector>
+      </fieldset>
+    </div>
+
+    <div class="devices-block grid">
+      <fieldset class="devices-fieldset">
+        <hmdm-text-input
+          class="full-width"
+          formControlName="androidVersion"
+          label="{{ 'form.settings.common.android.version' | translate }}"
+        ></hmdm-text-input>
+      </fieldset>
+
+      <fieldset class="devices-fieldset">
+        <hmdm-text-input
+          class="full-width"
+          formControlName="launcherVersion"
+          label="{{ 'search.placeholder.launcher.version' | translate }}"
+        ></hmdm-text-input>
+      </fieldset>
+    </div>
+  </div>
+
+  <div class="devices-search">
+    <hmdm-checkbox
+      label="{{ 'form.devices.fast.search' | translate }}"
+      formControlName="fastSearch"
+    ></hmdm-checkbox>
+  </div>
+</form>

@@ -22,7 +22,10 @@
 package com.hmdm.plugins.messaging.guice.module;
 
 import com.google.inject.servlet.ServletModule;
+import com.hmdm.plugin.guice.module.AbstractPluginRestModule;
 import com.hmdm.plugin.rest.PluginAccessFilter;
+import com.hmdm.plugins.messaging.MessagingPluginConfigurationImpl;
+import com.hmdm.plugins.messaging.rest.MessagingPublicResource;
 import com.hmdm.plugins.messaging.rest.MessagingResource;
 import com.hmdm.rest.filter.AuthFilter;
 import com.hmdm.rest.filter.PrivateIPFilter;
@@ -37,21 +40,29 @@ import java.util.List;
  *
  * @author isv
  */
-public class MessagingRestModule extends ServletModule {
+public class MessagingRestModule extends AbstractPluginRestModule {
 
     /**
      * <p>A list of patterns for URIs for plugin resources which prohibit anonymous access.</p>
      */
-    private static final List<String> protectedResources = Arrays.asList(
-            "/rest/plugins/messaging/private/*"
-    );
+    @Override
+    protected List<String> getProtectedResources() {
+        return Arrays.asList(
+                "/rest/private/plugin-messaging/*"
+        );
+    }
 
-    /**
-     * <p> A list of patterns for URIs for plugin resources available to devices</p>
-     */
-    private static final List<String> publicResources = Arrays.asList(
-            "/rest/plugins/messaging/public/*"
-    );
+    @Override
+    protected List<String> getPublicResources() {
+        return Arrays.asList(
+            "/rest/public/plugin-messaging/*"
+        );
+    }
+
+    @Override
+    protected String getPluginId() {
+        return MessagingPluginConfigurationImpl.PLUGIN_ID;
+    }
 
     /**
      * <p>Constructs new <code>MessagingRestModule</code> instance. This implementation does nothing.</p>
@@ -63,12 +74,9 @@ public class MessagingRestModule extends ServletModule {
      * <p>Configures the <code>Messaging Plugin</code> REST resources.</p>
      */
     protected void configureServlets() {
-        this.filter(protectedResources).through(JWTFilter.class);
-        this.filter(protectedResources).through(AuthFilter.class);
-        this.filter(protectedResources).through(PluginAccessFilter.class);
-        this.filter(protectedResources).through(PrivateIPFilter.class);
-        this.filter(publicResources).through(PublicIPFilter.class);
+        super.configureServlets();
         this.bind(MessagingResource.class);
+        this.bind(MessagingPublicResource.class);
     }
 
 }

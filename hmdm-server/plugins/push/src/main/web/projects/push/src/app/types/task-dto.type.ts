@@ -1,0 +1,25 @@
+export type TTaskDTO = {
+  id: number;
+  customerId: number;
+  deviceId: number;
+  groupId: number;
+  configurationId: number;
+  groupName: string;
+  configurationName: string;
+  target: string;
+  scope: string;
+  messageType: string;
+  payload: string;
+  comment: string;
+  min: string;
+  minBit: string;
+  hour: string;
+  hourBit: string;
+  day: string;
+  dayBit: string;
+  weekday: string;
+  weekdayBit: string;
+  month: string;
+  monthBit: string;
+  common: boolean;
+};

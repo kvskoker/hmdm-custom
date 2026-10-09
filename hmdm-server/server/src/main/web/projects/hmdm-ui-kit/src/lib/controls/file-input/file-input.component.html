@@ -1,0 +1,63 @@
+<div class="input-container">
+  <mat-form-field appearance="outline">
+    <mat-label>{{ label() }}</mat-label>
+
+    <!-- Hidden file input -->
+    <input
+      #fileInput
+      type="file"
+      [accept]="acceptTypes()"
+      [multiple]="multiple()"
+      (change)="onFileSelect($event)"
+      style="display: none"
+    />
+
+    <!-- Display input that shows selected file(s) -->
+    <input
+      matInput
+      readonly
+      [value]="displayValue"
+      [placeholder]="placeholder()"
+      [disabled]="isDisabled()"
+      (click)="openFileDialog()"
+      style="cursor: pointer"
+    />
+
+    <!-- Browse button -->
+    <button
+      type="button"
+      mat-icon-button
+      matSuffix
+      (click)="openFileDialog()"
+      [disabled]="isDisabled()"
+    >
+      <mat-icon>folder_open</mat-icon>
+    </button>
+
+    <!-- Clear button (only show when files are selected) -->
+    @if (selectedFiles.length > 0) {
+      <button
+        type="button"
+        mat-icon-button
+        matSuffix
+        (click)="clearFiles()"
+        [disabled]="isDisabled()"
+      >
+        <mat-icon>clear</mat-icon>
+      </button>
+    }
+
+    @if (help()) {
+      <hmdm-help-tooltip matSuffix [text]="help()" />
+    }
+  </mat-form-field>
+
+  @if (showError()) {
+    <div class="input-error">
+      <!-- Error message -->
+      @if (errorMessage) {
+        <mat-error>{{ errorMessage }}</mat-error>
+      }
+    </div>
+  }
+</div>

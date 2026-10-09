@@ -24,12 +24,9 @@ package com.hmdm.plugins.push;
 import com.google.inject.Module;
 import com.hmdm.plugin.PluginConfiguration;
 import com.hmdm.plugin.PluginTaskModule;
-import com.hmdm.plugins.push.guice.module.PushLiquibaseModule;
-import com.hmdm.plugins.push.guice.module.PushPersistenceModule;
-import com.hmdm.plugins.push.guice.module.PushRestModule;
-import com.hmdm.plugins.push.guice.module.PushScheduleTaskModule;
+import com.hmdm.plugins.push.guice.module.*;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -98,6 +95,7 @@ public class PushPluginConfigurationImpl implements PluginConfiguration {
     public Optional<List<Class<? extends PluginTaskModule>>> getTaskModules(ServletContext context) {
         List<Class<? extends PluginTaskModule>> modules = new ArrayList<>();
 
+        modules.add(PushTaskModule.class);
         modules.add(PushScheduleTaskModule.class);
 
         return Optional.of(modules);

@@ -26,7 +26,7 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd"
-        logicalFilePath="xtra.changelog.xml">
+        logicalFilePath="openvpn.changelog.xml">
 
     <!--
     The change set IDs MUST start with "plugin-<plugin identifier>" followed by dash symbol ALWAYS.
@@ -34,42 +34,58 @@
     symbol.
     -->
 
-    <changeSet id="plugin-xtra-13.05.2023-16:02" author="seva" context="common">
+    <changeSet id="plugin-xtra-20.06.2026-15:28" author="seva" context="common">
         <comment>Plugin,new: xtra</comment>
         <sql>
             INSERT INTO plugins (
-            identifier, name, description,
-            javascriptModuleFile,
-            functionsViewTemplate,
-            settingsViewTemplate,
+            identifier,
+            name,
+            description,
+            icon,
+            baseUrl,
+            baseUrlDev,
+            hasSettingsPage,
             namelocalizationkey,
-            settingsPermission, functionsPermission, deviceFunctionsPermission
+            settingsPermission,
+            functionsPermission,
+            deviceFunctionsPermission,
+            enabledForDevice
             )
             VALUES (
-            'xtra', 'More plugins...', 'Request for more plugins in the Premium version',
-            'app/components/plugins/xtra/xtra.module.js',
-            'app/components/plugins/xtra/views/xtra.html',
-            NULL,
+            'xtra',
+            'More plugins',
+            'Request for upgrade to Premium',
+            'grade',
+            '/plugins/xtra',
+            'http://localhost:4216',
+            false,
             'plugin.xtra.localization.key.name',
             'plugin_xtra_access',
             'plugin_xtra_access',
-            'plugin_xtra_access'
-            );
-        </sql>
-        <rollback>
-            DELETE FROM plugins WHERE identifier = 'xtra';
-        </rollback>
-    </changeSet>
+            'plugin_xtra_access',
+            false
+            ) ON CONFLICT (identifier)
+            DO UPDATE SET
+                name = EXCLUDED.name,
+                description = EXCLUDED.description,
+                icon = EXCLUDED.icon,
+                baseUrl = EXCLUDED.baseurl,
+                baseUrlDev = EXCLUDED.baseUrlDev,
+                hasSettingsPage = EXCLUDED.hasSettingsPage,
+                namelocalizationkey = EXCLUDED.namelocalizationkey,
+                settingsPermission = EXCLUDED.settingsPermission,
+                functionsPermission = EXCLUDED.functionsPermission,
+                deviceFunctionsPermission = EXCLUDED.deviceFunctionsPermission,
+                enabledForDevice = EXCLUDED.enabledForDevice
+            ;
 
-    <changeSet id="plugin-xtra-13.05.2023-16:04" author="seva" context="common">
-        <comment>Permission,new: plugin_xtra_access</comment>
-        <sql>
             INSERT INTO permissions (name, description) VALUES ('plugin_xtra_access', 'Access to Premium version request plugin');
             INSERT INTO userRolePermissions (roleId, permissionId) VALUES (1, currval('permissions_id_seq'));
             INSERT INTO userRolePermissions (roleId, permissionId) VALUES (2, currval('permissions_id_seq'));
             INSERT INTO userRolePermissions (roleId, permissionId) VALUES (3, currval('permissions_id_seq'));
         </sql>
         <rollback>
+            DELETE FROM plugins WHERE identifier = 'xtra';
             DELETE FROM permissions WHERE name = 'plugin_xtra_access';
         </rollback>
     </changeSet>

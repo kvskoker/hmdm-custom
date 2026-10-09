@@ -1,0 +1,135 @@
+.card {
+  &-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    gap: 16px;
+  }
+
+  &-content {
+    margin-top: 16px;
+    overflow: hidden;
+  }
+}
+
+.title {
+  text-align: center;
+  font-size: 28px;
+  font-weight: 400;
+  margin-bottom: 40px;
+  color: #333;
+  height: 40px;
+}
+
+.updates-grid {
+  display: grid;
+  grid-template-columns: 2.5fr 2fr 2fr 1fr;
+  align-items: center;
+  padding: 12px 0;
+  font-size: 15px;
+}
+
+.header {
+  font-weight: 600;
+  color: #444;
+  border-bottom: 1px solid transparent;
+  margin-bottom: 8px;
+}
+
+.data-row {
+  min-height: 40px;
+}
+
+.span-two-columns {
+  grid-column: span 2;
+}
+
+.warning-text {
+  color: #ff3b30;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.checkmark {
+  font-size: 16px;
+  font-weight: bold;
+  color: #222;
+}
+
+.options-container {
+  margin-top: 35px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #444;
+}
+
+.custom-checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 28px;
+  height: 28px;
+  border: 1px solid #a0a0a0;
+  border-radius: 2px;
+  outline: none;
+  background-color: #fff;
+  cursor: pointer;
+  display: grid;
+  place-content: center;
+}
+
+.hint-container {
+  margin-top: 15px;
+  font-size: 13px;
+  color: #8e8e93;
+  line-height: 1.4;
+}
+
+.actions-container {
+  margin-top: 40px;
+  display: flex;
+  justify-content: center;
+}
+
+.btn-submit {
+  background-color: #f8f9fa;
+  border: 1px solid #d1d1d6;
+  border-radius: 4px;
+  padding: 10px 24px;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+}
+
+.btn-submit:hover:not(:disabled) {
+  background-color: #e5e5ea;
+}
+
+.btn-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.alert {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 4px;
+}
+.error-message { background-color: #fde8e8; color: #e53e3e; }
+.success-message { background-color: #e6fffa; color: #319795; }
+.loading-gif { width: 16px; height: 16px; margin-left: 10px; vertical-align: middle; }

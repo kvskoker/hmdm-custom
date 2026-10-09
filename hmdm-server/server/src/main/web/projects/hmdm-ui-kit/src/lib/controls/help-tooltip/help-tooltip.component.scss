@@ -1,0 +1,19 @@
+.help-trigger {
+  color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.54));
+  flex-shrink: 0;
+
+  &:hover {
+    color: var(--mat-sys-primary, rgba(0, 0, 0, 0.87));
+  }
+}
+
+.help-popup {
+  max-width: 280px;
+  padding: 10px 14px;
+  background-color: var(--mat-sys-primary);
+  color: var(--mat-sys-on-primary);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  font-size: 13px;
+  line-height: 1.5;
+}

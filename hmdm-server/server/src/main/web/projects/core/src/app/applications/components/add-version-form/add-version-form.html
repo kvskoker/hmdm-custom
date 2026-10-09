@@ -1,0 +1,27 @@
+<form class="version-form" [formGroup]="formGroup">
+  <hmdm-text-input
+    formControlName="version"
+    [label]="'form.application.version' | translate"
+  ></hmdm-text-input>
+
+  <hmdm-selector
+    formControlName="arch"
+    [label]="'form.application.arch' | translate"
+    [options]="architectureOptions"
+  ></hmdm-selector>
+
+  <hmdm-text-input
+    formControlName="url"
+    [label]="'form.application.url' | translate"
+  ></hmdm-text-input>
+
+  <hmdm-file-input
+    formControlName="file"
+    [label]="'form.application.file' | translate"
+  ></hmdm-file-input>
+
+  <hmdm-checkbox
+    formControlName="autoUpdate"
+    [label]="'form.application.auto.update' | translate"
+  ></hmdm-checkbox>
+</form>

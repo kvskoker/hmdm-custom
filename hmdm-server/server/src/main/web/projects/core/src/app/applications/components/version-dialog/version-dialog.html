@@ -1,0 +1,10 @@
+<hmdm-dialog-template>
+  <core-add-version-form></core-add-version-form>
+
+  <hmdm-dialog-common-buttons
+    dialog-actions
+    [isSaveDisabled]="isFormInvalid"
+    (cancel)="onCancel()"
+    (save)="onSave()"
+  ></hmdm-dialog-common-buttons>
+</hmdm-dialog-template>

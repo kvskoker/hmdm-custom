@@ -23,6 +23,7 @@ package com.hmdm.rest.json;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
@@ -31,7 +32,7 @@ import java.util.Objects;
  * @author isv
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class LookupItem {
+public class LookupItem implements Serializable {
 
     // An ID of the item.
     private int id;

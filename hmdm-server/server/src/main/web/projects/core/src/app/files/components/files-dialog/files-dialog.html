@@ -1,0 +1,31 @@
+<hmdm-dialog-template>
+  <div class="dialog">
+    <core-files-form
+      [initialData]="initialData"
+      (formChange)="onFormChange($event)"
+    ></core-files-form>
+
+    <div class="progress-wrapper">
+      @if (isLoading()) {
+        @if (uploadProgress() !== null) {
+          <mat-progress-bar
+            mode="determinate"
+            [value]="uploadProgress()"
+            class="progress"
+          ></mat-progress-bar>
+          <span class="progress-label">{{ uploadProgress() }}%</span>
+        } @else {
+          <mat-progress-bar mode="indeterminate" class="progress"></mat-progress-bar>
+        }
+      }
+    </div>
+  </div>
+
+  <hmdm-dialog-common-buttons
+    dialog-actions
+    [isSaveDisabled]="isSaveDisabled()"
+    [isCancelDisabled]="isLoading()"
+    (cancel)="onCancel()"
+    (save)="onSave()"
+  ></hmdm-dialog-common-buttons>
+</hmdm-dialog-template>

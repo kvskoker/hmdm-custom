@@ -23,20 +23,18 @@ package com.hmdm.service;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.hmdm.event.EventService;
 import com.hmdm.persistence.domain.Customer;
 import com.hmdm.util.StringUtil;
-import liquibase.util.FileUtil;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Named;
-import javax.mail.*;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
+import jakarta.inject.Named;
+import jakarta.mail.*;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeBodyPart;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
 import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
@@ -178,7 +176,7 @@ public class EmailService {
     }
 
     public String getRecoveryEmailBody(String language, String passwordResetToken) {
-        String passwordResetUrl = baseUrl + "/#/passwordReset/" + passwordResetToken;
+        String passwordResetUrl = baseUrl + "/auth/reset-password?token=" + passwordResetToken;
 
         return getLocalizedText(recoveryEmailBody, language)
                 .replace("${passwordResetUrl}", passwordResetUrl);
@@ -189,7 +187,7 @@ public class EmailService {
     }
 
     public String getVerifyEmailBody(String language, String verifyToken) {
-        String signupCompleteUrl = baseUrl + "/#/signupComplete/" + verifyToken;
+        String signupCompleteUrl = baseUrl + "/auth/sign-up-complete?token=" + verifyToken;
 
         return getLocalizedText(signupEmailBody, language)
                 .replace("${signupCompleteUrl}", signupCompleteUrl);

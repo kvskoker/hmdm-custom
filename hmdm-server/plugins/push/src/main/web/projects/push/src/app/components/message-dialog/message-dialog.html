@@ -1,0 +1,9 @@
+<hmdm-dialog-template>
+  <push-message-form [formGroup]="formGroup"></push-message-form>
+
+  <hmdm-dialog-common-buttons
+    (cancel)="onCancel()"
+    (save)="onSave()"
+    saveText="plugin.push.button.send"
+  ></hmdm-dialog-common-buttons>
+</hmdm-dialog-template>

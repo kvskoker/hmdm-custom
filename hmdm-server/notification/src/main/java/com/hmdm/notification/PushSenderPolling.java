@@ -2,11 +2,10 @@ package com.hmdm.notification;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.google.inject.name.Named;
 import com.hmdm.notification.persistence.NotificationDAO;
 import com.hmdm.notification.persistence.domain.PushMessage;
 
-import javax.servlet.AsyncContext;
+import jakarta.servlet.AsyncContext;
 import java.util.*;
 
 @Singleton
@@ -25,6 +24,10 @@ public class PushSenderPolling implements PushSender {
         // Do nothing here
     }
 
+    // TODO: this will not work if called from a plugin deployed as another WAR file!
+    // To make it working from standalone WAR plugins, an internal REST API should be defined
+    // which is served by the "server" WAR and called by the plugin WAR.
+    // (this method should be limited to localhost calls!)
     @Override
     public int send(PushMessage message) {
         DeviceEntry deviceEntry = deviceIdMap.get(message.getDeviceId());

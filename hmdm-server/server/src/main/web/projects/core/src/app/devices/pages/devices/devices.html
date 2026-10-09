@@ -1,0 +1,81 @@
+<div class="search">
+  <mat-card class="table" [hmdmLoader]="isLoadingDevices() || isLoadingSettings()">
+    <mat-card-title class="table-header">
+      <h3 class="table-title">{{ 'breadcrumb.devices' | translate }}</h3>
+
+      <hmdm-search-container
+        class="table-search"
+        persistKey="devices-search-control"
+        [searchControl]="tableSearchControl"
+        [activeFiltersCount]="activeFiltersCnt()"
+        [filtersTemplate]="filtersTemplate"
+        (searchClick)="onSearchClick()"
+        (toggleFilters)="toggleSearchMenu()"
+      ></hmdm-search-container>
+
+      <ng-template #filtersTemplate>
+        <core-devices-form [showMore]="true" (valueChange)="onFormValueChange($event)">
+        </core-devices-form>
+      </ng-template>
+
+      <div class="table-actions">
+        <button
+          *hmdmHasPermission="'edit_devices'"
+          matButton="outlined"
+          class="info table-actions-btn"
+          [matMenuTriggerFor]="menu"
+          [disabled]="!selectedDevices().length"
+        >
+          <mat-icon>arrow_drop_down</mat-icon>
+          {{ 'button.group.action' | translate }}
+        </button>
+
+        <mat-menu #menu="matMenu">
+          <button mat-menu-item (click)="onSetConfigurationClick()">
+            <mat-icon>settings</mat-icon>
+            <span>{{ 'button.set.configuration' | translate }}</span>
+          </button>
+          <button mat-menu-item (click)="onSetGroupClick()">
+            <mat-icon>group</mat-icon>
+            <span>{{ 'button.set.group' | translate }}</span>
+          </button>
+          <button mat-menu-item (click)="onDeleteClick()">
+            <mat-icon>delete</mat-icon>
+            <span>{{ 'button.delete' | translate }}</span>
+          </button>
+        </mat-menu>
+
+        <button
+          *hmdmHasPermission="'edit_devices'"
+          matButton="filled"
+          class="primary"
+          [disabled]="isDeviceLimitReached()"
+          (click)="onAddClick()"
+        >
+          <mat-icon>add</mat-icon>
+          {{ 'button.add' | translate }}
+        </button>
+      </div>
+    </mat-card-title>
+
+    <mat-divider></mat-divider>
+
+    <mat-card-content class="table-content">
+      <div class="table-inner">
+        @if (isUpdatingSilently()) {
+          <mat-spinner class="update-spinner" diameter="30"></mat-spinner>
+        }
+
+        <hmdm-table
+          #table
+          [config]="tableConfig"
+          [data]="tableData()"
+          [totalItems]="totalItems()"
+          (pageChange)="onTablePageChange($event)"
+          (sortChange)="onTableSortChange($event)"
+          (selectionChange)="onTableSelectionChange($event)"
+        ></hmdm-table>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

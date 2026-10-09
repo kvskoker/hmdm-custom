@@ -1,0 +1,35 @@
+<div class="logs scroll-content">
+  <mat-card class="card scroll-content" [hmdmLoader]="isLoadingDetails()">
+    <mat-card-title class="card-title">
+      <h3>{{ 'plugin.deviceinfo.tab.title' | translate }}</h3>
+
+      <hmdm-async-select-search
+        class="card-select"
+        [formControl]="deviceSearchControl"
+        [autocompleteServiceProps]="deviceAutocompleteService"
+        [showError]="false"
+        [showLabel]="false"
+      ></hmdm-async-select-search>
+
+      <button
+        matButton="filled"
+        class="card-btn primary"
+        (click)="onDynamicClick()"
+        [disabled]="!details()"
+      >
+        <mat-icon>dynamic_feed</mat-icon>
+        {{ 'button.plugin.deviceinfo.dynamic' | translate }}
+      </button>
+    </mat-card-title>
+
+    <mat-divider></mat-divider>
+
+    <mat-card-content class="card-content scroll-scrollable">
+      <di-details class=""></di-details>
+
+      <mat-divider></mat-divider>
+
+      <di-apps-table class="card-table"></di-apps-table>
+    </mat-card-content>
+  </mat-card>
+</div>

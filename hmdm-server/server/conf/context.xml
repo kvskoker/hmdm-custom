@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Context>
+<Context crossContext="true">
     <!-- database settings -->
     <Parameter name="JDBC.driver"   value="${jdbc.driver}"/>
     <Parameter name="JDBC.url"      value="${jdbc.url}"/>
@@ -22,6 +22,29 @@
          0 or empty value does not require request signature which is less secure -->
     <Parameter name="secure.enrollment" value="${secure.enrollment}"/>
     <Parameter name="hash.secret" value="${hash.secret}"/>
+    <!-- If set to 1, Strict-Transport-Security (HSTS) is turned on -->
+<!--    <Parameter name="strict.transport.security" value="${strict.transport.security}"/> -->
+
+    <!-- If set to 1, the device will not be enrolled if a device with the same number
+     was already enrolled. To enroll a device, delete it from the list and add back -->
+    <Parameter name="prevent.duplicate.enrollment" value="${prevent.duplicate.enrollment}"/>
+
+    <!-- If set to 1, the password will be transmitted to the server using RSA encryption.
+         The clean-text password can be used to delegate the authorization to third party 
+         authorization services like LDAP. 
+         If set to 0 (default), just a MD5 hash will be sent to the server
+         Important! This shouldn't be set to 1 for "Local" authentication! -->
+    <Parameter name="transmit.password" value="${transmit.password}"/>
+    
+    <!-- Authentification class (available options: Local, default: Local) -->
+    <Parameter name="auth.class" value="${auth.class}"/>
+
+    <!-- Session storage class (available options: Native, Db, default: Native)
+         Native is a Tomcat native session storage, which might be faster but won't work in plugins
+         delivered as WAR files. If third party plugins are used, set this parameter to Db
+         (Notice: letter case matters!
+    -->
+    <Parameter name="session.class" value="${session.class}"/>
 
     <Parameter name="role.orgadmin.id" value="${role.orgadmin.id}"/>
 
@@ -60,8 +83,18 @@
      to avoid congestion when all devices are updating configuration at the same time -->
     <Parameter name="mqtt.message.delay" value="${mqtt.message.delay}"/>
 
+    <Parameter name="plugin.knox.license" value="${plugin.knox.license}"/>
+
     <!-- Display X-Forwarded-For instead of source IP -->
     <Parameter name="plugin.audit.display.forwarded.ip" value="${plugin.audit.display.forwarded.ip}"/>
+
+<!--    <Parameter name="rebranding.name" value="${rebranding.name}"/>
+    <Parameter name="rebranding.vendor.name" value="${rebranding.vendor.name}"/>
+    <Parameter name="rebranding.vendor.link" value="${rebranding.vendor.link}"/>
+    <Parameter name="rebranding.logo" value="${rebranding.logo}"/>
+    <Parameter name="rebranding.mobile.name" value="${rebranding.mobile.name}"/>  
+    <Parameter name="rebranding.signup.link" value="${rebranding.signup.link}"/> --> 
+    <Parameter name="rebranding.terms.link" value="${rebranding.terms.link}"/>
 
     <!-- Email parameters are necessary for password recovery -->
     <Parameter name="smtp.host" value="${smtp.host}"/>
@@ -86,4 +119,66 @@
     <!-- <Parameter name="jwt.secretkey" value="${jwt.secretkey}"/> -->
     <!-- <Parameter name="jwt.validity" value="${jwt.validity}"/> -->
     <!-- <Parameter name="jwt.validityrememberme" value="${jwt.validityrememberme}"/> -->
+
+    <!--<Parameter name="customer.auto.status" value="${customer.auto.status}"/>        
+        <Parameter name="admin.email" value="${admin.email}"/>
+        <Parameter name="mailchimp.url" value="${mailchimp.url}"/>
+        <Parameter name="mailchimp.key" value="${mailchimp.key}"/> -->
+
+    <Parameter name="customer.signup" value="${customer.signup}"/>
+    <!-- Set to 1 if new customers should get the design settings copied from the master config -->
+    <Parameter name="customer.signup.copy.settings" value="${customer.signup.copy.settings}"/>
+    <!-- Comma-separated IDs of master customer configurations to be copied to the customer settings -->
+    <Parameter name="customer.signup.configurations" value="${customer.signup.configurations}"/>
+    <!-- Added to Reply-To when sending signup emails -->
+    <Parameter name="customer.signup.support.email" value="${customer.signup.support.email}"/>
+    <Parameter name="customer.signup.device.limit" value="${customer.signup.device.limit}"/>
+    <Parameter name="customer.signup.size.limit" value="${customer.signup.size.limit}"/>
+    <Parameter name="customer.signup.expiry.days" value="${customer.signup.expiry.days}"/>
+    <Parameter name="customer.signup.device.config" value="${customer.signup.device.config}"/>
+
+<!-- These are the customer email templates
+     Email paths may contain _LANGUAGE_ replaced to a two-letter language
+     The default language is en -->
+    <Parameter name="email.recovery.subj" value="${email.recovery.subj}"/>
+    <Parameter name="email.recovery.body" value="${email.recovery.body}"/>
+    <Parameter name="email.signup.subj" value="${email.signup.subj}"/>
+    <Parameter name="email.signup.body" value="${email.signup.body}"/>
+    <Parameter name="email.signup.complete.subj" value="${email.signup.complete.subj}"/>
+    <Parameter name="email.signup.complete.body" value="${email.signup.complete.body}"/>
+
+    <!-- Bind as admin to query for the user. This may be set to 0 if a user's CN is used to authenticate -->
+    <Parameter name="ldap.admin.bind" value="${ldap.admin.bind}"/>
+    <Parameter name="ldap.host" value="${ldap.host}"/>
+    <Parameter name="ldap.port" value="${ldap.port}"/>
+    <Parameter name="ldap.base.dn" value="${ldap.base.dn}"/>
+    <!-- Should be used when ldap.admin.bind is set to 1 -->
+    <Parameter name="ldap.admin.dn" value="${ldap.admin.dn}"/>
+    <Parameter name="ldap.admin.password" value="${ldap.admin.password}"/>
+    <Parameter name="ldap.username.attribute" value="${ldap.username.attribute}"/>     <!-- For example, cn or sAMAccountName -->
+    <!-- Should be used when ldap.admin.bind is set to 0. ${username} must present in this template
+         Example: CN=${username},CN=Users,DC=hmdmtest,DC=local -->
+    <Parameter name="ldap.user.dn" value="${ldap.user.dn}"/>
+    <!-- User role is determined by the memberOf attribute. The group DN must start with CN=HMDM-...,
+         for example, CN=HMDM-Admin (the string after HMDM- should be a valid group name, cyrillic is allowed).
+         If no user role found, the default role is assigned (ldap.default.role contains the role name) -->
+    <Parameter name="ldap.default.role" value="${ldap.default.role}"/>
+    <!-- In a multi-tenant setup, you may assign LDAP to another customer (the default customer ID is 1) -->
+    <Parameter name="ldap.customer.id" value="${ldap.customer.id}"/>
+
+    <!-- IP filters for REST API and web panel UI -->
+<!--    <Parameter name="device.allowed.address" value='${device.allowed.address}'/>
+    <Parameter name="ui.allowed.address" value='${ui.allowed.address}'/> -->
+
+    <!-- If the URL of an APK starts with this URL, the existing APK hash is not changed. 
+         This is important for deployment on the LAN -->
+    <Parameter name="apk.trusted.url" value="${apk.trusted.url}"/>
+
+    <!-- URL for internal API calls
+         Defaults to 127.0.0.1:8080 and the default filter is 127.0.0.1 -->
+    <Parameter name="internal.url" value="${internal.url}"/>
+    <Parameter name="internal.source.ip" value="${internal.source.ip}"/>
+
+    <!-- Purchase link displayed in the main application when a license is expiring -->
+    <Parameter name="plugin.license.purchase.link" value="${plugin.license.purchase.link}"/>   
 </Context>

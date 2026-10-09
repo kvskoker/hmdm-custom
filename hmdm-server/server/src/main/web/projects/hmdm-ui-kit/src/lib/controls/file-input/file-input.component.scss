@@ -1,0 +1,103 @@
+@use '@angular/material' as mat;
+
+mat-form-field {
+  width: 100%;
+}
+
+// Hide the file input's built-in button styling
+input[type='file'] {
+  display: none !important;
+}
+
+// Style the display input to indicate it's clickable
+input[readonly] {
+  cursor: pointer !important;
+
+  &:hover {
+    background-color: rgba(var(--mat-sys-primary-rgb), 0.04);
+  }
+
+  &:focus {
+    background-color: rgba(var(--mat-sys-primary-rgb), 0.08);
+  }
+}
+
+// Custom styling for file input container
+.file-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+// Ensure proper spacing for multiple suffix buttons
+.mat-mdc-form-field-suffix {
+  .mat-mdc-icon-button + .mat-mdc-icon-button {
+    margin-left: 4px;
+  }
+
+  .mat-mdc-icon-button {
+    color: var(--mat-sys-on-surface-variant);
+
+    &:hover {
+      color: var(--mat-sys-primary);
+      background-color: rgba(var(--mat-sys-primary-rgb), 0.08);
+    }
+
+    &:disabled {
+      color: var(--mat-sys-outline);
+      background-color: transparent;
+    }
+  }
+}
+
+// Error state styling
+mat-error {
+  font-size: 12px;
+  margin-top: 4px;
+  color: var(--mat-sys-error);
+}
+
+// File list display (for potential future enhancements)
+.file-list {
+  margin-top: 8px;
+  font-size: 14px;
+  color: var(--mat-sys-on-surface);
+
+  .file-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+    border-bottom: 1px solid var(--mat-sys-outline-variant);
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .file-name {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: var(--mat-sys-on-surface);
+    }
+
+    .file-size {
+      color: var(--mat-sys-on-surface-variant);
+      font-size: 12px;
+      margin-left: 8px;
+    }
+  }
+}
+
+// Disabled state styling
+mat-form-field.mat-form-field-disabled {
+  .mat-mdc-form-field-input-control input[readonly] {
+    cursor: not-allowed !important;
+    color: var(--mat-sys-outline);
+
+    &:hover {
+      background-color: transparent;
+    }
+  }
+}

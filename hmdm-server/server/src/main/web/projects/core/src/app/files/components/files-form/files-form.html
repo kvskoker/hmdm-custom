@@ -1,0 +1,48 @@
+<form [formGroup]="formGroup" class="files-form">
+  <div class="files-line">
+    <hmdm-checkbox
+      formControlName="external"
+      [label]="'form.file.external' | translate"
+    ></hmdm-checkbox>
+
+    <hmdm-checkbox
+      formControlName="replaceVariables"
+      [label]="'form.configuration.files.variables' | translate"
+    ></hmdm-checkbox>
+  </div>
+
+  @if (isExternal()) {
+    <hmdm-text-input
+      formControlName="externalUrl"
+      [label]="'form.configuration.file.url' | translate"
+    ></hmdm-text-input>
+  } @else {
+    @if (!isEdit()) {
+      <hmdm-file-input
+        formControlName="file"
+        [showError]="false"
+        [label]="'form.configuration.file.file' | translate"
+      ></hmdm-file-input>
+      <p class="storage-warning">
+        @if (availableSpaceWarning() !== null) {
+          {{ 'form.file.available' | translate: { space: availableSpaceWarning() } }}
+        }
+      </p>
+    }
+
+    <hmdm-text-input
+      formControlName="filePath"
+      [label]="'form.configuration.file.name' | translate"
+    ></hmdm-text-input>
+  }
+
+  <hmdm-text-input
+    formControlName="devicePath"
+    [label]="'form.configuration.file.path' | translate"
+  ></hmdm-text-input>
+
+  <hmdm-text-input
+    formControlName="description"
+    [label]="'form.file.description' | translate"
+  ></hmdm-text-input>
+</form>

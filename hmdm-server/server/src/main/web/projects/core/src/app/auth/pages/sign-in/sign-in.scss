@@ -1,0 +1,18 @@
+.auth {
+  &-form {
+    display: flex;
+    flex-direction: column;
+    width: 400px;
+  }
+
+  &-title {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  &-link {
+    margin-top: 16px;
+    text-decoration: none;
+    color: var(--mat-sys-primary);
+  }
+}

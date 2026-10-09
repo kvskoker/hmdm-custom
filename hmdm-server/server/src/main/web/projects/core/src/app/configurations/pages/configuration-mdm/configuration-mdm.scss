@@ -1,0 +1,37 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.mdm {
+  overflow-y: auto;
+  padding-right: 8px;
+
+  &-double {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    max-width: 100%;
+  }
+
+  @media (min-width: 816px) {
+    &-double {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  &-wifi {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    max-width: 100%;
+  }
+
+  @media (min-width: 816px) {
+    &-wifi {
+      grid-template-columns: 200px repeat(2, 1fr);
+    }
+  }
+}

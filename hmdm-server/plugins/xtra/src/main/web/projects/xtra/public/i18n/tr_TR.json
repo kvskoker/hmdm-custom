@@ -1,0 +1,15 @@
+{
+  "xtra.plugin.title": "Headwind MDM Enterprise'da daha fazla özellik!",
+  "xtra.plugin.content.description": "Örneğinizi deneme sürümüne yükseltmek çok kolay ve tamamen ÜCRETSİZ!",
+  "xtra.plugin.content.button": "ÜCRETSİZ DENEME SÜRÜMÜ AL",
+  "xtra.plugin.kiosk-mode": "Kiosk (tek görev) modu",
+  "xtra.plugin.device-location-tracking": "Cihaz konum takibi",
+  "xtra.plugin.remote-management": "Uzaktan yeniden başlatma, kilitleme ve fabrika ayarlarına sıfırlama",
+  "xtra.plugin.upload-photos": "Cihazlardan fotoğraf yükleme",
+  "xtra.plugin.remote-control": "Uzaktan kontrol",
+  "xtra.plugin.traffic-filtering": "Ağ trafiği filtreleme",
+  "xtra.plugin.two-factor-authentication": "İki faktörlü kimlik doğrulama",
+  "xtra.plugin.export-import-devices": "Cihazları dışa aktar ve içe aktar",
+  "xtra.plugin.device-contacts-management": "Cihaz kişileri yönetimi",
+  "xtra.plugin.white-label": "White-label yazılım (yeniden markalama)"
+}

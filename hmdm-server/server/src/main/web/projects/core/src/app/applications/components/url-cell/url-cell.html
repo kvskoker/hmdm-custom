@@ -1,0 +1,20 @@
+<div class="cell">
+  @if (url() || urlArm64() || urlArmeabi()) {
+    @if (isSplitApk()) {
+      <div class="cell-urls">
+        <div class="cell-arch">
+          <span class="cell-label"> arm64: </span>
+
+          <span class="cell-value">{{ urlArm64() }}</span>
+        </div>
+
+        <div class="cell-arch">
+          <span class="cell-label">armeabi:</span>
+          <span class="cell-value">{{ urlArmeabi() }}</span>
+        </div>
+      </div>
+    } @else {
+      <div class="cell-url">{{ params().data.url }}</div>
+    }
+  }
+</div>

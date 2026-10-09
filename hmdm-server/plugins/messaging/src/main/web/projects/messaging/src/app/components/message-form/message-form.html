@@ -1,0 +1,37 @@
+<form [formGroup]="formGroup()">
+  <hmdm-selector
+    formControlName="scope"
+    [label]="'plugin.messaging.label.scope' | translate"
+    [options]="scopeOptions"
+  ></hmdm-selector>
+
+  @if (scope === 'device') {
+    <hmdm-async-select-search
+      formControlName="deviceNumber"
+      [label]="'plugin.messaging.label.device' | translate"
+      [autocompleteServiceProps]="deviceAutocompleteService"
+    ></hmdm-async-select-search>
+  }
+
+  @if (scope === 'group') {
+    <hmdm-selector
+      formControlName="groupId"
+      [label]="'plugin.messaging.label.group' | translate"
+      [options]="groupsOptions()"
+    ></hmdm-selector>
+  }
+
+  @if (scope === 'configuration') {
+    <hmdm-selector
+      formControlName="configurationId"
+      [label]="'plugin.messaging.label.configuration' | translate"
+      [options]="configurationsOptions()"
+    ></hmdm-selector>
+  }
+
+  <hmdm-textarea-input
+    formControlName="message"
+    [label]="'plugin.messaging.label.message' | translate"
+    [rows]="5"
+  ></hmdm-textarea-input>
+</form>

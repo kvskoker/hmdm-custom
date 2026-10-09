@@ -1,0 +1,29 @@
+<div class="configurations scroll-content">
+  <mat-card class="card scroll-content" [hmdmLoader]="isLoadingConfigurations()">
+    <mat-card-title class="card-title">
+      <h3>{{ 'button.configurations' | translate }}</h3>
+
+      <hmdm-search-container
+        persistKey="configurations-search-control"
+        [searchControl]="configurationsSearchControl"
+        [showFiltersButton]="false"
+      ></hmdm-search-container>
+
+      <button
+        *hmdmHasPermission="'add_config'"
+        matButton="filled"
+        class="card-btn primary"
+        (click)="onAddConfigClick()"
+      >
+        <mat-icon>add</mat-icon>
+        {{ 'button.add' | translate }}
+      </button>
+    </mat-card-title>
+
+    <mat-divider></mat-divider>
+
+    <mat-card-content class="card-content scroll-table">
+      <core-configurations-table class="scroll-table"></core-configurations-table>
+    </mat-card-content>
+  </mat-card>
+</div>

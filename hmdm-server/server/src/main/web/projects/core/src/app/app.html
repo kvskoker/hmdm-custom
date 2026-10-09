@@ -1,0 +1,7 @@
+@if (isLoading()) {
+  <div class="app-container">
+    <mat-spinner></mat-spinner>
+  </div>
+} @else {
+  <router-outlet></router-outlet>
+}

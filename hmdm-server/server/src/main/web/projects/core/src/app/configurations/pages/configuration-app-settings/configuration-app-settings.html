@@ -1,0 +1,34 @@
+<div class="applications scroll-content">
+  <mat-card class="card scroll-content">
+    <mat-card-title class="card-title">
+      <hmdm-search-container
+        persistKey="config-app-search-control"
+        [searchControl]="tableSearchControl"
+        [filtersTemplate]="filtersTemplate"
+        [activeFiltersCount]="activeFiltersCount()"
+        [showSearchButton]="false"
+      ></hmdm-search-container>
+
+      <ng-template #filtersTemplate>
+        <hmdm-text-input
+          hmdmPersistControl="config-app-settings-apps-control"
+          [label]="'form.configuration.apps.show.system.apps' | translate"
+          [formControl]="settingsSearchControl"
+        ></hmdm-text-input>
+      </ng-template>
+
+      <button matButton="filled" class="card-btn primary" (click)="onAddAppSettingsClick()">
+        <mat-icon>add</mat-icon>
+        {{ 'button.add' | translate }}
+      </button>
+    </mat-card-title>
+
+    <mat-divider></mat-divider>
+
+    <mat-card-content class="card-content scroll-content">
+      <core-configuration-app-settings-table
+        class="scroll-table"
+      ></core-configuration-app-settings-table>
+    </mat-card-content>
+  </mat-card>
+</div>

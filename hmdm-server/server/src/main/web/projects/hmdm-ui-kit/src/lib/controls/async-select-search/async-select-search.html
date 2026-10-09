@@ -1,0 +1,26 @@
+<div class="input-container" appClickOutside>
+  <mat-form-field appearance="outline">
+    @if (showLabel()) {
+      <mat-label>{{ label() }}</mat-label>
+    }
+
+    <input type="text" matInput [formControl]="searchControl" [matAutocomplete]="auto" />
+    <mat-autocomplete #auto="matAutocomplete">
+      @for (option of options(); track $index) {
+        <mat-option [value]="option">{{ option.viewValue }}</mat-option>
+      }
+    </mat-autocomplete>
+
+    @if (help()) {
+      <hmdm-help-tooltip matSuffix [text]="help()" />
+    }
+  </mat-form-field>
+
+  @if (showError()) {
+    <div class="input-error">
+      @if (control && control.invalid && control.touched) {
+        <hmdm-error-message [control]="control"></hmdm-error-message>
+      }
+    </div>
+  }
+</div>

@@ -1,0 +1,10 @@
+<hmdm-dialog-template [title]="'form.application.icon' | translate">
+  <core-icon-form [formGroup]="formGroup"></core-icon-form>
+
+  <hmdm-dialog-common-buttons
+    dialog-actions
+    (cancel)="onCancel()"
+    (save)="onSave()"
+    [isSaveDisabled]="formGroup.invalid"
+  ></hmdm-dialog-common-buttons>
+</hmdm-dialog-template>

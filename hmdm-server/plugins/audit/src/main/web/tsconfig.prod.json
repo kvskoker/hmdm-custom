@@ -1,0 +1,49 @@
+/* Production-specific TypeScript configuration */
+/* This file is used only for production builds via fileReplacements */
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "ES2022",
+    "module": "preserve",
+    "paths": {
+      "hmdm-ui-kit": ["../../../../../server/src/main/web/dist/hmdm-ui-kit"]
+    }
+  },
+  "angularCompilerOptions": {
+    "enableI18nLegacyMessageIdFormat": false,
+    "strictInjectionParameters": true,
+    "strictInputAccessModifiers": true,
+    "typeCheckHostBindings": true,
+    "strictTemplates": true
+  },
+  "files": [],
+  "references": [
+    {
+      "path": "./projects/core/tsconfig.app.json"
+    },
+    {
+      "path": "./projects/core/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/plugin1/tsconfig.app.json"
+    },
+    {
+      "path": "./projects/plugin1/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/audit/tsconfig.app.json"
+    },
+    {
+      "path": "./projects/audit/tsconfig.spec.json"
+    }
+  ]
+}

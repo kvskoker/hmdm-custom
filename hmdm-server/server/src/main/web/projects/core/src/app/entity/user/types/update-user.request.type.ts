@@ -1,0 +1,26 @@
+export type TUpdateUserRequest = {
+  allConfigAvailable: boolean;
+  allDevicesAvailable: boolean;
+  common: boolean;
+  configurations: { id: number }[];
+  confirm?: string;
+  confirmModal?: string;
+  customerId: number;
+  editable: boolean;
+  email: string;
+  groups: { id: number }[];
+  id: number;
+  lastLoginFail: number;
+  login: string;
+  masterCustomer: boolean;
+  name: string;
+  newPassword?: string;
+  oldPassword?: string;
+  passwordReset: boolean;
+  singleCustomer: boolean;
+  superAdmin: boolean;
+  twoFactor: boolean;
+  twoFactorAccepted: boolean;
+  userRole: { id: number };
+  alertLevel: number;
+};

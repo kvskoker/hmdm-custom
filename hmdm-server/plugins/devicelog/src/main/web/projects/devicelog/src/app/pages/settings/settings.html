@@ -1,0 +1,37 @@
+<mat-card class="card">
+  <mat-card-header>
+    <mat-card-title>{{ 'plugin.devicelog.settings.title' | translate }}</mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content class="card-content">
+    <hmdm-text-input
+      class="card-input"
+      inputType="number"
+      [formControl]="preserveControl"
+      [label]="'plugin.devicelog.settings.log.preserve.period' | translate"
+    ></hmdm-text-input>
+
+    <button matButton="filled" class="primary" (click)="onPreserve()">
+      {{ 'button.save' | translate }}
+    </button>
+  </mat-card-content>
+</mat-card>
+
+<div class="rules">
+  <mat-card class="rules-card" [hmdmLoader]="isLoadingRules()">
+    <mat-card-title class="rules-title">
+      <h3>{{ 'plugin.devicelog.setting.rules.title' | translate }}</h3>
+
+      <button matButton="filled" class="rules-btn primary" (click)="onNewRuleClick()">
+        <mat-icon>add</mat-icon>
+        {{ 'button.add' | translate }}
+      </button>
+    </mat-card-title>
+
+    <mat-divider></mat-divider>
+
+    <mat-card-content class="rules-content">
+      <log-rules-table #table></log-rules-table>
+    </mat-card-content>
+  </mat-card>
+</div>

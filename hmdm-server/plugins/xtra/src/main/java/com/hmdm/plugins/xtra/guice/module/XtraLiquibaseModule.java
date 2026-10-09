@@ -22,10 +22,8 @@
 package com.hmdm.plugins.xtra.guice.module;
 
 import com.hmdm.guice.module.AbstractLiquibaseModule;
-import com.hmdm.plugin.guice.module.PluginLiquibaseResourceAccessor;
-import liquibase.resource.ResourceAccessor;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 /**
  * <p>A module used for initializing and managing the state of the database tables related to <code>Xtra</code>
@@ -51,21 +49,6 @@ public class XtraLiquibaseModule extends AbstractLiquibaseModule {
      */
     @Override
     protected String getChangeLogResourcePath() {
-        String path = this.getClass().getResource("/liquibase/xtra.changelog.xml").getPath();
-        if (!path.startsWith("jar:")) {
-            path = "jar:" + path;
-        }
-        return path;
+        return "classpath:liquibase/xtra.changelog.xml";
     }
-
-    /**
-     * <p>Gets the resource accessor to be used for loading the change log file.</p>
-     *
-     * @return a resource accessor for change log file.
-     */
-    @Override
-    protected ResourceAccessor getResourceAccessor() {
-        return new PluginLiquibaseResourceAccessor();
-    }
-
 }

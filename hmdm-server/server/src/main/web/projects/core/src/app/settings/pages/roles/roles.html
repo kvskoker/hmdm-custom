@@ -1,0 +1,18 @@
+<div class="roles scroll-content">
+  <mat-card class="card scroll-content" [hmdmLoader]="isLoadingRoles()">
+    <mat-card-title class="card-title">
+      <h3>{{ 'form.settings.roles.title' | translate }}</h3>
+
+      <button matButton="filled" class="card-btn primary" (click)="onAddRoleClick()">
+        <mat-icon>add</mat-icon>
+        {{ 'button.add' | translate }}
+      </button>
+    </mat-card-title>
+
+    <mat-divider></mat-divider>
+
+    <mat-card-content class="card-content scroll-content">
+      <core-roles-table class="scroll-table"></core-roles-table>
+    </mat-card-content>
+  </mat-card>
+</div>

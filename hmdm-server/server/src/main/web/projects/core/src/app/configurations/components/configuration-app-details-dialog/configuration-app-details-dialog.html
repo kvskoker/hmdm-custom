@@ -1,0 +1,14 @@
+<hmdm-dialog-template>
+  <h2 class="dialog-app">{{ appName() }}</h2>
+
+  <core-configuration-app-details-form
+    (formChange)="onFormChange($event)"
+    [formGroup]="formGroup"
+  ></core-configuration-app-details-form>
+
+  <div class="dialog-buttons" dialog-actions>
+    <button matButton class="dialog-btn primary" (click)="onCancel()">
+      {{ 'button.close' | translate }}
+    </button>
+  </div>
+</hmdm-dialog-template>

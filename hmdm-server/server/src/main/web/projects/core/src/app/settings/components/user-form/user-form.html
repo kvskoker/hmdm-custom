@@ -1,0 +1,65 @@
+<form [formGroup]="formGroup()">
+  <hmdm-text-input
+    formControlName="login"
+    [label]="'form.user.login' | translate"
+  ></hmdm-text-input>
+
+  <hmdm-text-input
+    formControlName="email"
+    [label]="'form.user.email' | translate"
+  ></hmdm-text-input>
+
+  <hmdm-text-input formControlName="name" [label]="'form.user.name' | translate"></hmdm-text-input>
+
+  <hmdm-selector
+    formControlName="userRole"
+    [label]="'form.user.role' | translate"
+    [options]="rolesOptions()"
+  ></hmdm-selector>
+
+  <hmdm-selector
+    formControlName="alertLevel"
+    [label]="'form.user.alert.level' | translate"
+    [options]="alertLevelOptions"
+  ></hmdm-selector>
+
+  <hmdm-checkbox
+    formControlName="allDevicesAvailable"
+    [label]="'form.user.all.devices.available' | translate"
+  ></hmdm-checkbox>
+
+  @if (!isAllGroups()) {
+    <hmdm-selector
+      formControlName="groups"
+      [label]="'form.user.available.groups' | translate"
+      [multi]="true"
+      [options]="groupOptions()"
+    ></hmdm-selector>
+  }
+
+  <hmdm-checkbox
+    formControlName="allConfigAvailable"
+    [label]="'form.user.all.configs.available' | translate"
+  ></hmdm-checkbox>
+
+  @if (!isAllConfigs()) {
+    <hmdm-selector
+      formControlName="configurations"
+      [label]="'form.user.available.configs' | translate"
+      [multi]="true"
+      [options]="configOptions()"
+    ></hmdm-selector>
+  }
+
+  <hmdm-text-input
+    formControlName="newPassword"
+    inputType="password"
+    [label]="'form.user.password' | translate"
+  ></hmdm-text-input>
+
+  <hmdm-text-input
+    formControlName="confirm"
+    inputType="password"
+    [label]="'form.user.password.confirm' | translate"
+  ></hmdm-text-input>
+</form>

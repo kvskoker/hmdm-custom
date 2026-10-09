@@ -1,0 +1,29 @@
+<mat-card class="card">
+  <mat-card-title class="card-title">
+    <h3 class="card-breadcrumb">
+      <a class="card-breadcrumb-link" [routerLink]="['/home', 'applications']">
+        {{ 'breadcrumb.applications' | translate }}
+      </a>
+
+      @if (application()) {
+        <span class="card-breadcrumb-current">- {{ application()!.name }}</span>
+      }
+    </h3>
+
+    <button
+      class="card-button primary"
+      *hmdmHasPermission="'edit_application_versions'"
+      matButton="filled"
+      (click)="onAddVersionClick()"
+    >
+      <mat-icon>add</mat-icon>
+      {{ 'button.add' | translate }}
+    </button>
+  </mat-card-title>
+
+  <mat-divider></mat-divider>
+
+  <mat-card-content class="card-content">
+    <hmdm-table class="card-table" [config]="tableConfig" [data]="tableData()"></hmdm-table>
+  </mat-card-content>
+</mat-card>

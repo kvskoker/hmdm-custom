@@ -1,0 +1,15 @@
+{
+  "xtra.plugin.title": "Headwind MDM Enterprise のさらなる機能！",
+  "xtra.plugin.content.description": "インスタンスを体験版にアップグレードするのは非常に簡単で、完全に無料です！",
+  "xtra.plugin.content.button": "無料体験版を取得",
+  "xtra.plugin.kiosk-mode": "キオスク（シングルタスク）モード",
+  "xtra.plugin.device-location-tracking": "デバイスの位置追跡",
+  "xtra.plugin.remote-management": "リモート再起動、ロック、および工場出荷時設定へのリセット",
+  "xtra.plugin.upload-photos": "デバイスから写真をアップロード",
+  "xtra.plugin.remote-control": "リモートコントロール",
+  "xtra.plugin.traffic-filtering": "ネットワークトラフィックのフィルタリング",
+  "xtra.plugin.two-factor-authentication": "2要素認証",
+  "xtra.plugin.export-import-devices": "デバイスのエクスポートとインポート",
+  "xtra.plugin.device-contacts-management": "デバイスの連絡先管理",
+  "xtra.plugin.white-label": "ホワイトレーベルソフトウェア（リブランディング）"
+}

@@ -1,0 +1,22 @@
+<hmdm-dialog-template>
+  <form [formGroup]="formGroup">
+    <hmdm-selector
+      formControlName="action"
+      label="{{ 'form.configuration.file.action' | translate }}"
+      [options]="actionOptions"
+    ></hmdm-selector>
+
+    <hmdm-selector
+      formControlName="groups"
+      label="{{ 'form.device.groups' | translate }}"
+      [multi]="true"
+      [options]="groupOptions()"
+    ></hmdm-selector>
+  </form>
+
+  <hmdm-dialog-common-buttons
+    dialog-actions
+    (cancel)="onCancel()"
+    (save)="onSave()"
+  ></hmdm-dialog-common-buttons>
+</hmdm-dialog-template>

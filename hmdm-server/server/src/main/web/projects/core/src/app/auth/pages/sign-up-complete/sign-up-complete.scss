@@ -1,0 +1,32 @@
+.auth {
+  &-description {
+    text-align: center;
+    margin-bottom: 16px;
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  &-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 48px 0;
+  }
+
+  &-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 550px;
+  }
+
+  &-title {
+    text-align: center;
+    margin-bottom: 8px;
+  }
+
+  &-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+}

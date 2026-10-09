@@ -1,0 +1,13 @@
+<hmdm-dialog-template>
+  <core-customer-form
+    [initialData]="initialData"
+    [isNew]="isNew"
+    (formChange)="onFormChange($event)"
+  ></core-customer-form>
+
+  <hmdm-dialog-common-buttons
+    dialog-actions
+    (cancel)="onCancel()"
+    (save)="onSave()"
+  ></hmdm-dialog-common-buttons>
+</hmdm-dialog-template>

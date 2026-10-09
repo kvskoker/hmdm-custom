@@ -1,0 +1,19 @@
+.card {
+  &-header {
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+  }
+
+  &-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  &-table {
+    max-height: 90%;
+  }
+}

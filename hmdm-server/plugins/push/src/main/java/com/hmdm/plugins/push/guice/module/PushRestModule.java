@@ -22,7 +22,9 @@
 package com.hmdm.plugins.push.guice.module;
 
 import com.google.inject.servlet.ServletModule;
+import com.hmdm.plugin.guice.module.AbstractPluginRestModule;
 import com.hmdm.plugin.rest.PluginAccessFilter;
+import com.hmdm.plugins.push.PushPluginConfigurationImpl;
 import com.hmdm.plugins.push.rest.PushResource;
 import com.hmdm.rest.filter.AuthFilter;
 import com.hmdm.rest.filter.PrivateIPFilter;
@@ -36,14 +38,7 @@ import java.util.List;
  *
  * @author isv
  */
-public class PushRestModule extends ServletModule {
-
-    /**
-     * <p>A list of patterns for URIs for plugin resources which prohibit anonymous access.</p>
-     */
-    private static final List<String> protectedResources = Arrays.asList(
-            "/rest/plugins/push/private/*"
-    );
+public class PushRestModule extends AbstractPluginRestModule {
 
     /**
      * <p>Constructs new <code>PushRestModule</code> instance. This implementation does nothing.</p>
@@ -51,14 +46,29 @@ public class PushRestModule extends ServletModule {
     public PushRestModule() {
     }
 
+    @Override
+    protected List<String> getProtectedResources() {
+        return Arrays.asList(
+                "/rest/private/plugin-push/*"
+        );
+    }
+
+    @Override
+    protected List<String> getPublicResources() {
+        return Arrays.asList(
+        );
+    }
+
+    @Override
+    protected String getPluginId() {
+        return PushPluginConfigurationImpl.PLUGIN_ID;
+    }
+
     /**
      * <p>Configures the <code>Push Plugin</code> REST resources.</p>
      */
     protected void configureServlets() {
-        this.filter(protectedResources).through(JWTFilter.class);
-        this.filter(protectedResources).through(AuthFilter.class);
-        this.filter(protectedResources).through(PluginAccessFilter.class);
-        this.filter(protectedResources).through(PrivateIPFilter.class);
+        super.configureServlets();
         this.bind(PushResource.class);
     }
 

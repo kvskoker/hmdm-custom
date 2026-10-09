@@ -22,9 +22,11 @@
 package com.hmdm.guice;
 
 import liquibase.resource.ClassLoaderResourceAccessor;
+import liquibase.resource.InputStreamList;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashSet;
@@ -41,20 +43,20 @@ public class LiquibaseJARResourceAccessor extends ClassLoaderResourceAccessor {
      * <p>Constructs new <code>LiquibaseJARResourceAccessor</code> instance. This implementation does nothing.</p>
      */
     public LiquibaseJARResourceAccessor() {
+        super();
     }
 
     @Override
-    public Set<InputStream> getResourcesAsStream(String path) throws IOException {
-        URLConnection connection = new URL(path).openConnection();
-        connection.setUseCaches(false);
+    public InputStreamList openStreams(String relativeTo, String streamPath) throws IOException {
+        URLConnection connection = new URL(streamPath).openConnection();
+        connection.setUseCaches(false); // avoid JAR caching/locking (Windows, etc.)
 
-        InputStream resourceAsStream = connection.getInputStream();
-        Set<InputStream> returnSet = new HashSet<>();
-        if (resourceAsStream != null) {
-            returnSet.add(resourceAsStream);
+        InputStream is = connection.getInputStream();
+
+        InputStreamList list = new InputStreamList();
+        if (is != null) {
+            list.add(URI.create(streamPath), is);
         }
-
-        return returnSet;
+        return list;
     }
-
 }

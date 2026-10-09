@@ -1,0 +1,42 @@
+@use '@angular/material' as mat;
+
+.mat-mdc-select-panel.mdc-menu-surface {
+  margin-top: 5px;
+  padding: 0;
+
+  --mat-option-focus-state-layer-color: var(--mat-sys-surface);
+
+  @include mat.select-overrides(
+    (
+      panel-background-color: var(--mat-sys-surface),
+    )
+  );
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+.mat-mdc-option:hover:not(.mdc-list-item--disabled),
+.mat-mdc-option.mat-mdc-option-active.mdc-list-item {
+  &:hover {
+    background-color: var(--mat-sys-primary);
+    color: var(--mat-sys-on-primary);
+  }
+}
+
+.hmdm-select-all-option {
+  // Hide the built-in pseudo-checkbox rendered by mat-option in multiple mode
+  .mat-pseudo-checkbox,
+  .mat-mdc-option-pseudo-checkbox {
+    display: none;
+  }
+}
+
+.hmdm-select-all-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  cursor: pointer;
+}

@@ -1,0 +1,29 @@
+@if (isSuccess) {
+  <div class="auth-form">
+    <h1 class="auth-title">{{ 'signup.title' | translate }}</h1>
+
+    <p class="auth-description">{{ 'signup.email.check' | translate }}</p>
+
+    <a matButton routerLink="/auth/sign-in">
+      {{ 'forgot.password.back.to.login' | translate }}
+    </a>
+  </div>
+} @else {
+  <form class="auth-form" [formGroup]="formGroup!">
+    <h1 class="auth-title">{{ 'signup.title' | translate }}</h1>
+
+    <hmdm-text-input
+      [label]="'signup.email' | translate"
+      [placeholder]="'signup.email.placeholder' | translate"
+      formControlName="email"
+    ></hmdm-text-input>
+
+    <button matButton="filled" class="primary" (click)="onSubmit()" [disabled]="isLoading">
+      {{ (isLoading ? 'signup.progress' : 'signup.submit') | translate }}
+    </button>
+
+    <a class="auth-link" routerLink="/auth/sign-in">
+      {{ 'forgot.password.back.to.login' | translate }}
+    </a>
+  </form>
+}

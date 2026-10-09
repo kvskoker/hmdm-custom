@@ -36,11 +36,11 @@ import org.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -142,14 +142,14 @@ public class UpdateResource {
         String webVersion = "";
 
         for (UpdateEntry app : request.getUpdates()) {
-            if (app.getPkg().equals("web")) {
+            if (app.getPkg().equals(UpdateEntry.WEB_PKG)) {
                 webVersion = app.getCurrentVersion();
             }
             if (!app.isOutdated() || app.isUpdateDisabled()) {
                 continue;
             }
             if (!app.isDownloaded()) {
-                if (app.getPkg().equals("web")) {
+                if (app.getPkg().equals(UpdateEntry.WEB_PKG)) {
                     if (!downloadWebApp(app)) {
                         app.setUpdateDisabled(true);
                         app.setUpdateDisableReason(UpdateEntry.DISABLED_DOWNLOAD);
@@ -164,7 +164,7 @@ public class UpdateResource {
                 }
                 app.setDownloaded(true);
             }
-            if (request.isUpdate() && !app.getPkg().equals("web")) {
+            if (request.isUpdate() && !app.getPkg().equals(UpdateEntry.WEB_PKG)) {
                 updateAppInConfig(app);
                 app.setCurrentVersion(app.getVersion());
             }
@@ -304,8 +304,21 @@ public class UpdateResource {
         entry.setDownloaded(file.exists());
 
         entry.setName("Web panel");
-
+        entry.setCurrentVersion(getVersion());
         // For the web app, we set the current version and name on the front end
+    }
+
+    // Duplicate code: PublicAboutResource
+    public String getVersion() {
+        Properties props = new Properties();
+        try (InputStream in = getClass()
+                .getClassLoader()
+                .getResourceAsStream("app.properties")) {
+            props.load(in);
+        } catch (IOException e) {
+            return null;
+        }
+        return props.getProperty("app.version");
     }
 
     private void processLauncherAppEntry(UpdateEntry entry) {

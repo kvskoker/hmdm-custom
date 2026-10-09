@@ -1,0 +1,20 @@
+<div class="dialog">
+  <div class="dialog-content">
+    <hmdm-textarea-input
+      [label]="'tab.license' | translate"
+      [rows]="4"
+      [formControl]="licenseKeyControl"
+      [showError]="true"
+    >
+    </hmdm-textarea-input>
+  </div>
+
+  <div class="dialog-actions">
+    <button matButton (click)="cancel()">{{'button.cancel' | translate}}</button>
+    <button
+      matButton="filled"
+      [disabled]="!licenseKeyControl.value"
+      (click)="submit()"
+    >{{'button.save' | translate}}</button>
+  </div>
+</div>

@@ -1,0 +1,28 @@
+<form class="version-form" [formGroup]="formGroup">
+  <hmdm-text-input
+    formControlName="version"
+    [label]="'form.application.version' | translate"
+  ></hmdm-text-input>
+
+  <hmdm-checkbox
+    formControlName="split"
+    [label]="'form.application.arch.split' | translate"
+  ></hmdm-checkbox>
+
+  @if (isSplitApk()) {
+    <hmdm-text-input
+      formControlName="urlArmeabi"
+      [label]="'form.application.url.armeabi' | translate"
+    ></hmdm-text-input>
+
+    <hmdm-text-input
+      formControlName="urlArm64"
+      [label]="'form.application.url.arm64' | translate"
+    ></hmdm-text-input>
+  } @else {
+    <hmdm-text-input
+      formControlName="url"
+      [label]="'form.application.url' | translate"
+    ></hmdm-text-input>
+  }
+</form>

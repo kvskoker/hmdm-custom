@@ -21,12 +21,10 @@
 
 package com.hmdm.rest.resource;
 
-import com.hmdm.auth.HmdmAuthInterface;
-import com.hmdm.persistence.CommonDAO;
+import com.hmdm.auth.IHmdmAuth;
 import com.hmdm.persistence.CustomerDAO;
 import com.hmdm.persistence.UnsecureDAO;
 import com.hmdm.persistence.domain.Settings;
-import com.hmdm.rest.filter.AuthFilter;
 import com.hmdm.rest.json.AuthOptionsResponse;
 import com.hmdm.rest.json.Response;
 import com.hmdm.rest.json.UserCredentials;
@@ -34,17 +32,19 @@ import com.hmdm.persistence.domain.User;
 import com.hmdm.rest.json.view.user.UserView;
 import com.hmdm.service.EmailService;
 import com.hmdm.service.RsaKeyService;
+import com.hmdm.session.IHmdmSession;
+import com.hmdm.session.IHmdmSessionProvider;
 import com.hmdm.util.BackgroundTaskRunnerService;
 import com.hmdm.util.PasswordUtil;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
 import java.security.PublicKey;
 import java.util.Base64;
 
@@ -65,7 +65,8 @@ public class AuthResource {
     private EmailService emailService;
     private RsaKeyService rsaKeyService;
     private boolean transmitPassword;
-    private HmdmAuthInterface authEngine;
+    private IHmdmAuth authEngine;
+    private IHmdmSessionProvider sessionProvider;
 
     /**
      * <p>A constructor required by Swagger.</p>
@@ -85,7 +86,8 @@ public class AuthResource {
                         RsaKeyService rsaKeyService,
                         @Named("customer.signup") boolean customerSignup,
                         @Named("transmit.password") boolean transmitPassword,
-                        @Named("auth.class") HmdmAuthInterface authEngine) {
+                        @Named("session.class") IHmdmSessionProvider sessionProvider,
+                        @Named("auth.class") IHmdmAuth authEngine) {
         this.userDAO = userDAO;
         this.customerDAO = customerDAO;
         this.settingsDAO = settingsDAO;
@@ -94,6 +96,7 @@ public class AuthResource {
         this.rsaKeyService = rsaKeyService;
         this.customerSignup = customerSignup;
         this.transmitPassword = transmitPassword;
+        this.sessionProvider = sessionProvider;
         this.authEngine = authEngine;
     }
 
@@ -109,8 +112,9 @@ public class AuthResource {
     @Path( "/login" )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
-    public Response login( UserCredentials credentials,
-                           @Context HttpServletRequest req ) throws InterruptedException {
+    public Response login(UserCredentials credentials,
+                          @Context HttpServletRequest req,
+                          @Context HttpServletResponse resp) throws InterruptedException {
         if ( credentials.getLogin() == null || credentials.getPassword() == null ) {
             return Response.ERROR();
         }
@@ -145,13 +149,13 @@ public class AuthResource {
                 this.customerDAO.recordLastLoginTime(user.getCustomerId(), System.currentTimeMillis());
             });
 
-            HttpSession userSession = req.getSession();
-            userSession.setAttribute(AuthFilter.sessionCredentials, user );
+            IHmdmSession userSession = sessionProvider.getOrCreateSession(req, resp, false);
+            userSession.setUser(user);
 
             Settings settings = settingsDAO.getSettings(user.getCustomerId());
             if (settings != null) {
                 if (settings.isTwoFactor()) {
-                    userSession.setAttribute(AuthFilter.twoFactorNeeded, "true");
+                    userSession.setTwoFactorNeeded(true);
                     user.setTwoFactor(true);
                 }
                 user.setIdleLogout(settings.getIdleLogout());
@@ -181,11 +185,12 @@ public class AuthResource {
      */
     @POST
     @Path( "/logout" )
-    public void logout( @Context HttpServletRequest req ) {
-        HttpSession session = req.getSession( false );
-        if ( session != null ) {
+    public void logout( @Context HttpServletRequest req, @Context HttpServletResponse resp ) {
+        IHmdmSession session = sessionProvider.getSession(req);
+        if (session != null) {
             session.invalidate();
         }
+        sessionProvider.invalidateSession(req, resp);
     }
 
 

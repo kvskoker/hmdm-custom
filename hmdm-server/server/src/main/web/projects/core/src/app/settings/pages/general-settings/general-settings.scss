@@ -1,0 +1,49 @@
+.settings {
+  display: flex;
+  gap: 16px;
+  flex-direction: column;
+
+  &-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  &-title {
+    margin-bottom: 10px;
+  }
+
+  &-property {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+  }
+
+  &-content {
+    margin-top: 10px;
+  }
+
+  &-line {
+    display: flex;
+    gap: 16px;
+  }
+
+  &-double {
+    display: grid;
+    column-gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    max-width: 100%;
+  }
+
+  @media (min-width: 816px) {
+    &-double {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+}

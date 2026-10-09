@@ -1,0 +1,42 @@
+import { TApplicationDTO } from './application-dto.type';
+import { TDynamicDTO } from './dynamic-dto.type';
+
+export type TDetailsDTO = {
+  id: number;
+  deviceNumber: string;
+  description: string;
+  imeiRequired: string;
+  imeiActual: string;
+  phoneNumberRequired: string;
+  phoneNumberActual: string;
+  model: string;
+  osVersion: string;
+  batteryLevel: number;
+  latestUpdateTime: number;
+  latestUpdateInterval: number;
+  latestUpdateIntervalType: string;
+  groups: Array<{
+    id: number;
+    name: string;
+  }>;
+  adminPermission: boolean;
+  overlapPermission: boolean;
+  historyPermission: boolean;
+  accessibilityPermission: boolean;
+  mdmMode: boolean;
+  kioskMode: boolean;
+  launcherType: string;
+  launcherPackage: string;
+  defaultLauncher: boolean;
+  iccid: string;
+  imsi: string;
+  imei2: string;
+  phone2: string;
+  iccid2: string;
+  imsi2: string;
+  serial: string;
+  mac?: string;
+  cpu: string;
+  latestDynamicData: TDynamicDTO;
+  applications: TApplicationDTO[];
+};

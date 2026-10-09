@@ -1,0 +1,39 @@
+<div class="privacy">
+  <div class="privacy-content">
+    <div class="privacy-logo">
+      <img class="privacy-img" [src]="logoUrl" alt="App Logo" />
+      <h1>{{ rebranding().appName }}</h1>
+    </div>
+
+    <div class="privacy-card">
+      <h2 class="privacy-title">{{ 'cookieNotice.details.title' | translate }}</h2>
+      <p class="privacy-intro">{{ 'cookieNotice.details.intro' | translate }}</p>
+
+      <dl class="privacy-list">
+        <div class="privacy-row">
+          <dt>{{ 'cookieNotice.details.purpose' | translate }}</dt>
+          <dd>{{ 'cookieNotice.details.purposeValue' | translate }}</dd>
+        </div>
+        <div class="privacy-row">
+          <dt>{{ 'cookieNotice.details.lifespan' | translate }}</dt>
+          <dd>{{ 'cookieNotice.details.lifespanValue' | translate }}</dd>
+        </div>
+        <div class="privacy-row">
+          <dt>{{ 'cookieNotice.details.necessary' | translate }}</dt>
+          <dd>{{ 'cookieNotice.details.necessaryValue' | translate }}</dd>
+        </div>
+      </dl>
+
+      <button matButton="filled" class="primary" type="button" (click)="onBack()">
+        {{ 'cookieNotice.details.back' | translate }}
+      </button>
+    </div>
+  </div>
+
+  <div class="privacy-footer">
+    <p>
+      {{ rebranding().appName }} {{ 'app.description' | translate }}. &copy; {{ currentYear }}
+      <a [href]="rebranding().vendorLink" target="_blank">{{ rebranding().vendorName }}</a>
+    </p>
+  </div>
+</div>

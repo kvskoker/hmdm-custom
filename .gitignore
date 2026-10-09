@@ -35,6 +35,7 @@ hmdm-server/server/src/main/webapp/lib/
 hmdm-server/server/webtarget/node/
 **/node_modules/
 **/bower_components/
+test-results/
 
 # --- jars ------------------------------------------------------------------
 # Build output, EXCEPT the ones that are genuinely source:
@@ -89,3 +90,4 @@ apply-enroll-v*.ps1
 .DS_Store
 Thumbs.db
 desktop.ini
+.env.bak

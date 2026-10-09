@@ -3,7 +3,7 @@ package com.hmdm.plugins.devicereset.persistence.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.hmdm.persistence.domain.CustomerData;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.io.Serializable;
 
@@ -17,25 +17,25 @@ public class DeviceLock implements CustomerData, Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty("Device ID (primary key - one row per device)")
+    @Schema(description = "Device ID (primary key - one row per device)")
     private int deviceId;
 
-    @ApiModelProperty("Customer ID")
+    @Schema(description = "Customer ID")
     private int customerId;
 
-    @ApiModelProperty("Device number")
+    @Schema(description = "Device number")
     private String deviceNumber;
 
-    @ApiModelProperty("Whether the device is currently locked")
+    @Schema(description = "Whether the device is currently locked")
     private boolean locked;
 
-    @ApiModelProperty("Message shown on the device's lock screen")
+    @Schema(description = "Message shown on the device's lock screen")
     private String lockMessage;
 
-    @ApiModelProperty("Login of the admin who last changed the lock state")
+    @Schema(description = "Login of the admin who last changed the lock state")
     private String requestedBy;
 
-    @ApiModelProperty("When the lock state last changed (ms since epoch)")
+    @Schema(description = "When the lock state last changed (ms since epoch)")
     private long updateTime;
 
     public DeviceLock() {

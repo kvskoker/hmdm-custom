@@ -1,0 +1,13 @@
+.git
+.env*
+docs
+tools
+hmdm-android
+**/target
+**/node_modules
+**/.angular
+**/dist
+**/node
+**/*.log
+**/*.bak
+**/build.properties

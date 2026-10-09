@@ -1,0 +1,14 @@
+<div class="dialog-buttons" dialog-actions>
+  <button matButton class="dialog-btn primary" (click)="onCancel()">
+    {{ cancelText() | translate }}
+  </button>
+
+  <button
+    matButton="filled"
+    class="dialog-btn primary"
+    [disabled]="isSaveDisabled()"
+    (click)="onSave()"
+  >
+    {{ saveText() | translate }}
+  </button>
+</div>

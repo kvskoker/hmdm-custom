@@ -3,10 +3,12 @@ package com.hmdm.guice.module;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import com.hmdm.event.EventService;
+import com.hmdm.persistence.AlertDAO;
 import com.hmdm.persistence.CommonDAO;
 import com.hmdm.persistence.UnsecureDAO;
 import com.hmdm.persistence.domain.User;
 import com.hmdm.service.RsaKeyService;
+import com.hmdm.session.IHmdmSessionProvider;
 import com.hmdm.task.CustomerStatusTask;
 import com.hmdm.task.FileCheckTask;
 import com.hmdm.task.FileMigrateTask;
@@ -15,13 +17,9 @@ import com.hmdm.util.PasswordUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -29,12 +27,14 @@ public class StartupTaskModule {
 
     private CommonDAO commonDAO;
     private UnsecureDAO unsecureDAO;
+    private AlertDAO alertDAO;
     private BackgroundTaskRunnerService taskRunner;
     private int deviceFastSearchChars;
     private String sqlInitScriptPath;
     private CustomerStatusTask customerStatusTask;
     private FileCheckTask fileCheckTask;
     private FileMigrateTask fileMigrateTask;
+    private final IHmdmSessionProvider sessionProvider;
     private boolean customerAutoStatus;
     private boolean transmitPassword;
     private RsaKeyService rsaKeyService;
@@ -45,23 +45,27 @@ public class StartupTaskModule {
      * <p>Constructs new <code>StartupTaskModule</code> instance. This implementation does nothing.</p>
      */
     @Inject
-    public StartupTaskModule(CommonDAO commonDAO, UnsecureDAO unsecureDAO, BackgroundTaskRunnerService taskRunner,
+    public StartupTaskModule(CommonDAO commonDAO, UnsecureDAO unsecureDAO, AlertDAO alertDAO,
+                             BackgroundTaskRunnerService taskRunner,
                              CustomerStatusTask customerStatusTask,
                              FileCheckTask fileCheckTask,
                              FileMigrateTask fileMigrateTask,
                              RsaKeyService rsaKeyService,
+                             @Named("session.class") IHmdmSessionProvider sessionProvider,
                              @Named("device.fast.search.chars") int deviceFastSearchChars,
                              @Named("sql.init.script.path") String sqlInitScriptPath,
                              @Named("customer.auto.status") boolean customerAutoStatus,
                              @Named("transmit.password") boolean transmitPassword) {
         this.commonDAO = commonDAO;
         this.unsecureDAO = unsecureDAO;
+        this.alertDAO = alertDAO;
         this.taskRunner = taskRunner;
         this.deviceFastSearchChars = deviceFastSearchChars;
         this.sqlInitScriptPath = sqlInitScriptPath;
         this.customerStatusTask = customerStatusTask;
         this.fileCheckTask = fileCheckTask;
         this.fileMigrateTask = fileMigrateTask;
+        this.sessionProvider = sessionProvider;
         this.customerAutoStatus = customerAutoStatus;
         this.transmitPassword = transmitPassword;
         this.rsaKeyService = rsaKeyService;
@@ -83,6 +87,8 @@ public class StartupTaskModule {
         if (transmitPassword) {
             taskRunner.submitTask(new GenerateRsaKeysTask());
         }
+        taskRunner.submitRepeatableTask(new SessionCleanupTask(), 0, 4, TimeUnit.HOURS);
+        taskRunner.submitRepeatableTask(alertDAO::purgeRecords, 1, 24, TimeUnit.HOURS);
     }
 
     public class UpdatePasswordTask implements Runnable {
@@ -137,6 +143,14 @@ public class StartupTaskModule {
         public void run() {
             // This method generates keys if they do not yet exist
             rsaKeyService.getPrivateKey();
+        }
+    }
+
+    public class SessionCleanupTask implements Runnable {
+
+        @Override
+        public void run() {
+            sessionProvider.collectGarbage();
         }
     }
 }

@@ -21,25 +21,31 @@
 
 package com.hmdm.rest.resource;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
 
 import com.google.inject.Injector;
 import com.google.inject.Key;
@@ -59,9 +65,6 @@ import com.hmdm.rest.json.*;
 import com.hmdm.security.SecurityContext;
 import com.hmdm.util.CryptoUtil;
 import com.hmdm.util.FileUtil;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hmdm.persistence.UnsecureDAO;
 import com.hmdm.persistence.domain.Application;
@@ -76,7 +79,7 @@ import org.slf4j.LoggerFactory;
  */
 @Singleton
 @Path("/public/sync")
-@Api(tags = {"Device data synchronization"})
+@Tag(name = "Device data synchronization")
 public class SyncResource {
 
 
@@ -163,10 +166,13 @@ public class SyncResource {
     }
 
     // =================================================================================================================
-    @ApiOperation(
-            value = "Get device settings",
-            notes = "Gets the device info and settings from the MDM server.",
-            response = SyncResponse.class
+    @Operation(
+            summary = "Get device settings",
+            description = "Gets the device info and settings from the MDM server."
+    )
+    @ApiResponse(
+            responseCode = "200",
+            content = @Content(schema = @Schema(implementation = SyncResponse.class))
     )
     @POST
     @Path("/configuration/{deviceId}")
@@ -174,7 +180,7 @@ public class SyncResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response enrollDevice(DeviceCreateOptions createOptions,
                                  @PathParam("deviceId")
-                                     @ApiParam("An identifier of device within MDM server")
+                                 @Parameter(description = "An identifier of device within MDM server")
                                              String number,
                                  @Context HttpServletRequest request,
                                  @Context HttpServletResponse response) {
@@ -231,16 +237,19 @@ public class SyncResource {
     }
 
     // =================================================================================================================
-    @ApiOperation(
-            value = "Get device settings",
-            notes = "Gets the device info and settings from the MDM server.",
-            response = SyncResponse.class
+    @Operation(
+            summary = "Get device settings",
+            description = "Gets the device info and settings from the MDM server."
+    )
+    @ApiResponse(
+            responseCode = "200",
+            content = @Content(schema = @Schema(implementation = SyncResponse.class))
     )
     @GET
     @Path("/configuration/{deviceId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getDeviceSetting(@PathParam("deviceId")
-                                     @ApiParam("An identifier of device within MDM server")
+                                     @Parameter(description = "An identifier of device within MDM server")
                                      String number,
                                      @Context HttpServletRequest request,
                                      @Context HttpServletResponse response) {
@@ -514,10 +523,13 @@ public class SyncResource {
     }
 
     // =================================================================================================================
-    @ApiOperation(
-            value = "Update device info",
-            notes = "Updates the device info on the MDM server.",
-            response = Response.class
+    @Operation(
+            summary = "Update device info",
+            description = "Updates the device info on the MDM server."
+    )
+    @ApiResponse(
+            responseCode = "200",
+            content = @Content(schema = @Schema(implementation = Response.class))
     )
     @POST
     @Path("/info")
@@ -613,17 +625,20 @@ public class SyncResource {
     }
 
     // =================================================================================================================
-    @ApiOperation(
-            value = "Save application settings",
-            notes = "Saves the application settings for the device on the MDM server.",
-            response = Response.class
+    @Operation(
+            summary = "Save application settings",
+            description = "Saves the application settings for the device on the MDM server."
+    )
+    @ApiResponse(
+            responseCode = "200",
+            content = @Content(schema = @Schema(implementation = Response.class))
     )
     @POST
     @Path("/applicationSettings/{deviceId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response saveApplicationSettings(@PathParam("deviceId")
-                                                @ApiParam("An identifier of device within MDM server")
+                                            @Parameter(description = "An identifier of device within MDM server")
                                                         String deviceNumber,
                                             List<SyncApplicationSetting> applicationSettings) {
         logger.debug("/public/sync/applicationSettings/{} --> {}", deviceNumber, applicationSettings);

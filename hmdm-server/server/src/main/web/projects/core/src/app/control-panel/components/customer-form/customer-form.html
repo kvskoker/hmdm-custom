@@ -1,0 +1,102 @@
+<form class="customer-form" [formGroup]="formGroup">
+  <div class="form-row form-row--cols-3">
+    <hmdm-text-input
+      formControlName="name"
+      [label]="'form.customer.name' | translate"
+    ></hmdm-text-input>
+
+    <hmdm-text-input
+      formControlName="firstName"
+      [label]="'form.customer.firstname.placeholder' | translate"
+    ></hmdm-text-input>
+
+    <hmdm-text-input
+      formControlName="lastName"
+      [label]="'form.customer.lastname.placeholder' | translate"
+    ></hmdm-text-input>
+  </div>
+
+  <div class="form-row form-row--cols-2">
+    <hmdm-text-input
+      formControlName="email"
+      [label]="'form.user.email' | translate"
+    ></hmdm-text-input>
+
+    <hmdm-text-input
+      formControlName="language"
+      [label]="'form.customer.language' | translate"
+    ></hmdm-text-input>
+  </div>
+
+  <hmdm-textarea-input
+    formControlName="description"
+    [label]="'form.customer.desc' | translate"
+  ></hmdm-textarea-input>
+
+  <div class="form-row form-row--cols-3">
+    <hmdm-selector
+      formControlName="accountType"
+      [label]="'form.customer.type' | translate"
+      [options]="accountTypeOptions"
+    ></hmdm-selector>
+
+    <hmdm-selector
+      formControlName="customerStatus"
+      [label]="'form.customer.status' | translate"
+      [options]="customerStatusOptions"
+    ></hmdm-selector>
+
+    <hmdm-datepicker
+      formControlName="expiryTime"
+      [label]="'form.customer.expiry.time' | translate"
+    ></hmdm-datepicker>
+  </div>
+
+  <div class="form-row form-row--cols-3">
+    <hmdm-text-input
+      formControlName="deviceLimit"
+      type="number"
+      [label]="'form.customer.device.limit' | translate"
+    ></hmdm-text-input>
+
+    <hmdm-text-input
+      formControlName="sizeLimit"
+      type="number"
+      [label]="'form.customer.size.limit' | translate"
+    ></hmdm-text-input>
+
+    <hmdm-text-input
+      formControlName="prefix"
+      [label]="'form.customer.prefix' | translate"
+    ></hmdm-text-input>
+  </div>
+
+  @if (isNew()) {
+    <div class="form-row form-row--cols-2 form-row--align-center">
+      <hmdm-selector
+        formControlName="configurationIds"
+        [label]="'form.customer.copy.configuration' | translate"
+        [options]="configurationOptions()"
+        [multi]="true"
+      ></hmdm-selector>
+
+      <hmdm-selector
+        formControlName="deviceConfigurationId"
+        [label]="'form.customer.device.configuration' | translate"
+        [options]="filteredConfigOptions()"
+      ></hmdm-selector>
+    </div>
+  } @else {
+    <hmdm-selector
+      formControlName="deviceConfigurationId"
+      [label]="'form.customer.device.configuration' | translate"
+      [options]="filteredConfigOptions()"
+    ></hmdm-selector>
+  }
+
+  @if (isNew()) {
+    <mat-checkbox formControlName="copyDesign" class="checkbox-label">
+      {{ 'form.customer.copy.design' | translate }}
+    </mat-checkbox>
+  }
+</form>

@@ -1,0 +1,41 @@
+<hmdm-dialog-template>
+  <div class="content">
+    <div class="content-top">
+      <hmdm-async-select-search
+        [formControl]="deviceControl"
+        [label]="'plugin.devicelog.settings.form.rule.device.placeholder' | translate"
+        [autocompleteServiceProps]="deviceAutocompleteService"
+        [showError]="false"
+      ></hmdm-async-select-search>
+
+      <button
+        class="primary"
+        matButton="filled"
+        [disabled]="deviceControl.invalid"
+        (click)="onAddDevice()"
+      >
+        {{ 'button.add' | translate }}
+      </button>
+    </div>
+
+    <h2>{{ 'plugin.devicelog.settings.form.rule.devices' | translate }}</h2>
+    <mat-divider></mat-divider>
+
+    <div class="devices">
+      @for (device of devices(); track $index) {
+        <div class="devices-item">
+          <span class="devices-name">{{ device.name }}</span>
+          <button mat-icon-button (click)="onRemoveDevice(device.id)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+
+  <hmdm-dialog-common-buttons
+    dialog-actions
+    (save)="onSave()"
+    (cancel)="onCancel()"
+  ></hmdm-dialog-common-buttons>
+</hmdm-dialog-template>

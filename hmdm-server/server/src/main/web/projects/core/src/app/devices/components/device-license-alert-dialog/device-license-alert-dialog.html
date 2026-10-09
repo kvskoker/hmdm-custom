@@ -1,0 +1,20 @@
+<hmdm-dialog-template class="dialog">
+  <div class="wrapper">
+    <h2>{{'devices.license.alert.head' | translate}}</h2>
+
+    <span>{{'devices.license.alert.subhead' | translate}}</span>
+
+    <span>{{'devices.license.alert.description' | translate}}</span>
+
+    <div class="actions">
+      <button matButton (click)="dialogRef.close(true)">
+        {{'devices.license.alert.add' | translate}}
+      </button>
+
+      <button matButton="filled" (click)="dialogRef.close(false)">
+        {{'button.cancel' | translate}}
+      </button>
+    </div>
+  </div>
+</hmdm-dialog-template>
+

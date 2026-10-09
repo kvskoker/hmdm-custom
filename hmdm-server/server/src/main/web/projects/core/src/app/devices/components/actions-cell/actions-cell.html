@@ -1,0 +1,42 @@
+<div class="cell">
+  <button *hmdmHasPermission="'edit_device_desc'" mat-icon-button (click)="onEditClick()">
+    <mat-icon>edit</mat-icon>
+  </button>
+
+  <div
+    class="btn-wrapper"
+    [matTooltip]="'error.invalid.configuration.mainApp' | translate"
+    [matTooltipShowDelay]="300"
+    [matTooltipDisabled]="!isQrCodeDisabled()"
+  >
+    <button
+      *hmdmHasPermission="'enroll_devices'"
+      mat-icon-button
+      [disabled]="isQrCodeDisabled()"
+      (click)="onQrCodeClick()"
+    >
+      <mat-icon>qr_code</mat-icon>
+    </button>
+  </div>
+
+  <button mat-icon-button (click)="onDeleteClick()" *hmdmHasPermission="'edit_devices'">
+    <mat-icon>delete</mat-icon>
+  </button>
+
+  <button matIconButton [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">
+    <mat-icon>more_vert</mat-icon>
+  </button>
+
+  <mat-menu #menu="matMenu">
+    @for (plugin of plugins; track plugin.id) {
+      <button
+        mat-menu-item
+        (click)="onPluginClick(plugin.identifier)"
+        *hmdmHasPermission="plugin.deviceFunctionsPermission"
+      >
+        <mat-icon>{{ plugin.icon || 'extension' }}</mat-icon>
+        <span>{{ plugin.nameLocalizationKey | translate }}</span>
+      </button>
+    }
+  </mat-menu>
+</div>

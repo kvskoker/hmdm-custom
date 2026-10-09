@@ -1,0 +1,18 @@
+<form
+  class="audit-form"
+  persistFormKey="audit-form-values"
+  [formGroup]="formGroup()"
+  [hmdmPersistForm]="formGroup()"
+>
+  <hmdm-selector
+    formControlName="messageFilter"
+    label="{{ 'table.heading.plugin.audit.action' | translate }}"
+    [optional]="true"
+    [options]="auditActionOptions"
+  ></hmdm-selector>
+
+  <hmdm-date-range
+    formControlName="date"
+    label="{{ 'table.heading.plugin.audit.dateTime' | translate }}"
+  ></hmdm-date-range>
+</form>

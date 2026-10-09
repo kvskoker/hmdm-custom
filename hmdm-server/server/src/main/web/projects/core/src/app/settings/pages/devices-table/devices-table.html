@@ -1,0 +1,47 @@
+<mat-card class="settings-card scroll-content">
+  <mat-card-header class="settings-header">
+    <mat-card-title>{{ 'form.settings.common.visible.columns' | translate }}</mat-card-title>
+
+    <button matButton="filled" class="primary" (click)="onSave()">
+      {{ 'button.save' | translate }}
+    </button>
+  </mat-card-header>
+
+  <mat-card-content class="settings-content scroll-scrollable">
+    <form class="settings-form" [formGroup]="formGroup">
+      <hmdm-selector
+        formControlName="roleId"
+        [label]="'form.settings.common.role' | translate"
+        [options]="roleOptions()"
+      ></hmdm-selector>
+
+      @for (column of columns; track $index) {
+        <hmdm-checkbox
+          [formControlName]="column.column"
+          [label]="column.label | translate"
+        ></hmdm-checkbox>
+      }
+
+      @if (settings()?.customPropertyName1) {
+        <hmdm-checkbox
+          [formControlName]="'columnDisplayedCustom1'"
+          [label]="settings()?.customPropertyName1 || ''"
+        ></hmdm-checkbox>
+      }
+
+      @if (settings()?.customPropertyName2) {
+        <hmdm-checkbox
+          [formControlName]="'columnDisplayedCustom2'"
+          [label]="settings()?.customPropertyName2 || ''"
+        ></hmdm-checkbox>
+      }
+
+      @if (settings()?.customPropertyName3) {
+        <hmdm-checkbox
+          [formControlName]="'columnDisplayedCustom3'"
+          [label]="settings()?.customPropertyName3 || ''"
+        ></hmdm-checkbox>
+      }
+    </form>
+  </mat-card-content>
+</mat-card>

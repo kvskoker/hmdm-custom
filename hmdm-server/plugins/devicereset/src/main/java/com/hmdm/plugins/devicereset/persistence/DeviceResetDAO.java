@@ -68,6 +68,26 @@ public class DeviceResetDAO {
                 .orElse(Collections.emptyList());
     }
 
+    public java.util.Map<String, Object> historyPage(String kind, int page, int size,
+            String search, Integer status, String commandType, long after) {
+        return SecurityContext.get().getCurrentUser().map(user -> {
+            java.util.Map<String, Object> args = new java.util.HashMap<>();
+            args.put("kind", kind);
+            args.put("customerId", user.getCustomerId());
+            args.put("userId", user.getId());
+            args.put("pageSize", size);
+            args.put("offset", (long) page * size);
+            args.put("search", "%" + search.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%");
+            args.put("status", status);
+            args.put("commandType", commandType);
+            args.put("after", after);
+            java.util.Map<String, Object> result = new java.util.HashMap<>();
+            result.put("items", this.mapper.historyPage(args));
+            result.put("totalItemsCount", this.mapper.historyCount(args));
+            return result;
+        }).orElseGet(() -> java.util.Map.of("items", Collections.emptyList(), "totalItemsCount", 0));
+    }
+
     // ---------------------------------------------------------------- commands
 
     /**

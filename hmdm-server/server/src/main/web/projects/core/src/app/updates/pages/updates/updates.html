@@ -1,0 +1,78 @@
+<mat-card class="card scroll-wrap" [hmdmLoader]="isUpdating() || isChecking()">
+  <mat-card-title class="card-title">
+    <h3>{{ 'updates.title' | translate }}</h3>
+  </mat-card-title>
+
+  <mat-divider></mat-divider>
+
+  <mat-card-content class="card-content scroll-wrap">
+    <div class="updates-container">
+      <form [formGroup]="updateForm" (submit)="$event.preventDefault()">
+
+        @if (errorMessage()) {
+          <div class="alert error-message">
+            <span>{{ errorMessage() }}</span>
+          </div>
+        }
+
+        @if (!isChecking()) {
+          <div class="content-layout">
+
+            <div class="updates-grid header row-bold">
+              <div>{{ 'updates.application' | translate }}</div>
+              <div>{{ 'updates.current.version' | translate }}</div>
+              <div>{{ 'updates.available.version' | translate }}</div>
+              <div class="text-center">{{ 'updates.downloaded' | translate }}</div>
+            </div>
+
+            @for (app of updates(); track app.name) {
+              <div class="updates-grid data-row">
+                <div class="app-name">{{ app.name }}</div>
+
+                @if (app.updateDisabled) {
+                  <div class="warning-text span-two-columns">
+                    {{ app.updateDisableReasonLocalized }}
+                  </div>
+                } @else {
+                  <div [class.warning-text]="app.outdated">
+                    {{ app.currentVersion || '-' }}
+                  </div>
+                  <div>{{ app.version || '-' }}</div>
+                }
+
+                <div class="text-center">
+                  @if (!app.updateDisabled && app.downloaded) {
+                    <mat-icon>check</mat-icon>
+                  }
+                </div>
+              </div>
+            }
+
+            <div class="options-container">
+              <label class="checkbox-label">
+                <mat-checkbox formControlName="update"/>
+                <span>{{ 'updates.auto.update' | translate }}</span>
+              </label>
+
+              <label class="checkbox-label">
+                <mat-checkbox formControlName="sendStats"/>
+                <span>{{ 'updates.enable.stats' | translate }}</span>
+              </label>
+            </div>
+
+            <div class="hint-container">
+              <p class="field-hint">{{ 'updates.web.hint' | translate }}</p>
+            </div>
+
+            <div class="actions-container">
+              <button matButton="filled" [disabled]="isUpdating() || isError()" (click)="getUpdates()">
+                {{ 'updates.get' | translate }}
+              </button>
+            </div>
+
+          </div>
+        }
+      </form>
+    </div>
+  </mat-card-content>
+</mat-card>

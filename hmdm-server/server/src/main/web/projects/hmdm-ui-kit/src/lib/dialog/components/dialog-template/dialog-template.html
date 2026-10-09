@@ -1,0 +1,20 @@
+<div class="dialog">
+  <div class="dialog-top">
+    @if (title()) {
+      <h2 class="dialog-title">
+        {{ title() }}
+      </h2>
+    } @else {
+      <div class="dialog-title-placeholder"></div>
+    }
+    <ng-content select="[dialog-title]"> </ng-content>
+  </div>
+
+  <div class="dialog-content">
+    <ng-content></ng-content>
+  </div>
+
+  <div class="dialog-actions">
+    <ng-content select="[dialog-actions]"></ng-content>
+  </div>
+</div>

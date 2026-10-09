@@ -2,7 +2,7 @@ package com.hmdm.plugins.devicelocation.persistence.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.hmdm.persistence.domain.CustomerData;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.io.Serializable;
 
@@ -16,28 +16,28 @@ public class DeviceLocationSettings implements CustomerData, Serializable {
     public static final int DEFAULT_NORMAL_INTERVAL_MINS = 360;
     public static final int DEFAULT_LOST_INTERVAL_MINS = 2;
 
-    @ApiModelProperty("Primary key")
+    @Schema(description = "Primary key")
     private Integer id;
 
-    @ApiModelProperty("Customer ID")
+    @Schema(description = "Customer ID")
     private int customerId;
 
-    @ApiModelProperty("How many positions to keep per device in normal operation")
+    @Schema(description = "How many positions to keep per device in normal operation")
     private int keepPoints = DEFAULT_KEEP_POINTS;
 
-    @ApiModelProperty("How often a device reports its position normally, in minutes")
+    @Schema(description = "How often a device reports its position normally, in minutes")
     private int normalIntervalMins = DEFAULT_NORMAL_INTERVAL_MINS;
 
-    @ApiModelProperty("How often a device reported lost should report, in minutes")
+    @Schema(description = "How often a device reported lost should report, in minutes")
     private int lostIntervalMins = DEFAULT_LOST_INTERVAL_MINS;
 
-    @ApiModelProperty("Ask every device for its position, whatever its configuration says")
+    @Schema(description = "Ask every device for its position, whatever its configuration says")
     private boolean trackAllDevices = true;
 
-    @ApiModelProperty("Map tile URL template")
+    @Schema(description = "Map tile URL template")
     private String tileUrl;
 
-    @ApiModelProperty("Attribution text the tile provider requires")
+    @Schema(description = "Attribution text the tile provider requires")
     private String tileAttribution;
 
     public DeviceLocationSettings() {

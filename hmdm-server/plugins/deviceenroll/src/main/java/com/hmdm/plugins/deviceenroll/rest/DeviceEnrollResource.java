@@ -3,20 +3,20 @@ package com.hmdm.plugins.deviceenroll.rest;
 import com.hmdm.plugins.deviceenroll.persistence.DeviceEnrollDAO;
 import com.hmdm.plugins.deviceenroll.persistence.domain.NumberingRule;
 import com.hmdm.rest.json.Response;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.Authorization;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
 
 @Singleton
 @Path("/plugins/deviceenroll")
-@Api(tags = {"Device enrollment plugin"})
+@Tag(name = "Device enrollment plugin")
 public class DeviceEnrollResource {
 
     private static final Logger logger = LoggerFactory.getLogger(DeviceEnrollResource.class);
@@ -31,7 +31,7 @@ public class DeviceEnrollResource {
         this.dao = dao;
     }
 
-    @ApiOperation(value = "Numbering rules", authorizations = {@Authorization("Bearer Token")})
+    @Operation(summary = "Numbering rules", security = {@SecurityRequirement(name = "Bearer Token")})
     @GET
     @Path("/private/rules")
     @Produces(MediaType.APPLICATION_JSON)
@@ -52,7 +52,7 @@ public class DeviceEnrollResource {
      * @param overwrite set when the panel has asked the user to confirm replacing a rule
      *                  the group already has.
      */
-    @ApiOperation(value = "Save a numbering rule", authorizations = {@Authorization("Bearer Token")})
+    @Operation(summary = "Save a numbering rule", security = {@SecurityRequirement(name = "Bearer Token")})
     @POST
     @Path("/private/rules")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -76,7 +76,7 @@ public class DeviceEnrollResource {
         }
     }
 
-    @ApiOperation(value = "Delete a numbering rule", authorizations = {@Authorization("Bearer Token")})
+    @Operation(summary = "Delete a numbering rule", security = {@SecurityRequirement(name = "Bearer Token")})
     @DELETE
     @Path("/private/rules/{id}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -90,7 +90,7 @@ public class DeviceEnrollResource {
         }
     }
 
-    @ApiOperation(value = "Numbers handed out", authorizations = {@Authorization("Bearer Token")})
+    @Operation(summary = "Numbers handed out", security = {@SecurityRequirement(name = "Bearer Token")})
     @GET
     @Path("/private/assignments")
     @Produces(MediaType.APPLICATION_JSON)

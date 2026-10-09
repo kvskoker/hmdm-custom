@@ -5,22 +5,22 @@ import com.hmdm.plugins.devicelocation.persistence.domain.DeviceLocationSettings
 import com.hmdm.plugins.devicelocation.persistence.domain.LostDevice;
 import com.hmdm.rest.json.Response;
 import com.hmdm.security.SecurityContext;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.Authorization;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
 import java.util.HashMap;
 import java.util.Map;
 
 @Singleton
 @Path("/plugins/devicelocation")
-@Api(tags = {"Device tracking plugin"})
+@Tag(name = "Device tracking plugin")
 public class DeviceLocationResource {
 
     private static final Logger logger = LoggerFactory.getLogger(DeviceLocationResource.class);
@@ -40,7 +40,7 @@ public class DeviceLocationResource {
      * devices are flagged lost, the tile settings, and how many devices have never
      * reported at all.</p>
      */
-    @ApiOperation(value = "Map data", authorizations = {@Authorization("Bearer Token")})
+    @Operation(summary = "Map data", security = {@SecurityRequirement(name = "Bearer Token")})
     @GET
     @Path("/private/map")
     @Produces(MediaType.APPLICATION_JSON)
@@ -67,8 +67,8 @@ public class DeviceLocationResource {
         }
     }
 
-    @ApiOperation(value = "Location history for one device",
-            authorizations = {@Authorization("Bearer Token")})
+    @Operation(summary = "Location history for one device",
+            security = {@SecurityRequirement(name = "Bearer Token")})
     @GET
     @Path("/private/device/{number}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -93,7 +93,7 @@ public class DeviceLocationResource {
         }
     }
 
-    @ApiOperation(value = "Report a device lost", authorizations = {@Authorization("Bearer Token")})
+    @Operation(summary = "Report a device lost", security = {@SecurityRequirement(name = "Bearer Token")})
     @POST
     @Path("/private/lost/{number}")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -117,7 +117,7 @@ public class DeviceLocationResource {
         }
     }
 
-    @ApiOperation(value = "Clear the lost flag", authorizations = {@Authorization("Bearer Token")})
+    @Operation(summary = "Clear the lost flag", security = {@SecurityRequirement(name = "Bearer Token")})
     @POST
     @Path("/private/found/{number}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -139,8 +139,8 @@ public class DeviceLocationResource {
         }
     }
 
-    @ApiOperation(value = "Delete a device's location history",
-            authorizations = {@Authorization("Bearer Token")})
+    @Operation(summary = "Delete a device's location history",
+            security = {@SecurityRequirement(name = "Bearer Token")})
     @DELETE
     @Path("/private/device/{number}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -165,8 +165,8 @@ public class DeviceLocationResource {
      * <p>Whether a device is flagged lost, used by the entry in the device list dropdown so
      * it can offer the right action.</p>
      */
-    @ApiOperation(value = "Tracking status of one device",
-            authorizations = {@Authorization("Bearer Token")})
+    @Operation(summary = "Tracking status of one device",
+            security = {@SecurityRequirement(name = "Bearer Token")})
     @GET
     @Path("/private/status/{number}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -187,7 +187,7 @@ public class DeviceLocationResource {
         }
     }
 
-    @ApiOperation(value = "Tracking settings", authorizations = {@Authorization("Bearer Token")})
+    @Operation(summary = "Tracking settings", security = {@SecurityRequirement(name = "Bearer Token")})
     @GET
     @Path("/private/settings")
     @Produces(MediaType.APPLICATION_JSON)
@@ -200,7 +200,7 @@ public class DeviceLocationResource {
         }
     }
 
-    @ApiOperation(value = "Save tracking settings", authorizations = {@Authorization("Bearer Token")})
+    @Operation(summary = "Save tracking settings", security = {@SecurityRequirement(name = "Bearer Token")})
     @PUT
     @Path("/private/settings")
     @Consumes(MediaType.APPLICATION_JSON)

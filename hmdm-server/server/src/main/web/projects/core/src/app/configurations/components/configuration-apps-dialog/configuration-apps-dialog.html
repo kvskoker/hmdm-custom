@@ -1,0 +1,22 @@
+<hmdm-dialog-template>
+  <core-configuration-app-form (formChange)="onFormChange($event)"></core-configuration-app-form>
+
+  <div class="dialog-buttons" dialog-actions>
+    <button
+      class="dialog-btn primary"
+      *hmdmHasPermission="'edit_applications'"
+      matButton="filled"
+      (click)="onCreateNewApp()"
+    >
+      {{ 'button.new.app' | translate }}
+    </button>
+
+    <button matButton class="dialog-btn primary" (click)="onCancel()">
+      {{ 'button.cancel' | translate }}
+    </button>
+
+    <button matButton="filled" class="dialog-btn primary" [disabled]="!app" (click)="onSave()">
+      {{ 'button.save' | translate }}
+    </button>
+  </div>
+</hmdm-dialog-template>

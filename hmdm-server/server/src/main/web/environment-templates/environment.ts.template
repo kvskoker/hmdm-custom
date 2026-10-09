@@ -1,0 +1,8 @@
+import { TEnvironment } from './environtment.type';
+
+export const environment: TEnvironment = {
+  development: false,
+  baseApiUrl: '', //empty for relative path in war
+  version: '${project.version}',
+  i18nUrl: 'i18n/',
+};

@@ -52,10 +52,10 @@ public interface UserMapper {
 
     @Insert({"INSERT INTO users (login, email, name, password, customerId, userRoleId, " +
             "allDevicesAvailable, allConfigAvailable, passwordReset, authToken, " +
-            "passwordResetToken, authData, twoFactorSecret, twoFactorAccepted) " +
+            "passwordResetToken, authData, twoFactorSecret, twoFactorAccepted, alertLevel) " +
             "VALUES (#{login}, #{email}, #{name}, #{password}, #{customerId}, #{userRole.id}, " +
             "#{allDevicesAvailable}, #{allConfigAvailable}, #{passwordReset}, #{authToken}, " +
-            "#{passwordResetToken}, #{authData}, #{twoFactorSecret}, #{twoFactorAccepted})"})
+            "#{passwordResetToken}, #{authData}, #{twoFactorSecret}, #{twoFactorAccepted}, #{alertLevel})"})
     @SelectKey( statement = "SELECT currval('users_id_seq')", keyColumn = "id", keyProperty = "id", before = false, resultType = int.class )
     void insert(User user);
 
@@ -63,7 +63,7 @@ public interface UserMapper {
             "SET name = #{name}, login=#{login}, email=#{email}, userRoleId=#{userRole.id}, " +
             "allDevicesAvailable=#{allDevicesAvailable}, allConfigAvailable=#{allConfigAvailable}, " +
             "passwordReset=#{passwordReset}, authData=#{authData}, twoFactorSecret=#{twoFactorSecret}, " +
-            "twoFactorAccepted=#{twoFactorAccepted} " +
+            "twoFactorAccepted=#{twoFactorAccepted}, alertLevel=#{alertLevel} " +
             "WHERE id=#{id}"})
     void updateUserMainDetails(User user);
 
@@ -108,6 +108,10 @@ public interface UserMapper {
 
     @Select("SELECT hintKey FROM userHints WHERE userId = #{id}")
     List<String> getShownHints(@Param("id") Integer userId);
+
+    @Select("SELECT true FROM userdevicegroupsaccess a INNER JOIN devicegroups g ON a.groupId = g.groupId " +
+            "WHERE a.userId = #{userId} AND g.deviceId = #{deviceId}")
+    Boolean hasDeviceAccess(@Param("userId") Integer userId, @Param("deviceId") Integer deviceId);
 
     @Insert("INSERT INTO userHints (userId, hintKey) VALUES (#{userId}, #{hintKey})")
     int insertShownHint(@Param("userId") Integer userId, @Param("hintKey") String hintKey);

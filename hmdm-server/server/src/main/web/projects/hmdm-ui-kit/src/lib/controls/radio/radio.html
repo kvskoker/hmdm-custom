@@ -1,0 +1,17 @@
+<div class="radio">
+  <div class="radio-label-row">
+    <label class="radio-label">{{ label() }}</label>
+
+    @if (help()) {
+      <hmdm-help-tooltip [text]="help()" />
+    }
+  </div>
+
+  <mat-button-toggle-group class="radio-group" [formControl]="formControl">
+    @for (option of options(); track $index) {
+      <mat-button-toggle class="example-radio-button" [value]="option.value">
+        {{ option.viewValue | translate }}
+      </mat-button-toggle>
+    }
+  </mat-button-toggle-group>
+</div>

@@ -97,4 +97,21 @@
         </rollback>
     </changeSet>
 
+    <changeSet id="plugin-messsaging-18.01.2026-18:14" author="seva" context="common">
+        <comment>Adapt plugin settings to version 6</comment>
+        <sql>
+            UPDATE plugins SET
+                               icon='mail',
+                               javascriptModuleFile=null,
+                               functionsViewTemplate=null,
+                               settingsViewTemplate=null,
+                               baseUrl='/plugins/messaging',
+                               baseUrlDev='http://localhost:4202',
+                               hasSettingsPage=true
+            WHERE identifier='messaging';
+        </sql>
+        <rollback>
+        </rollback>
+    </changeSet>
+
 </databaseChangeLog>

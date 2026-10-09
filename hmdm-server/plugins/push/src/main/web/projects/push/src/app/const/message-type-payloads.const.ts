@@ -1,0 +1,18 @@
+export const MESSAGE_TYPE_PAYLOADS: Record<string, string> = {
+  configUpdated: '',
+  runApp: '{"pkg": "app.package.id"}',
+  uninstallApp: '{"pkg": "app.package.id"}',
+  deleteFile: '{"path": "/path/to/file"}',
+  deleteDir: '{"path": "/path/to/dir"}',
+  purgeDir: '{"path": "/path/to/dir", "recursive": "1"}',
+  permissiveMode: '',
+  intent: '{"action": "android.intent.action.VIEW", "data": "https://h-mdm.com"}',
+  runCommand: '{"command": "shell command"}',
+  reboot: '',
+  exitKiosk: '',
+  adminPanel: '',
+  clearDownloadHistory: '',
+  grantPermissions: '{"pkg": "app.package.id"}',
+  clearAppData: '{"pkg": "app.package.id"}',
+  '(custom)': '',
+};

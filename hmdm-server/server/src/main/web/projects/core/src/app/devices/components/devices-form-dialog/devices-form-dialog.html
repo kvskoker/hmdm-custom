@@ -1,0 +1,12 @@
+<hmdm-dialog-template class="dialog">
+  <core-device-form
+    [initialData]="initialData"
+    (formChange)="onFormChange($event)"
+  ></core-device-form>
+
+  <hmdm-dialog-common-buttons
+    dialog-actions
+    (cancel)="onCancel()"
+    (save)="onSave()"
+  ></hmdm-dialog-common-buttons>
+</hmdm-dialog-template>

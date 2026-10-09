@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context crossContext="true">
+    <!-- Display X-Forwarded-For instead of source IP -->
+    <Parameter name="plugin.audit.display.forwarded.ip" value="${plugin.audit.display.forwarded.ip}"/>   
+</Context>

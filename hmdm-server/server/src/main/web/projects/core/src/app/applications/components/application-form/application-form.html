@@ -1,0 +1,37 @@
+<div class="application-wrapper">
+  <div class="application-type">
+    <hmdm-selector
+      [label]="'form.application.type' | translate"
+      [formControl]="typeControl"
+      [options]="typesOptions"
+    ></hmdm-selector>
+
+    <mat-divider></mat-divider>
+  </div>
+
+  @if (type() === 'app') {
+    <core-apk-form
+      (formChange)="onApplicationFormChange($event)"
+      (uploadSuccess)="onUploadSuccess()"
+      [initialValue]="initialValue()"
+    ></core-apk-form>
+  } @else if (type() === 'web') {
+    <core-web-page-form
+      (formChange)="onApplicationFormChange($event)"
+      [initialValue]="initialValue()"
+    ></core-web-page-form>
+  } @else if (type() === 'intent') {
+    <core-system-action-form
+      (formChange)="onApplicationFormChange($event)"
+      [initialValue]="initialValue()"
+    ></core-system-action-form>
+  }
+
+  <mat-divider></mat-divider>
+
+  <core-application-icon-form
+    (formChange)="onIconFormChange($event)"
+    [initialValue]="initialIconValue()"
+    [applicationType]="type()"
+  ></core-application-icon-form>
+</div>

@@ -1,0 +1,18 @@
+<form [formGroup]="formGroup()" class="details">
+  <div class="details-line">
+    <hmdm-checkbox
+      formControlName="longTap"
+      [label]="'form.configuration.apps.long.tap' | translate"
+    ></hmdm-checkbox>
+
+    <hmdm-checkbox
+      formControlName="bottom"
+      [label]="'form.configuration.apps.bottom' | translate"
+    ></hmdm-checkbox>
+  </div>
+
+  <hmdm-text-input
+    formControlName="keyCode"
+    [label]="'form.configuration.apps.keycode' | translate"
+  ></hmdm-text-input>
+</form>

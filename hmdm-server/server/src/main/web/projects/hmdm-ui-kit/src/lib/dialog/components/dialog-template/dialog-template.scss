@@ -1,0 +1,11 @@
+.dialog {
+  padding: 24px;
+  overflow: hidden;
+
+  &-content {
+    max-height: 75vh;
+    overflow: auto;
+    width: calc(100% + 50px);
+    padding-right: 50px;
+  }
+}

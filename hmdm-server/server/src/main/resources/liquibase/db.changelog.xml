@@ -2572,18 +2572,35 @@
         </rollback>
     </changeSet>
 
-
     <changeSet id="06.10.25-12:50" author="seva" context="common">
         <comment>Adding screen on and launcher URL columns to configurations table</comment>
         <sql>
             ALTER TABLE configurations
-            ADD COLUMN kioskScreenOn BOOLEAN,
+                ADD COLUMN kioskScreenOn BOOLEAN,
             ADD COLUMN launcherUrl TEXT;
         </sql>
         <rollback>
             ALTER TABLE configurations
             DROP COLUMN kioskScreenOn,
             DROP COLUMN launcherUrl;
+        </rollback>
+    </changeSet>
+
+    <changeSet id="24.11.25-15:52" author="seva" context="common">
+        <comment>Create session table</comment>
+        <sql>
+            CREATE TABLE sessions (
+                sessionId TEXT NOT NULL,
+                created BIGINT NOT NULL DEFAULT 0,
+                accessed BIGINT NOT NULL DEFAULT 0,
+                userData TEXT,
+                twoFactorNeeded BOOLEAN NOT NULL DEFAULT false
+            );
+            CREATE UNIQUE INDEX idx_sessions_sessionid
+                ON sessions(sessionId);
+        </sql>
+        <rollback>
+            DROP TABLE sessions;
         </rollback>
     </changeSet>
 
@@ -2606,6 +2623,39 @@
         <rollback>
             ALTER TABLE deviceApplicationSettings DROP COLUMN variable;
             ALTER TABLE configurationApplicationSettings DROP COLUMN variable;
+        </rollback>
+    </changeSet>
+
+    <changeSet id="31.05.26-19:55" author="seva" context="common">
+        <comment>Column,new: users#alertLevel, table, new: alert</comment>
+        <sql>
+            ALTER TABLE users ADD COLUMN alertLevel INT NOT NULL DEFAULT 20;
+            CREATE TABLE alerts(
+                id serial NOT NULL CONSTRAINT id_pr_key PRIMARY KEY,
+                createTime BIGINT,
+                customerId INT NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+                level INT NOT NULL DEFAULT 10,
+                userId INT,
+                deviceId INT,
+                message VARCHAR(1024)
+            );
+
+            INSERT INTO permissions (name, description) VALUES ('delete_device', 'Can delete devices');
+            INSERT INTO userRolePermissions (roleId, permissionId) VALUES (1, currval('permissions_id_seq'));
+            INSERT INTO userRolePermissions (roleId, permissionId) VALUES (2, currval('permissions_id_seq'));
+            INSERT INTO userRolePermissions (roleId, permissionId) VALUES (3, currval('permissions_id_seq'));
+
+            INSERT INTO permissions (name, description) VALUES ('alerts', 'Can view alerts');
+            INSERT INTO userRolePermissions (roleId, permissionId) VALUES (1, currval('permissions_id_seq'));
+            INSERT INTO userRolePermissions (roleId, permissionId) VALUES (2, currval('permissions_id_seq'));
+            INSERT INTO userRolePermissions (roleId, permissionId) VALUES (3, currval('permissions_id_seq'));
+
+        </sql>
+        <rollback>
+            ALTER TABLE users DROP COLUMN alertLevel;
+            DROP TABLE alerts;
+            DELETE FROM permission WHERE name='delete_device';
+            DELETE FROM permission WHERE name='alerts';
         </rollback>
     </changeSet>
 

@@ -1,0 +1,38 @@
+.cell {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-weight: 500;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+
+  &-badge {
+    flex-shrink: 0;
+    display: block;
+    width: 10px;
+    height: 10px;
+    transform: rotate(45deg);
+    border-radius: 2px;
+
+    &.green {
+      background: #4caf82ff;
+    }
+
+    &.red {
+      background: #ed554dff;
+    }
+
+    &.yellow {
+      background: #ff9800;
+    }
+
+    &.gray {
+      background: #9e9e9e;
+    }
+  }
+
+  &-label {
+    flex-shrink: 0;
+  }
+}

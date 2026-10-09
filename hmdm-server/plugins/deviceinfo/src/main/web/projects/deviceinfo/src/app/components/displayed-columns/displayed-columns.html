@@ -1,0 +1,133 @@
+<div class="displayed-columns">
+  <div class="columns-grid">
+    <!-- Device Fields -->
+    <div class="field-group">
+      <div class="group-header">
+        <mat-checkbox
+          class="group-checkbox"
+          [checked]="isGroupFullySelected('device')"
+          [indeterminate]="isGroupPartiallySelected('device')"
+          (change)="toggleGroup('device')"
+        >
+          <span class="group-title">{{ 'plugin.deviceinfo.title.group.device' | translate }}</span>
+        </mat-checkbox>
+      </div>
+      <div class="fields-list">
+        @for (field of deviceFields(); track field.name) {
+          <mat-checkbox
+            class="field-checkbox"
+            [id]="'field_' + field.name"
+            [checked]="fieldsSelection()[field.name]"
+            (change)="toggleField(field.name)"
+          >
+            {{ 'plugin.deviceinfo.title.group.' + field.name | translate }}
+          </mat-checkbox>
+        }
+      </div>
+    </div>
+
+    <!-- Wi-Fi Fields -->
+    <div class="field-group">
+      <div class="group-header">
+        <mat-checkbox
+          class="group-checkbox"
+          [checked]="isGroupFullySelected('wifi')"
+          [indeterminate]="isGroupPartiallySelected('wifi')"
+          (change)="toggleGroup('wifi')"
+        >
+          <span class="group-title">{{ 'plugin.deviceinfo.title.group.wifi' | translate }}</span>
+        </mat-checkbox>
+      </div>
+      <div class="fields-list">
+        @for (field of wifiFields(); track field.name) {
+          <mat-checkbox
+            class="field-checkbox"
+            [id]="'field_' + field.name"
+            [checked]="fieldsSelection()[field.name]"
+            (change)="toggleField(field.name)"
+          >
+            {{ 'plugin.deviceinfo.title.group.' + field.name | translate }}
+          </mat-checkbox>
+        }
+      </div>
+    </div>
+
+    <!-- GPS Fields -->
+    <div class="field-group">
+      <div class="group-header">
+        <mat-checkbox
+          class="group-checkbox"
+          [checked]="isGroupFullySelected('gps')"
+          [indeterminate]="isGroupPartiallySelected('gps')"
+          (change)="toggleGroup('gps')"
+        >
+          <span class="group-title">{{ 'plugin.deviceinfo.title.group.gps' | translate }}</span>
+        </mat-checkbox>
+      </div>
+      <div class="fields-list">
+        @for (field of gpsFields(); track field.name) {
+          <mat-checkbox
+            class="field-checkbox"
+            [id]="'field_' + field.name"
+            [checked]="fieldsSelection()[field.name]"
+            (change)="toggleField(field.name)"
+          >
+            {{ 'plugin.deviceinfo.title.group.' + field.name | translate }}
+          </mat-checkbox>
+        }
+      </div>
+    </div>
+
+    <!-- Mobile #1 Fields -->
+    <div class="field-group">
+      <div class="group-header">
+        <mat-checkbox
+          class="group-checkbox"
+          [checked]="isGroupFullySelected('mobile1')"
+          [indeterminate]="isGroupPartiallySelected('mobile1')"
+          (change)="toggleGroup('mobile1')"
+        >
+          <span class="group-title">{{ 'plugin.deviceinfo.title.group.mobile1' | translate }}</span>
+        </mat-checkbox>
+      </div>
+      <div class="fields-list">
+        @for (field of mobile1Fields(); track field.name) {
+          <mat-checkbox
+            class="field-checkbox"
+            [id]="'field_' + field.name"
+            [checked]="fieldsSelection()[field.name]"
+            (change)="toggleField(field.name)"
+          >
+            {{ 'plugin.deviceinfo.title.group.' + field.name | translate }}
+          </mat-checkbox>
+        }
+      </div>
+    </div>
+
+    <!-- Mobile #2 Fields -->
+    <div class="field-group">
+      <div class="group-header">
+        <mat-checkbox
+          class="group-checkbox"
+          [checked]="isGroupFullySelected('mobile2')"
+          [indeterminate]="isGroupPartiallySelected('mobile2')"
+          (change)="toggleGroup('mobile2')"
+        >
+          <span class="group-title">{{ 'plugin.deviceinfo.title.group.mobile2' | translate }}</span>
+        </mat-checkbox>
+      </div>
+      <div class="fields-list">
+        @for (field of mobile2Fields(); track field.name) {
+          <mat-checkbox
+            class="field-checkbox"
+            [id]="'field_' + field.name"
+            [checked]="fieldsSelection()[field.name]"
+            (change)="toggleField(field.name)"
+          >
+            {{ 'plugin.deviceinfo.title.group.' + field.name | translate }}
+          </mat-checkbox>
+        }
+      </div>
+    </div>
+  </div>
+</div>

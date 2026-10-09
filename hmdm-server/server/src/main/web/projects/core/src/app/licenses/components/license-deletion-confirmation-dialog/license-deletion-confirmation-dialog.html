@@ -1,0 +1,13 @@
+<div class="dialog">
+  <div class="dialog-content">
+    <h2>{{ 'license.delete.confirmation.title' | translate }}</h2>
+  </div>
+
+  <div class="dialog-actions">
+    <button matButton (click)="close(false)">{{'button.cancel' | translate}}</button>
+    <button
+      matButton="filled"
+      (click)="close(true)"
+    >{{'button.delete' | translate}}</button>
+  </div>
+</div>

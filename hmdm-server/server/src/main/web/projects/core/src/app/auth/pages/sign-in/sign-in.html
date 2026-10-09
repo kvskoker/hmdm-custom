@@ -1,0 +1,41 @@
+@if (showTwoFactorInput) {
+  <core-two-factor
+    [isSetup]="isSetupFlow"
+    (success)="onTwoFactorSuccess()"
+    (cancel)="showTwoFactorInput = false">
+  </core-two-factor>
+} @else {
+  <form class="auth-form" [formGroup]="formGroup">
+    <h1 class="auth-title">{{ 'signin.title' | translate }}</h1>
+
+    <hmdm-text-input [label]="'login.username' | translate" formControlName="login"></hmdm-text-input>
+
+    <hmdm-text-input
+      [label]="'login.password' | translate"
+      inputType="password"
+      formControlName="password"
+    ></hmdm-text-input>
+
+    <button matButton="filled" class="primary" (click)="onSignIn()">
+      {{ 'signin.title' | translate }}
+    </button>
+
+    @if (authOptions()?.recover) {
+      <a class="auth-link" routerLink="/auth/forgot-password">{{
+          'login.password.recovery' | translate
+        }}</a>
+    }
+
+    @if (rebranding().signupLink) {
+      <p class="auth-signup">
+        {{ 'login.no.account' | translate }}
+        <a [href]="rebranding().signupLink" class="auth-link">{{ 'login.signup' | translate }}</a>
+      </p>
+    } @else if (authOptions()?.signup) {
+      <p class="auth-signup">
+        {{ 'login.no.account' | translate }}
+        <a class="auth-link" routerLink="/auth/sign-up">{{ 'login.signup' | translate }}</a>
+      </p>
+    }
+  </form>
+}

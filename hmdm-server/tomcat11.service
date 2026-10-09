@@ -1,0 +1,23 @@
+[Unit]
+Description=Apache Tomcat 11
+After=network.target
+
+[Service]
+Type=forking
+
+User=tomcat
+Group=tomcat
+
+Environment="JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64"
+
+Environment="CATALINA_PID=/var/lib/tomcat11/temp/tomcat.pid"
+Environment="CATALINA_HOME=/var/lib/tomcat11"
+Environment="CATALINA_BASE=/var/lib/tomcat11"
+
+ExecStart=/var/lib/tomcat11/bin/startup.sh
+ExecStop=/var/lib/tomcat11/bin/shutdown.sh
+
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,17 @@
+<hmdm-dialog-template>
+  <log-rule-form [formGroup]="ruleFormGroup"></log-rule-form>
+
+  <div class="dialog-buttons" dialog-actions>
+    <button class="dialog-btn primary" matButton (click)="onDevicesDialog()">
+      {{ 'plugin.devicelog.settings.button.devices' | translate }}
+    </button>
+
+    <button matButton class="dialog-btn primary" (click)="onCancel()">
+      {{ 'button.cancel' | translate }}
+    </button>
+
+    <button matButton="filled" class="dialog-btn primary" (click)="onSave()">
+      {{ 'button.save' | translate }}
+    </button>
+  </div>
+</hmdm-dialog-template>

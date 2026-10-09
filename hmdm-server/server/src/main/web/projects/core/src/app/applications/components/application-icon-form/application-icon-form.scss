@@ -1,0 +1,14 @@
+.form {
+  &-icon {
+    padding-top: 16px;
+  }
+
+  &-line {
+    display: flex;
+    gap: 16px;
+
+    hmdm-selector {
+      flex: 1;
+    }
+  }
+}

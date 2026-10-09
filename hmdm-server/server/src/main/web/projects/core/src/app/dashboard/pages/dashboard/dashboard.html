@@ -1,0 +1,144 @@
+@if (dashboardFacadeService.summary() != null) {
+  <div class="dashboard scroll-wrap">
+    <section class="dashboard-section">
+      <div class="dashboard-circle">
+        <p class="dashboard-title">{{ 'summary.devices.enrollment' | translate }}</p>
+
+        <hmdm-chart
+          class="dashboard-doughnut"
+          chartType="doughnut"
+          [data]="dashboardFacadeService.enrollmentCircleData()"
+          [showLegend]="false"
+        >
+        </hmdm-chart>
+
+        <div class="dashboard-summary">
+          <table>
+            <tr>
+              <td>{{ 'summary.devices.enrolled.total' | translate }}:</td>
+              <td class="blue-value">{{ dashboardFacadeService.summary()?.devicesEnrolled }}</td>
+            </tr>
+
+            <tr>
+              <td>{{ 'summary.devices.enrolled.monthly' | translate }}:</td>
+              <td class="blue-value">
+                {{ dashboardFacadeService.summary()?.devicesEnrolledLastMonth }}
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="dashboard-chart">
+        <p class="dashboard-title">{{ 'summary.devices.enrolled.lastyear' | translate }}</p>
+
+        <hmdm-chart
+          class="dashboard-bar"
+          chartType="line"
+          [data]="dashboardFacadeService.enrollmentChartData()"
+          [showLegend]="false"
+        >
+        </hmdm-chart>
+      </div>
+    </section>
+
+    <section class="dashboard-section">
+      <div class="dashboard-circle">
+        <p class="dashboard-title">{{ 'summary.devices.status' | translate }}</p>
+
+        <hmdm-chart
+          class="dashboard-doughnut"
+          chartType="doughnut"
+          [data]="dashboardFacadeService.deviceCircleData()"
+          [showLegend]="false"
+        >
+        </hmdm-chart>
+
+        <div class="dashboard-summary">
+          <table>
+            <tr>
+              <td>{{ 'summary.devices.active' | translate }}:</td>
+              <td class="blue-value">
+                {{ dashboardFacadeService.summary()!.statusOnlineByConfig | arraySum }}
+              </td>
+            </tr>
+
+            <tr>
+              <td>{{ 'summary.devices.offline' | translate }}:</td>
+              <td class="red-value">
+                {{ dashboardFacadeService.summary()!.statusOfflineByConfig | arraySum }}
+              </td>
+            </tr>
+
+            <tr>
+              <td>{{ 'summary.devices.idle' | translate }}:</td>
+              <td class="yellow-value">
+                {{ dashboardFacadeService.summary()!.statusIdleByConfig | arraySum }}
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="dashboard-chart">
+        <hmdm-chart
+          class="dashboard-bar"
+          chartType="bar"
+          [data]="dashboardFacadeService.deviceChartData()"
+          [options]="options"
+          [showLegend]="false"
+        >
+        </hmdm-chart>
+      </div>
+    </section>
+
+    <section class="dashboard-section">
+      <div class="dashboard-circle">
+        <p class="dashboard-title">{{ 'summary.devices.installation.status' | translate }}</p>
+
+        <hmdm-chart
+          class="dashboard-doughnut"
+          chartType="doughnut"
+          [data]="dashboardFacadeService.applicationCircleData()"
+          [showLegend]="false"
+        >
+        </hmdm-chart>
+
+        <div class="dashboard-summary">
+          <table>
+            <tr>
+              <td>{{ 'summary.devices.installation.failed' | translate }}:</td>
+              <td class="red-value">
+                {{ dashboardFacadeService.summary()!.appFailureByConfig | arraySum }}
+              </td>
+            </tr>
+
+            <tr>
+              <td>{{ 'summary.devices.version.mismatch' | translate }}:</td>
+              <td class="yellow-value">
+                {{ dashboardFacadeService.summary()!.appMismatchByConfig | arraySum }}
+              </td>
+            </tr>
+
+            <tr>
+              <td>{{ 'summary.devices.installation.completed' | translate }}:</td>
+              <td class="blue-value">
+                {{ dashboardFacadeService.summary()!.appSuccessByConfig | arraySum }}
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="dashboard-chart">
+        <hmdm-chart
+          chartType="bar"
+          class="dashboard-bar"
+          [data]="dashboardFacadeService.applicationChartData()"
+          [options]="options"
+          [showLegend]="false"
+        ></hmdm-chart>
+      </div>
+    </section>
+  </div>
+}

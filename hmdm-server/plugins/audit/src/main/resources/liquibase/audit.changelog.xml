@@ -117,4 +117,24 @@
         </rollback>
     </changeSet>
 
+    <changeSet id="plugin-audit-18.01.2026-11:41" author="seva" context="common">
+        <comment>Adapt plugin settings to version 6</comment>
+        <sql>
+            UPDATE plugins SET
+                name='Audit',
+                description='Registers and displays the user actions in the web console',
+                icon='search',
+                javascriptModuleFile=null,
+                functionsViewTemplate=null,
+                settingsViewTemplate=null,
+                baseUrl='/plugins/audit',
+                baseUrlDev='http://localhost:4201',
+                hasSettingsPage=false
+            WHERE identifier='audit';
+
+        </sql>
+        <rollback>
+        </rollback>
+    </changeSet>
+
 </databaseChangeLog>

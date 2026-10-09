@@ -1,0 +1,17 @@
+<hmdm-dialog-template>
+  <div class="form-file">
+    <span class="form-file-name">{{ 'form.file.name' | translate }}:</span>
+    <span class="form-file-value">{{ fileDisplayName }}</span>
+  </div>
+
+  <core-files-config-form
+    [configurations]="configurations()"
+    (formChange)="onFormChange($event)"
+  ></core-files-config-form>
+
+  <hmdm-dialog-common-buttons
+    dialog-actions
+    (cancel)="onCancel()"
+    (save)="onSave()"
+  ></hmdm-dialog-common-buttons>
+</hmdm-dialog-template>

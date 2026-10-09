@@ -2,7 +2,7 @@ package com.hmdm.plugins.deviceenroll.guice.module;
 
 import com.hmdm.guice.module.AbstractPersistenceModule;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 public class DeviceEnrollPersistenceModule extends AbstractPersistenceModule {
 

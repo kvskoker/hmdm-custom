@@ -2,7 +2,7 @@ package com.hmdm.plugins.devicelocation.guice.module;
 
 import com.hmdm.guice.module.AbstractPersistenceModule;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 public class DeviceLocationPersistenceModule extends AbstractPersistenceModule {
 

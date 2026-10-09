@@ -1,0 +1,11 @@
+<form [formGroup]="formGroup()">
+  <hmdm-text-input formControlName="name" [label]="'form.role.name' | translate"></hmdm-text-input>
+
+  <hmdm-selector
+    formControlName="permissions"
+    [label]="'form.role.permissions' | translate"
+    [multi]="true"
+    [optional]="true"
+    [options]="permissionsOptions()"
+  ></hmdm-selector>
+</form>

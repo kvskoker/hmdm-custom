@@ -1,0 +1,40 @@
+<form [formGroup]="formGroup()">
+  <hmdm-text-input
+    formControlName="name"
+    [label]="'plugin.devicelog.settings.form.rule.name' | translate"
+  ></hmdm-text-input>
+
+  <hmdm-checkbox
+    formControlName="active"
+    [label]="'plugin.devicelog.settings.form.rule.active' | translate"
+  ></hmdm-checkbox>
+
+  <hmdm-text-input
+    formControlName="filter"
+    [label]="'plugin.devicelog.settings.form.rule.filter' | translate"
+  ></hmdm-text-input>
+
+  <hmdm-selector
+    formControlName="severity"
+    [label]="'plugin.devicelog.settings.form.rule.severity' | translate"
+    [options]="severityOptions"
+  ></hmdm-selector>
+
+  <hmdm-async-select-search
+    formControlName="applicationId"
+    [label]="'plugin.devicelog.settings.form.rule.application' | translate"
+    [autocompleteServiceProps]="applicationsAutocompleteService"
+  ></hmdm-async-select-search>
+
+  <hmdm-async-select-search
+    formControlName="groupId"
+    [label]="'plugin.devicelog.settings.form.rule.group' | translate"
+    [autocompleteServiceProps]="groupsAutocompleteService"
+  ></hmdm-async-select-search>
+
+  <hmdm-async-select-search
+    formControlName="configurationId"
+    [label]="'plugin.devicelog.settings.form.rule.configuration' | translate"
+    [autocompleteServiceProps]="configurationsAutocompleteService"
+  ></hmdm-async-select-search>
+</form>

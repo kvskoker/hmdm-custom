@@ -1,11 +1,18 @@
 package com.hmdm.plugins.devicereset.persistence.mapper;
 
 import com.hmdm.plugins.devicereset.persistence.domain.PasswordReset;
+import com.hmdm.plugins.devicereset.persistence.sql.HistorySql;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
 public interface PasswordResetMapper {
+
+    @SelectProvider(type = HistorySql.class, method = "page")
+    List<java.util.Map<String, Object>> historyPage(java.util.Map<String, Object> parameters);
+
+    @SelectProvider(type = HistorySql.class, method = "count")
+    long historyCount(java.util.Map<String, Object> parameters);
 
     @Insert("INSERT INTO plugin_devicereset_password " +
             "(customerId, deviceId, newPassword, requestedBy, requestTime, status) " +

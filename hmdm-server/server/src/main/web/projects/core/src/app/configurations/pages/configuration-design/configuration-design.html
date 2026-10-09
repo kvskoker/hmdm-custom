@@ -1,0 +1,59 @@
+<form [formGroup]="formGroup" class="design">
+  <div class="design-row">
+    <!--
+      <hmdm-checkbox
+        formControlName="useDefaultDesignSettings"
+        [label]="'form.configuration.settings.design.use.default' | translate"
+      ></hmdm-checkbox>
+    -->
+
+    <hmdm-checkbox
+      formControlName="displayStatus"
+      [label]="'form.configuration.settings.design.display.status' | translate"
+    ></hmdm-checkbox>
+  </div>
+
+  <div class="design-double">
+    <hmdm-color-input
+      formControlName="backgroundColor"
+      [label]="'form.configuration.settings.design.color.background' | translate"
+    ></hmdm-color-input>
+
+    <hmdm-color-input
+      formControlName="textColor"
+      [label]="'form.configuration.settings.design.color.app.names' | translate"
+    ></hmdm-color-input>
+
+    <hmdm-text-input
+      formControlName="backgroundImageUrl"
+      [label]="'form.configuration.settings.design.background.image.url' | translate"
+    ></hmdm-text-input>
+
+    <hmdm-selector
+      formControlName="iconSize"
+      [label]="'form.configuration.settings.design.icon' | translate"
+      [options]="iconSizeOptions"
+    ></hmdm-selector>
+
+    <hmdm-selector
+      formControlName="orientation"
+      [label]="'form.configuration.settings.orientation' | translate"
+      [options]="orientationOptions"
+    ></hmdm-selector>
+  </div>
+
+  <div class="design-double">
+    <hmdm-selector
+      formControlName="desktopHeader"
+      [label]="'form.configuration.settings.design.desktop.header' | translate"
+      [options]="desktopOptions()"
+    ></hmdm-selector>
+
+    @if (formValue.desktopHeader === 'TEMPLATE') {
+      <hmdm-text-input
+        formControlName="desktopHeaderTemplate"
+        [label]="'form.configuration.settings.design.desktop.header.template' | translate"
+      ></hmdm-text-input>
+    }
+  </div>
+</form>

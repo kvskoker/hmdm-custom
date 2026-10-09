@@ -21,9 +21,18 @@
 
 package com.hmdm.rest.resource;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.inject.Named;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.headers.Header;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import jakarta.inject.Named;
 
 import com.hmdm.notification.PushService;
 import com.hmdm.persistence.*;
@@ -49,20 +58,15 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.StreamingOutput;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.StreamingOutput;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.Authorization;
-import io.swagger.annotations.ResponseHeader;
 import org.apache.poi.util.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,7 +74,8 @@ import com.hmdm.security.SecurityContext;
 import com.hmdm.util.FileExistsException;
 import com.hmdm.util.FileUtil;
 
-@Api(tags = {"Files"}, authorizations = {@Authorization("Bearer Token")})
+@Tag(name = "Files")
+@SecurityRequirement(name = "Bearer Token")
 @Singleton
 @Path("/private/web-ui-files")
 public class FilesResource {
@@ -126,11 +131,15 @@ public class FilesResource {
     }
 
     // =================================================================================================================
-    @ApiOperation(
-            value = "Get all files",
-            notes = "Gets the list of all available files",
-            response = FileView.class,
-            responseContainer = "List"
+    @Operation(
+            summary = "Get all files",
+            description = "Gets the list of all available files"
+    )
+    @ApiResponse(
+            responseCode = "200",
+            content = @Content(
+                    array = @ArraySchema(schema = @Schema(implementation = FileView.class))
+            )
     )
     @GET
     @Path("/search")
@@ -145,9 +154,9 @@ public class FilesResource {
     }
 
     // =================================================================================================================
-    @ApiOperation(
-            value = "Remove a file",
-            notes = "Removes the file from the MDM server"
+    @Operation(
+            summary = "Remove a file",
+            description = "Removes the file from the MDM server"
     )
     @POST
     @Path("/remove")
@@ -202,10 +211,13 @@ public class FilesResource {
     }
 
     // =================================================================================================================
-    @ApiOperation(
-            value = "Complete file upload",
-            notes = "Commits the file upload to MDM server. Returns the uploaded file data",
-            response = FileView.class
+    @Operation(
+            summary = "Complete file upload",
+            description = "Commits the file upload to MDM server. Returns the uploaded file data"
+    )
+    @ApiResponse(
+            responseCode = "200",
+            content = @Content(schema = @Schema(implementation = FileView.class))
     )
     @POST
     @Path("/update")
@@ -338,16 +350,20 @@ public class FilesResource {
     }
 
     // =================================================================================================================
-    @ApiOperation(
-            value = "Search files",
-            notes = "Search files meeting the specified filter value",
-            response = FileView.class,
-            responseContainer = "List"
+    @Operation(
+            summary = "Search files",
+            description = "Search files meeting the specified filter value"
+    )
+    @ApiResponse(
+            responseCode = "200",
+            content = @Content(
+                    array = @ArraySchema(schema = @Schema(implementation = FileView.class))
+            )
     )
     @GET
     @Path("/search/{value}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getFilesByName(@PathParam("value") @ApiParam("A filter value") String value) {
+    public Response getFilesByName(@PathParam("value") @Parameter(description = "A filter value") String value) {
         if (!SecurityContext.get().hasPermission("files")) {
             logger.error("Unauthorized attempt to access file list by user " +
                     SecurityContext.get().getCurrentUserName());
@@ -357,16 +373,21 @@ public class FilesResource {
     }
 
     // =================================================================================================================
-    @ApiOperation(
-            value = "Get applications",
-            notes = "Gets the list of applications using the file",
-            response = Application.class,
-            responseContainer = "List"
+    @Operation(
+            summary = "Get applications",
+            description = "Gets the list of applications using the file"
+    )
+    @ApiResponse(
+            responseCode = "200",
+            content = @Content(
+                    array = @ArraySchema(schema = @Schema(implementation = Application.class))
+            )
     )
     @GET
     @Path("/apps/{url}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getApplicationsForFile(@PathParam("url") @ApiParam("An URL referencing the file") String url) {
+    public Response getApplicationsForFile(@PathParam("url")
+                                           @Parameter(description = "An URL referencing the file") String url) {
         if (!SecurityContext.get().hasPermission("files")) {
             logger.error("Unauthorized attempt to access file list by user " +
                     SecurityContext.get().getCurrentUserName());
@@ -382,6 +403,14 @@ public class FilesResource {
     }
 
     // =================================================================================================================
+    @Operation(
+            summary = "Get storage limit",
+            description = "Gets the storage limit of a customer in the multi-tenant environment"
+    )
+    @ApiResponse(
+            responseCode = "200",
+            content = @Content(schema = @Schema(implementation = LimitResponse.class))
+    )
     @GET
     @Path("/limit")
     @Produces(MediaType.APPLICATION_JSON)
@@ -404,16 +433,22 @@ public class FilesResource {
     }
 
     // =================================================================================================================
-    @ApiOperation(
-            value = "Get file configurations",
-            notes = "Gets the list of configurations using requested file",
-            response = ApplicationConfigurationLink.class,
-            responseContainer = "List"
+    @Operation(
+            summary = "Get file configurations",
+            description = "Gets the list of configurations using requested file"
+    )
+    @ApiResponse(
+            responseCode = "200",
+            content = @Content(
+                    array = @ArraySchema(schema = @Schema(implementation = ApplicationConfigurationLink.class))
+            )
     )
     @GET
     @Path("/configurations/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getFileConfigurations(@PathParam("id") @ApiParam("File ID") Integer id) {
+    public Response getFileConfigurations(@PathParam("id")
+                                          @Parameter(description = "File ID", schema = @Schema(type = "integer"))
+                                              Integer id) {
         if (!SecurityContext.get().hasPermission("files")) {
             logger.error("Unauthorized attempt to get file configurations by user " +
                     SecurityContext.get().getCurrentUserName());
@@ -423,9 +458,9 @@ public class FilesResource {
     }
 
     // =================================================================================================================
-    @ApiOperation(
-            value = "Update file configurations",
-            notes = "Updates the list of configurations using requested file"
+    @Operation(
+            summary = "Update file configurations",
+            description = "Updates the list of configurations using requested file"
     )
     @POST
     @Path("/configurations")
@@ -472,31 +507,41 @@ public class FilesResource {
     }
 
     // =================================================================================================================
-    @ApiOperation(
-            value = "Upload raw file",
-            notes = "Uploads the raw file to server (without attempt to parse APK). Returns a path to uploaded file",
-            response = FileUploadResult.class
+    @Operation(
+            summary = "Upload raw file",
+            description = "Uploads the raw file to server (without attempt to parse APK). Returns a path to uploaded file"
+    )
+    @ApiResponse(
+            responseCode = "200",
+            content = @Content(schema = @Schema(implementation = FileUploadResult.class))
     )
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Path("/raw")
     public Response uploadFilesRaw(@FormDataParam("file") InputStream uploadedInputStream,
-                                @ApiParam("A file to upload") @FormDataParam("file") FormDataContentDisposition fileDetail) throws Exception {
+                                   @Parameter(description = "A file to upload",
+                                              schema = @Schema(type = "string", format = "binary"))
+                                   @FormDataParam("file") FormDataContentDisposition fileDetail) throws Exception {
         return uploadFilesInternal(uploadedInputStream, fileDetail, false);
     }
 
     // =================================================================================================================
-    @ApiOperation(
-            value = "Upload file or application",
-            notes = "Uploads the file or application to server. Returns a path to uploaded file",
-            response = FileUploadResult.class
+    @Operation(
+            summary = "Upload file or application",
+            description = "Uploads the file or application to server. Returns a path to uploaded file"
+    )
+    @ApiResponse(
+            responseCode = "200",
+            content = @Content(schema = @Schema(implementation = FileUploadResult.class))
     )
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response uploadFiles(@FormDataParam("file") InputStream uploadedInputStream,
-                                @ApiParam("A file to upload") @FormDataParam("file") FormDataContentDisposition fileDetail) throws Exception {
+                                @Parameter(description = "A file to upload",
+                                        schema = @Schema(type = "string", format = "binary"))
+                                @FormDataParam("file") FormDataContentDisposition fileDetail) throws Exception {
         return uploadFilesInternal(uploadedInputStream, fileDetail, true);
     }
 
@@ -602,21 +647,28 @@ public class FilesResource {
     }
 
     // =================================================================================================================
-    @ApiOperation(
-            value = "Download a file",
-            notes = "Downloads the content of the file",
-            responseHeaders = {@ResponseHeader(name = "Content-Disposition")}
+    @Operation(
+            summary = "Download a file",
+            description = "Downloads the content of the file"
+    )
+    @ApiResponse(
+            responseCode = "200",
+            headers = {
+                    @Header(name = "Content-Disposition")
+            }
     )
     @GET
     @Path("/{filePath}")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    public javax.ws.rs.core.Response downloadFile(@PathParam("filePath") @ApiParam("A path to a file") String filePath) throws Exception {
+    public jakarta.ws.rs.core.Response downloadFile(@PathParam("filePath")
+                                                    @Parameter(description = "A path to a file")
+                                                        String filePath) throws Exception {
         File file = new File(filePath + "/" + URLDecoder.decode(filePath, "UTF8"));
         if (!file.exists()) {
-            return javax.ws.rs.core.Response.status(404).build();
+            return jakarta.ws.rs.core.Response.status(404).build();
         } else {
             ContentDisposition contentDisposition = ContentDisposition.type("attachment").fileName(file.getName()).creationDate(new Date()).build();
-            return javax.ws.rs.core.Response.ok( ( StreamingOutput ) output -> {
+            return jakarta.ws.rs.core.Response.ok( ( StreamingOutput ) output -> {
                 try {
                     InputStream input = new FileInputStream( file );
                     IOUtils.copy(input, output);

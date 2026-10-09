@@ -1,0 +1,9 @@
+<div class="checkbox-wrapper">
+  <mat-checkbox class="checkbox" [formControl]="formControl">
+    {{ label() }}
+  </mat-checkbox>
+
+  @if (help()) {
+    <hmdm-help-tooltip [text]="help()" />
+  }
+</div>

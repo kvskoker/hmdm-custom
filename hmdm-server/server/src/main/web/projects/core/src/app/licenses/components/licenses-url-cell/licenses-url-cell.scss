@@ -1,0 +1,15 @@
+@use '@angular/material' as mat;
+.cell {
+  width: 100%;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-start;
+
+  @include mat.icon-button-overrides(
+      (
+        icon-color: var(--mat-sys-on-primary),
+        disabled-icon-color: var(--mat-sys-outline),
+      )
+  );
+}

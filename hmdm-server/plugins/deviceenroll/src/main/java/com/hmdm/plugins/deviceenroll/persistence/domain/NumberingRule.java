@@ -2,7 +2,7 @@ package com.hmdm.plugins.deviceenroll.persistence.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.hmdm.persistence.domain.CustomerData;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.io.Serializable;
 
@@ -20,37 +20,37 @@ public class NumberingRule implements CustomerData, Serializable {
 
     private static final long serialVersionUID = 2L;
 
-    @ApiModelProperty("Primary key")
+    @Schema(description = "Primary key")
     private Integer id;
 
-    @ApiModelProperty("Group this rule applies to - one rule per group")
+    @Schema(description = "Group this rule applies to - one rule per group")
     private int groupId;
 
-    @ApiModelProperty("Group name, for display")
+    @Schema(description = "Group name, for display")
     private String groupName;
 
-    @ApiModelProperty("Configuration devices of this group are enrolled into")
+    @Schema(description = "Configuration devices of this group are enrolled into")
     private int configurationId;
 
-    @ApiModelProperty("Configuration name, for display")
+    @Schema(description = "Configuration name, for display")
     private String configurationName;
 
-    @ApiModelProperty("Customer ID")
+    @Schema(description = "Customer ID")
     private int customerId;
 
-    @ApiModelProperty("Number prefix, e.g. KAI")
+    @Schema(description = "Number prefix, e.g. KAI")
     private String prefix;
 
-    @ApiModelProperty("How many digits to pad the sequence to, e.g. 3 gives KAI001")
+    @Schema(description = "How many digits to pad the sequence to, e.g. 3 gives KAI001")
     private int digits;
 
-    @ApiModelProperty("The next sequence number to hand out")
+    @Schema(description = "The next sequence number to hand out")
     private int nextSeq;
 
-    @ApiModelProperty("Whether the rule is active")
+    @Schema(description = "Whether the rule is active")
     private boolean enabled;
 
-    @ApiModelProperty("The configuration's QR key - combined with the group id it makes this rule's QR code")
+    @Schema(description = "The configuration's QR key - combined with the group id it makes this rule's QR code")
     private String qrCodeKey;
 
     /**
@@ -58,7 +58,7 @@ public class NumberingRule implements CustomerData, Serializable {
      * enrollment QR code at all - the QR has to tell a factory-reset device which APK to
      * install as its device owner.
      */
-    @ApiModelProperty("Main application of the configuration, null if not set")
+    @Schema(description = "Main application of the configuration, null if not set")
     private Integer mainAppId;
 
     public NumberingRule() {

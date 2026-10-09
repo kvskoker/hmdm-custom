@@ -1,0 +1,5 @@
+@if (!params().value || params().value === 0) {
+  <div class="cell">{{ 'devices.date.unknown' | translate }}</div>
+} @else {
+  <div class="cell">{{ params().value | date: timeFormat }}</div>
+}

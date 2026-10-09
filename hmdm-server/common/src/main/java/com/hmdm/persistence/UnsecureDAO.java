@@ -40,7 +40,7 @@ import org.mybatis.guice.transactional.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Named;
+import jakarta.inject.Named;
 import java.io.File;
 import java.util.*;
 import java.util.function.Function;
@@ -133,6 +133,10 @@ public class UnsecureDAO {
         return userMapper.findByEmail(email);
     }
 
+    public User findById(int id) {
+        return userMapper.findById(id);
+    }
+
     public User findByPasswordResetToken( String token ) {
         return userMapper.findByPasswordResetToken(token);
     }
@@ -160,6 +164,11 @@ public class UnsecureDAO {
 
     public void resetUserLoginFailTime() {
         userMapper.resetLoginFailTime();
+    }
+
+    public boolean userHasDeviceAccess(Integer userId, Integer deviceId) {
+        // userMapper.hasDeviceAccess method returns true or null
+        return userMapper.hasDeviceAccess(userId, deviceId) != null;
     }
 
     public Device getDeviceByNumber(String number) {

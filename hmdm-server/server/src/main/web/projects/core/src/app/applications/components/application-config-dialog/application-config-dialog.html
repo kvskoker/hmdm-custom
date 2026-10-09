@@ -1,0 +1,25 @@
+<hmdm-dialog-template [title]="'button.set.configurations' | translate">
+  @if (application()) {
+    <div class="form-app">
+      <span class="form-app-name">{{ 'button.application' | translate }}:</span>
+      <span class="form-app-value">{{ applicationDisplayName() }}</span>
+    </div>
+  }
+
+  @if (localConfigurations()) {
+    <core-application-config-form
+      [configurations]="localConfigurations()"
+      [application]="simpleApplication()"
+      (configurationsChange)="onConfigurationsChange($event)"
+      (bulkAction)="onBulkAction($event)"
+    >
+    </core-application-config-form>
+  }
+
+  <hmdm-dialog-common-buttons
+    dialog-actions
+    (cancel)="onCancel()"
+    (save)="onSave()"
+    [isSaveDisabled]="saving()"
+  ></hmdm-dialog-common-buttons>
+</hmdm-dialog-template>

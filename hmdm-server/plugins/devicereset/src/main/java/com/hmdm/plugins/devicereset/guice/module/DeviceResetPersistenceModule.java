@@ -2,7 +2,7 @@ package com.hmdm.plugins.devicereset.guice.module;
 
 import com.hmdm.guice.module.AbstractPersistenceModule;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 public class DeviceResetPersistenceModule extends AbstractPersistenceModule {
 

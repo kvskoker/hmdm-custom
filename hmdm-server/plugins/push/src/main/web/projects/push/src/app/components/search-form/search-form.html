@@ -1,0 +1,12 @@
+<form [formGroup]="formGroup()" class="form">
+  <hmdm-async-select-search
+    formControlName="deviceFilter"
+    [label]="'plugin.push.label.device' | translate"
+    [autocompleteServiceProps]="deviceAutocompleteService"
+  ></hmdm-async-select-search>
+
+  <hmdm-date-range
+    formControlName="dateRange"
+    [label]="'table.heading.device.date' | translate"
+  ></hmdm-date-range>
+</form>

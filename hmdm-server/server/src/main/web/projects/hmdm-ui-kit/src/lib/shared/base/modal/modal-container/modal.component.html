@@ -1,0 +1,10 @@
+@for (injector of modalInjectors; track i; let i = $index) {
+  @if (modalState[i]) {
+    <div class="modal-overlay" (click)="closeModal(i)">
+      <div class="modal-container" (click)="$event.stopPropagation()">
+        <ng-container *ngComponentOutlet="modalState[i].modalType; injector: injector">
+        </ng-container>
+      </div>
+    </div>
+  }
+}

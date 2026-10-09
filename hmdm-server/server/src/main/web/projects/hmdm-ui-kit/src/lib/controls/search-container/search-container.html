@@ -1,0 +1,49 @@
+<div class="table-search" appClickOutside (clickOutside)="onCloseFilters()">
+  <div class="table-input" (click)="$event.stopPropagation()">
+    <mat-icon>search</mat-icon>
+
+    <input
+      class="table-control"
+      type="text"
+      [hmdmPersistControl]="persistKey()"
+      [placeholder]="'search.placeholder' | translate"
+      [formControl]="searchControl()"
+    />
+
+    @if (showFiltersButton()) {
+      <button
+        mat-icon-button
+        (click)="onToggleFilters()"
+        [matBadge]="activeFiltersCount()"
+        [matBadgeHidden]="activeFiltersCount() === 0"
+      >
+        <mat-icon>tune</mat-icon>
+      </button>
+    }
+  </div>
+
+  <div
+    class="search-menu-container"
+    [class.open]="isFiltersMenuOpen()"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="search-menu-content">
+      @if (filtersTemplate()) {
+        <ng-container>
+          <ng-container *ngTemplateOutlet="filtersTemplate()"></ng-container>
+        </ng-container>
+      }
+
+      @if (showSearchButton()) {
+        <mat-divider></mat-divider>
+
+        <div class="search-actions-menu">
+          <button matButton="filled" class="primary" (click)="onSearchClick()">
+            <mat-icon>search</mat-icon>
+            {{ 'button.search' | translate }}
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+</div>

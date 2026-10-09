@@ -1,0 +1,18 @@
+<form class="device-form" [formGroup]="formGroup()">
+  <hmdm-async-select-search
+    label="{{ 'form.label.alerts.device' | translate }}"
+    formControlName="deviceFilter"
+    [autocompleteServiceProps]="deviceAutocompleteService"
+  ></hmdm-async-select-search>
+
+  <hmdm-date-range
+    label="{{ 'form.label.alerts.daterange' | translate }}"
+    formControlName="date"
+  ></hmdm-date-range>
+
+  <hmdm-selector
+    label="{{ 'form.label.alerts.severity' | translate }}"
+    formControlName="severity"
+    [options]="severityOptions"
+  ></hmdm-selector>
+</form>

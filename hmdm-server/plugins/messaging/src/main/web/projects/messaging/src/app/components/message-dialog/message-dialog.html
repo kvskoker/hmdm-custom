@@ -1,0 +1,10 @@
+<hmdm-dialog-template>
+  <messaging-message-form [formGroup]="formGroup"></messaging-message-form>
+
+  <hmdm-dialog-common-buttons
+    dialog-actions
+    saveText="plugin.messaging.button.send"
+    (cancel)="onCancel()"
+    (save)="onSave()"
+  ></hmdm-dialog-common-buttons>
+</hmdm-dialog-template>

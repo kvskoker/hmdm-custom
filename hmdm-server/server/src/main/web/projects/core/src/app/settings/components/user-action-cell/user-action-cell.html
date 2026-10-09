@@ -1,0 +1,15 @@
+<div class="cell">
+  <button matIconButton (click)="onEditClick()">
+    <mat-icon>edit</mat-icon>
+  </button>
+
+  @if (isEditable()) {
+    <button matIconButton (click)="onImpersonateClick()">
+      <mat-icon>person</mat-icon>
+    </button>
+
+    <button matIconButton (click)="onDeleteClick()">
+      <mat-icon>delete</mat-icon>
+    </button>
+  }
+</div>

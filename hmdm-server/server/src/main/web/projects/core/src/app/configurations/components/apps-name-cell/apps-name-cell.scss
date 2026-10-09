@@ -1,0 +1,16 @@
+.name-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  &__name {
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  &__pkg {
+    font-size: 13px;
+    color: var(--color-text-secondary, #717171);
+    line-height: 1.3;
+  }
+}

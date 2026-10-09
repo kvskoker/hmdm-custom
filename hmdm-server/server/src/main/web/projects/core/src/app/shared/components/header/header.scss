@@ -1,0 +1,25 @@
+@use '@angular/material' as mat;
+
+:host {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header {
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+
+  &-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  @include mat.icon-overrides(
+    (
+      color: var(--mat-sys-on-primary),
+    )
+  );
+}

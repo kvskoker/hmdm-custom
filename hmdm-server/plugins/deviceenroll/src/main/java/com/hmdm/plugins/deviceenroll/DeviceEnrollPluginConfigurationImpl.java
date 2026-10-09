@@ -6,7 +6,7 @@ import com.hmdm.plugins.deviceenroll.guice.module.DeviceEnrollLiquibaseModule;
 import com.hmdm.plugins.deviceenroll.guice.module.DeviceEnrollPersistenceModule;
 import com.hmdm.plugins.deviceenroll.guice.module.DeviceEnrollRestModule;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 import java.util.ArrayList;
 import java.util.List;
 

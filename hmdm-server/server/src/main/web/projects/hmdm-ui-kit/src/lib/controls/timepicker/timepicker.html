@@ -1,0 +1,18 @@
+<div class="input-container">
+  <mat-form-field appearance="outline" class="timepicker">
+    <mat-label>{{ label() }}</mat-label>
+    <input matInput [formControl]="formControl" [matTimepicker]="picker" />
+    <mat-timepicker-toggle matIconSuffix [for]="picker" />
+    <mat-timepicker #picker />
+
+    @if (help()) {
+      <hmdm-help-tooltip matSuffix [text]="help()" />
+    }
+  </mat-form-field>
+
+  <div class="input-error">
+    @if (control) {
+      <hmdm-error-message [control]="control"></hmdm-error-message>
+    }
+  </div>
+</div>

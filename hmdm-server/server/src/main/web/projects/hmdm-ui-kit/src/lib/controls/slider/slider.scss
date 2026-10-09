@@ -1,0 +1,34 @@
+:host {
+  width: 100%;
+  display: block;
+  padding: 0 16px;
+}
+
+.slider {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+
+  &-label-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  &-label {
+    margin-left: 8px;
+    font-size: 16px;
+  }
+
+  &.inline {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 0;
+
+    mat-slider {
+      flex: 1;
+      min-width: 0;
+    }
+  }
+}

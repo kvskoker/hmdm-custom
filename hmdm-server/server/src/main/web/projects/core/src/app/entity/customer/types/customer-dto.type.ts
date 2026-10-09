@@ -1,0 +1,20 @@
+export type TCustomerDTO = {
+  id?: number;
+  name: string;
+  firstName?: string;
+  lastName?: string;
+  language?: string;
+  email?: string;
+  description?: string;
+  accountType?: number;
+  customerStatus?: string;
+  expiryTime?: number | null;
+  deviceLimit?: number;
+  sizeLimit?: number;
+  prefix?: string;
+  deviceConfigurationId?: number | null;
+  configurationIds?: number[];
+  copyDesign?: boolean;
+  registrationTime?: number;
+  lastLoginTime?: number;
+};

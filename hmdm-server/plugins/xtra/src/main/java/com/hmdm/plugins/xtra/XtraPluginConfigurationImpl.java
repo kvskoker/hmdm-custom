@@ -23,11 +23,15 @@ package com.hmdm.plugins.xtra;
 
 import com.google.inject.Module;
 import com.hmdm.plugin.PluginConfiguration;
-import com.hmdm.plugins.xtra.guice.module.XtraLiquibaseModule;
+import com.hmdm.plugin.PluginTaskModule;
 
-import javax.servlet.ServletContext;
+import com.hmdm.plugins.xtra.guice.module.XtraRestModule;
+import com.hmdm.plugins.xtra.guice.module.XtraLiquibaseModule;
+import com.hmdm.plugins.xtra.guice.module.XtraTaskModule;
+import jakarta.servlet.ServletContext;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * <p>A configuration for <code>Xtra</code> plugin.</p>
@@ -74,9 +78,22 @@ public class XtraPluginConfigurationImpl implements PluginConfiguration {
     @Override
     public List<Module> getPluginModules(ServletContext context) {
         List<Module> modules = new ArrayList<>();
-
         modules.add(new XtraLiquibaseModule(context));
-
+        modules.add(new XtraRestModule());
         return modules;
+    }
+
+
+    /**
+     * <p>Gets the list of task modules to be initialized upon application startup.</p>
+     *
+     * @param context a context for plugin usage.
+     * @return an optional list of task modules for plugins.
+     */
+    @Override
+    public Optional<List<Class<? extends PluginTaskModule>>> getTaskModules(ServletContext context) {
+        List<Class<? extends PluginTaskModule>> modules = new ArrayList<>();
+        modules.add(XtraTaskModule.class);
+        return Optional.of(modules);
     }
 }

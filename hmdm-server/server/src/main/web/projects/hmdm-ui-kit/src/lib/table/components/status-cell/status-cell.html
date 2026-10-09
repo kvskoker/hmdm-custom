@@ -1,0 +1,4 @@
+<div class="cell" [matTooltip]="status().tooltip || ''" [matTooltipDisabled]="!status().tooltip">
+  <span class="cell-badge" [ngClass]="status().color"></span>
+  <small class="cell-label">{{ status().label }}</small>
+</div>

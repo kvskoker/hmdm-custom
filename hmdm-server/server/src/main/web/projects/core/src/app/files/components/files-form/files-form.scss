@@ -1,0 +1,19 @@
+.files {
+  &-form {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &-line {
+    display: flex;
+    gap: 8px;
+  }
+}
+
+.storage-warning {
+  color: #c62828;
+  font-size: 13px;
+  margin-top: 4px;
+  border-radius: 4px;
+  height: 14px;
+}

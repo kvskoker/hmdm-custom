@@ -2,7 +2,7 @@ package com.hmdm.plugins.deviceenroll.persistence.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.hmdm.persistence.domain.CustomerData;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.io.Serializable;
 
@@ -15,13 +15,13 @@ public class NumberAssignment implements CustomerData, Serializable {
     private int deviceId;
     private int customerId;
 
-    @ApiModelProperty("The number the device enrolled with, usually its serial")
+    @Schema(description = "The number the device enrolled with, usually its serial")
     private String originalNumber;
 
-    @ApiModelProperty("The number allocated to it")
+    @Schema(description = "The number allocated to it")
     private String assignedNumber;
 
-    @ApiModelProperty("When it was allocated (ms since epoch)")
+    @Schema(description = "When it was allocated (ms since epoch)")
     private long assignTime;
 
     public NumberAssignment() {

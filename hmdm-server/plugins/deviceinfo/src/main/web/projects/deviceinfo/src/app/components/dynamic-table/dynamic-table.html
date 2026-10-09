@@ -1,0 +1,7 @@
+<hmdm-table
+  #table
+  [data]="tableData() ?? []"
+  [config]="tableConfig()"
+  [totalItems]="totalItemsCount()"
+  (pageChange)="onPageChange($event)"
+></hmdm-table>

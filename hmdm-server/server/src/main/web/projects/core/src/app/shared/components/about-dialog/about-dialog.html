@@ -1,0 +1,29 @@
+<hmdm-dialog-template class="dialog">
+  <div class="dialog-content">
+    <div class="dialog-info">
+      <h3 class="dialog-header">{{ 'about.line.1' | translate: { appName: 'Headwind MDM' } }}</h3>
+      <h3 class="dialog-header">{{ 'about.line.2' | translate }}</h3>
+      <h3 class="dialog-header">{{ 'about.line.3' | translate: { versionNumber: version } }}</h3>
+    </div>
+
+    @if (plugins && plugins.length > 0) {
+      <mat-divider class="dialog-divider"></mat-divider>
+
+      <div class="dialog-plugins">
+        <h3 class="dialog-header">{{ 'about.line.4' | translate }}</h3>
+
+        <div class="dialog-plugins-list">
+          @for (plugin of plugins; track $index) {
+            <span>{{ plugin.name }} {{ plugin.version }}{{ !$last ? ',' : '' }}</span>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="dialog-actions" dialog-actions>
+    <button matButton="filled" class="dialog-btn primary" (click)="onCancel()">
+      {{ 'button.close' | translate }}
+    </button>
+  </div>
+</hmdm-dialog-template>

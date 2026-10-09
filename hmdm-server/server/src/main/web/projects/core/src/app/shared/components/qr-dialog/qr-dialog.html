@@ -1,0 +1,59 @@
+<hmdm-dialog-template class="dialog">
+  <div class="dialog-content">
+    <p class="dialog-manual">{{ 'qr.dialog.manual' | translate }}</p>
+
+    <mat-card class="dialog-card">
+      <div class="dialog-qr">
+        <img
+          [src]="url()"
+          [alt]="'QR Code'"
+          [style.width.px]="optimalSize"
+          [style.height.px]="optimalSize"
+        />
+      </div>
+
+      <form class="dialog-form" [formGroup]="formGroup">
+        <div class="dialog-double">
+          <hmdm-text-input
+            formControlName="deviceId"
+            [label]="'form.qr.device.number' | translate"
+          ></hmdm-text-input>
+
+          <hmdm-selector
+            formControlName="useId"
+            [label]="'form.qr.number.use' | translate"
+            [options]="useIdOptions"
+          ></hmdm-selector>
+
+          <hmdm-checkbox
+            formControlName="create"
+            [label]="'form.qr.auto.create' | translate"
+          ></hmdm-checkbox>
+
+          @if (formGroup.get('create')?.value) {
+            <hmdm-selector
+              formControlName="groups"
+              [label]="'form.qr.groups' | translate"
+              [options]="groupsOptions()"
+              [multi]="true"
+            ></hmdm-selector>
+          }
+        </div>
+      </form>
+    </mat-card>
+  </div>
+
+  <div class="dialog-actions" dialog-actions>
+    <button matButton class="dialog-btn primary" (click)="onGetJson()">
+      {{ 'form.qr.button.json' | translate }}
+    </button>
+
+    <button matButton class="dialog-btn primary" (click)="onGetHelp()">
+      {{ 'button.help' | translate }}
+    </button>
+
+    <button matButton="filled" class="dialog-btn primary" (click)="onCancel()">
+      {{ 'button.close' | translate }}
+    </button>
+  </div>
+</hmdm-dialog-template>

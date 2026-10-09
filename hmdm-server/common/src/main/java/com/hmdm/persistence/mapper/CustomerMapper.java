@@ -83,11 +83,7 @@ public interface CustomerMapper {
 
     @Select({SELECT_BASE +
             "WHERE master = FALSE " +
-            "AND (LOWER(name) LIKE #{filter} " +
-            "OR LOWER(description) LIKE #{filter} " +
-            "OR LOWER(firstname) LIKE #{filter} " +
-            "OR LOWER(lastname) LIKE #{filter} " +
-            "OR LOWER(email) LIKE #{filter}) " +
+            "AND (LOWER(name) LIKE #{filter} OR LOWER(description) LIKE #{filter}) " +
             "ORDER BY name"})
     List<Customer> findAllByValue(@Param("filter") String value);
 

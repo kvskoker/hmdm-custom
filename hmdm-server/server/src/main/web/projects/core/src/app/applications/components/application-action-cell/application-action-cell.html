@@ -1,0 +1,57 @@
+<div class="cell">
+  <div
+    *hmdmHasPermission="'edit_applications'"
+    class="cell-action"
+    [class.cell-action-hidden]="!isShowVersions()"
+    matTooltip="{{ 'breadcrumb.application.versions' | translate }}"
+    [matTooltipShowDelay]="500"
+  >
+    <button matIconButton (click)="onVersionClick()">
+      <mat-icon>layers</mat-icon>
+    </button>
+  </div>
+
+  <div
+    class="cell-action"
+    *hmdmHasPermission="'edit_applications'"
+    matTooltip="{{ 'button.set.configurations' | translate }}"
+  >
+    <button matIconButton (click)="onConfigClick()">
+      <mat-icon>list</mat-icon>
+    </button>
+  </div>
+
+  @if (isShared()) {
+    <div
+      class="cell-action"
+      *hmdmHasPermission="'edit_applications'"
+      matTooltip="{{ 'tooltip.application.shared' | translate }}"
+      [matTooltipShowDelay]="500"
+    >
+      <button matIconButton (click)="onSharedClick()">
+        <mat-icon>cloud</mat-icon>
+      </button>
+    </div>
+  } @else {
+    <div
+      class="cell-action"
+      *hmdmHasPermission="'edit_applications'"
+      matTooltip="{{ 'button.edit' | translate }}"
+    >
+      <button matIconButton (click)="onEditClick()">
+        <mat-icon>edit</mat-icon>
+      </button>
+    </div>
+
+    <div
+      *hmdmHasPermission="'edit_applications'"
+      class="cell-action"
+      matTooltip="{{ (isDeleteDisabled() ? 'error.application.config.reference.exists' : 'button.delete') | translate }}"
+      [matTooltipShowDelay]="500"
+    >
+      <button matIconButton (click)="onDeleteClick()" [disabled]="isDeleteDisabled()">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </div>
+  }
+</div>

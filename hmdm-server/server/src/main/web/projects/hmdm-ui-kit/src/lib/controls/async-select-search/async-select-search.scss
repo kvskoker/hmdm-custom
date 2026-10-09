@@ -1,0 +1,26 @@
+@use '@angular/material' as mat;
+
+.mat-mdc-autocomplete-panel.mdc-menu-surface {
+  margin-top: 5px;
+  padding: 0;
+
+  --mat-option-focus-state-layer-color: var(--mat-sys-surface);
+
+  @include mat.autocomplete-overrides(
+    (
+      background-color: var(--mat-sys-surface),
+    )
+  );
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+.mat-mdc-option:hover:not(.mdc-list-item--disabled),
+.mat-mdc-option.mat-mdc-option-active.mdc-list-item {
+  &:hover {
+    background-color: var(--mat-sys-primary);
+    color: var(--mat-sys-on-primary);
+  }
+}

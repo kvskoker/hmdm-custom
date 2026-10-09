@@ -1,0 +1,14 @@
+.search {
+  &.double {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    max-width: 100%;
+  }
+
+  @media (min-width: 816px) {
+    &.double {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+}

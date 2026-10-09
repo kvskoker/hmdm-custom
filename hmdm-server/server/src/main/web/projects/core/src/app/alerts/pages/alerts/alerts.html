@@ -1,0 +1,26 @@
+<div class="alerts">
+  <mat-card class="card scroll-wrap" [hmdmLoader]="isAlertsLoading()">
+    <mat-card-title class="card-title">
+      <h3>{{ 'tab.alerts' | translate }}</h3>
+
+      <hmdm-search-container
+        persistKey="alerts-search-control"
+        [searchControl]="alertSearchControl"
+        [filtersTemplate]="filtersTemplate"
+        [activeFiltersCount]="activeFiltersCnt()"
+        (searchClick)="searchAlerts()"
+      ></hmdm-search-container>
+
+      <ng-template #filtersTemplate>
+        <core-alerts-form [formGroup]="alertsFormGroup"></core-alerts-form>
+      </ng-template>
+
+    </mat-card-title>
+
+    <mat-divider></mat-divider>
+
+    <mat-card-content class="card-content scroll-wrap">
+      <core-alerts-table (pageChange)="pageChanged($event)"></core-alerts-table>
+    </mat-card-content>
+  </mat-card>
+</div>

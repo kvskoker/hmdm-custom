@@ -257,7 +257,7 @@ public class DeviceDAO extends AbstractDAO<Device> {
      * @return a response with list of devices matching the specified filter.
      */
     public List<DeviceLookupItem> findDevices(String filter, int resultsCount) {
-        String searchFilter = '%' + filter.trim() + '%';
+        String searchFilter = filter != null ? '%' + filter.trim() + '%' : "%";
         return SecurityContext.get().getCurrentUser()
                 .map(u -> this.mapper.lookupDevices(u.getId(), u.getCustomerId(), searchFilter, resultsCount))
                 .orElse(new ArrayList<>());

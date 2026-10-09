@@ -1,0 +1,22 @@
+<div class="licenses">
+  <mat-card class="card scroll-wrap" [hmdmLoader]="isLicensesLoading()">
+    <mat-card-title class="card-title">
+      <h3>{{ 'menu.licenses' | translate }}</h3>
+
+      <button
+        matButton="filled"
+        class="primary"
+        (click)="onAddClick()"
+      >
+        <mat-icon>add</mat-icon>
+        {{ 'button.add' | translate }}
+      </button>
+    </mat-card-title>
+
+    <mat-divider></mat-divider>
+
+    <mat-card-content class="card-content scroll-wrap">
+      <core-licenses-table></core-licenses-table>
+    </mat-card-content>
+  </mat-card>
+</div>

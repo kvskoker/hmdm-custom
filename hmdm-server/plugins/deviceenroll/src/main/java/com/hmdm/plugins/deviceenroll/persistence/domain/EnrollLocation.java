@@ -1,7 +1,6 @@
 package com.hmdm.plugins.deviceenroll.persistence.domain;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.io.Serializable;
 
@@ -14,27 +13,27 @@ import java.io.Serializable;
  * Rather than making an administrator build those three things by hand and then wonder why
  * a second rule collides with the first, this request creates all of them in one step.</p>
  */
-@ApiModel(description = "A location to enrol devices into")
+@Schema(description = "A location to enrol devices into")
 public class EnrollLocation implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty("Location name - becomes the name of the configuration, e.g. Kailahun")
+    @Schema(description = "Location name - becomes the name of the configuration, e.g. Kailahun")
     private String name;
 
-    @ApiModelProperty("Device number prefix, e.g. KAI")
+    @Schema(description = "Device number prefix, e.g. KAI")
     private String prefix;
 
-    @ApiModelProperty("How many digits follow the prefix")
+    @Schema(description = "How many digits follow the prefix")
     private int digits = 3;
 
-    @ApiModelProperty("Existing group to add enrolled devices to, or null to use groupName")
+    @Schema(description = "Existing group to add enrolled devices to, or null to use groupName")
     private Integer groupId;
 
-    @ApiModelProperty("Name of a group to create (or reuse) when groupId is not given")
+    @Schema(description = "Name of a group to create (or reuse) when groupId is not given")
     private String groupName;
 
-    @ApiModelProperty("Configuration this location's configuration is copied from")
+    @Schema(description = "Configuration this location's configuration is copied from")
     private int templateConfigurationId;
 
     public EnrollLocation() {

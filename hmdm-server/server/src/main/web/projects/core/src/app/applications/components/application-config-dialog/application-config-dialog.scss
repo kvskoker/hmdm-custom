@@ -1,0 +1,59 @@
+.dialog {
+  &-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+  }
+}
+
+:host ::ng-deep {
+  .dialog {
+    display: flex;
+    flex-direction: column;
+    max-height: 75vh;
+  }
+
+  .dialog-content {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden !important;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.form-app {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding: 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+
+  &-name {
+    font-weight: 500;
+    color: #666;
+  }
+
+  &-value {
+    font-weight: 600;
+    color: #333;
+  }
+}
+
+.loading-message {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+}
+
+.error-message {
+  padding: 16px;
+  background-color: #ffebee;
+  color: #c62828;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  border-left: 4px solid #c62828;
+}

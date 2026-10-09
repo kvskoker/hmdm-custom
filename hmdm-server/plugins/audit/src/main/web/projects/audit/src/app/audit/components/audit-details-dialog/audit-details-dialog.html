@@ -1,0 +1,35 @@
+<hmdm-dialog-template class="dialog">
+  <h3 class="dialog-title" dialog-title>{{ 'plugin.audit.button.details' | translate }}</h3>
+
+  <div class="dialog-content">
+    <table class="dialog-table">
+      <tr class="dialog-row">
+        <td class="dialog-term">{{ 'table.heading.plugin.audit.dateTime' | translate }}:</td>
+        <td class="dialog-value">{{ date() | date: 'short' }}</td>
+      </tr>
+
+      <tr class="dialog-row">
+        <td class="dialog-term">{{ 'table.heading.plugin.audit.user' | translate }}:</td>
+        <td class="dialog-value">{{ data.login }}</td>
+      </tr>
+
+      <tr class="dialog-row">
+        <td class="dialog-term">{{ 'table.heading.plugin.audit.ipAddress' | translate }}:</td>
+        <td class="dialog-value">{{ data.ipAddress }}</td>
+      </tr>
+
+      <tr class="dialog-row">
+        <td class="dialog-term">{{ 'table.heading.plugin.audit.action' | translate }}:</td>
+        <td class="dialog-value">{{ data.action | translate }}</td>
+      </tr>
+    </table>
+
+    <p class="dialog-payload">{{ data.payload }}</p>
+  </div>
+
+  <div class="dialog-actions" dialog-actions>
+    <button matButton="outlined" class="primary" (click)="onCancel()">
+      {{ 'button.close' | translate }}
+    </button>
+  </div>
+</hmdm-dialog-template>

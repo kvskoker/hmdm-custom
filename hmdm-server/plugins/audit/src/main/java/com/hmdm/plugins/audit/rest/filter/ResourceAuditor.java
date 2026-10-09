@@ -24,7 +24,6 @@ package com.hmdm.plugins.audit.rest.filter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hmdm.persistence.domain.User;
 import com.hmdm.plugins.audit.persistence.domain.AuditLogRecord;
-import com.hmdm.plugins.audit.rest.AuditResource;
 import com.hmdm.rest.filter.BaseIPFilter;
 import com.hmdm.rest.json.Response;
 import org.json.JSONException;
@@ -32,15 +31,13 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Enumeration;
 
 /**
  * <p>An auditor for a single request-response chain.</p>
@@ -50,11 +47,6 @@ import java.util.Enumeration;
 class ResourceAuditor {
 
     private static final Logger logger = LoggerFactory.getLogger(ResourceAuditor.class);
-
-    /**
-     * <p>A name of session attribute holding the details for current user.</p>
-     */
-    private static final String sessionCredentials = "credentials";
 
     /**
      * <p>A key in message resource bundle referring to description of action mapped to audited request.</p>
@@ -124,14 +116,8 @@ class ResourceAuditor {
      *         record is available.
      * @throws IOException if an unexpected I/O error occurs.
      */
-    AuditLogRecord getAuditLogRecord() throws IOException {
+    AuditLogRecord getAuditLogRecord(User currentUser) throws IOException {
         final HttpServletRequest httpRequest = (HttpServletRequest) this.request;
-        final HttpSession session = httpRequest.getSession(false);
-        User currentUser = null;
-        if (session != null) {
-            currentUser = (User) session.getAttribute(sessionCredentials);
-        }
-
         String action = this.auditLogActionKey;
         String payloadString = null;
         String requestedLogin = null;

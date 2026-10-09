@@ -1,0 +1,55 @@
+<hmdm-dialog-template>
+  @if (data.isNewApp) {
+    <p class="dialog-text">
+      {{ 'form.resolved.duplicate.pkg.text1' | translate: { pkg: data.pkg } }}
+    </p>
+    <p class="dialog-text">
+      {{ 'form.resolved.duplicate.pkg.text2' | translate }}
+    </p>
+
+    <div class="app-selector">
+      <hmdm-selector
+        [formControl]="targetAppControl"
+        [options]="appOptions"
+        [label]="'form.resolved.duplicate.pkg.text3' | translate"
+      ></hmdm-selector>
+    </div>
+  } @else {
+    <p class="dialog-text">
+      {{ 'form.resolved.duplicate.pkg.text4' | translate: { pkg: data.pkg } }}
+    </p>
+    <p class="dialog-text">
+      {{ 'form.resolved.duplicate.pkg.text5' | translate }}
+    </p>
+  }
+
+  @if (data.isNewApp) {
+    <div class="dialog-actions-row" dialog-actions>
+      <button
+        mat-stroked-button
+        (click)="onNewVersion()"
+        [disabled]="!targetAppControl.value || isChecking()"
+      >
+        {{ 'button.new.app.version' | translate }}
+      </button>
+      <button mat-stroked-button (click)="onNewApp()" [disabled]="isChecking()">
+        @if (isChecking()) {
+          <mat-spinner diameter="16"></mat-spinner>
+        }
+        {{ 'button.new.app' | translate }}
+      </button>
+      <button mat-stroked-button (click)="onCancel()" [disabled]="isChecking()">
+        {{ 'button.cancel' | translate }}
+      </button>
+    </div>
+  } @else {
+    <div class="dialog-actions-row" dialog-actions>
+      <button mat-stroked-button (click)="onChangePkg()">
+        {{ 'button.change' | translate }}
+      </button>
+      <button mat-stroked-button (click)="onCancel()">
+        {{ 'button.cancel' | translate }}
+      </button>
+    </div>
+  }
+</hmdm-dialog-template>

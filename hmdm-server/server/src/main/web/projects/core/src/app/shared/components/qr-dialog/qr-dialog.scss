@@ -1,0 +1,56 @@
+.dialog {
+  overflow: hidden;
+
+  &-manual {
+    margin-bottom: 8px;
+    text-align: start;
+    padding: 0 16px;
+  }
+
+  &-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    // height: 80vh;
+    overflow-y: auto;
+  }
+
+  &-qr {
+    display: flex;
+      justify-content: center;
+  }
+
+  &-form {
+    margin-top: 16px;
+  }
+
+  &-double {
+    display: grid;
+    column-gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    max-width: 100%;
+  }
+
+  &-card {
+    width: 100%;
+    margin-bottom: 16px;
+  }
+
+  @media (min-width: 816px) {
+    &-card {
+      flex-direction: row;
+      gap: 16px;
+    }
+
+    &-double {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+    margin-top: 24px;
+  }
+}

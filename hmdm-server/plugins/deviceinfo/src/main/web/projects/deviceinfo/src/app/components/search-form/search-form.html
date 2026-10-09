@@ -1,0 +1,29 @@
+<form
+  [formGroup]="formGroup()"
+  class="search double"
+  [hmdmPersistForm]="formGroup()"
+  persistFormKey="di-dynamic-search-form"
+>
+  <hmdm-selector
+    formControlName="interval"
+    [label]="'plugin.deviceinfo.dynamic.period' | translate"
+    [options]="intervalOptions"
+  ></hmdm-selector>
+
+  @if (interval.value === -1) {
+    <hmdm-date-range
+      formControlName="dateRange"
+      [label]="'table.heading.device.date' | translate"
+    ></hmdm-date-range>
+
+    <hmdm-timepicker
+      formControlName="timeFrom"
+      [label]="'search.placeholder.from' | translate"
+    ></hmdm-timepicker>
+
+    <hmdm-timepicker
+      formControlName="timeTo"
+      [label]="'search.placeholder.to' | translate"
+    ></hmdm-timepicker>
+  }
+</form>

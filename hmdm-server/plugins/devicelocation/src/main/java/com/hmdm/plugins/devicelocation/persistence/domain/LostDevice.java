@@ -2,7 +2,7 @@ package com.hmdm.plugins.devicelocation.persistence.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.hmdm.persistence.domain.CustomerData;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.io.Serializable;
 
@@ -19,22 +19,22 @@ public class LostDevice implements CustomerData, Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty("Device that is missing - also the primary key")
+    @Schema(description = "Device that is missing - also the primary key")
     private int deviceId;
 
-    @ApiModelProperty("Device number, for display")
+    @Schema(description = "Device number, for display")
     private String deviceNumber;
 
-    @ApiModelProperty("Customer ID")
+    @Schema(description = "Customer ID")
     private int customerId;
 
-    @ApiModelProperty("When it was reported, ms since epoch")
+    @Schema(description = "When it was reported, ms since epoch")
     private long reportedAt;
 
-    @ApiModelProperty("Login of the user who reported it")
+    @Schema(description = "Login of the user who reported it")
     private String reportedBy;
 
-    @ApiModelProperty("Free text - where it was last seen, who had it")
+    @Schema(description = "Free text - where it was last seen, who had it")
     private String note;
 
     public LostDevice() {

@@ -1,0 +1,13 @@
+.actions {
+  display: flex;
+  gap: 16px;
+  justify-content: flex-end;
+  align-self: flex-end;
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+}

@@ -21,23 +21,27 @@
 
 package com.hmdm.rest.resource;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import com.hmdm.persistence.UserDAO;
 import com.hmdm.persistence.domain.Application;
 import com.hmdm.rest.json.Response;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.Authorization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 import java.util.List;
 
 /**
@@ -45,8 +49,8 @@ import java.util.List;
  *
  * @author isv
  */
-@Api(tags = {"Hint"}, authorizations = {@Authorization("Bearer Token")})
-@Singleton
+@Tag(name = "Hint")
+@SecurityRequirement(name = "Bearer Token")@Singleton
 @Path("/private/hints")
 public class HintResource {
 
@@ -69,11 +73,15 @@ public class HintResource {
     }
 
     // =================================================================================================================
-    @ApiOperation(
-            value = "Get shown hints",
-            notes = "Gets the list of identifiers for the hints already presented to current user",
-            response = String.class,
-            responseContainer = "List"
+    @Operation(
+            summary = "Get shown hints",
+            description = "Gets the list of identifiers for the hints already presented to current user"
+    )
+    @ApiResponse(
+            responseCode = "200",
+            content = @io.swagger.v3.oas.annotations.media.Content(
+                    array = @ArraySchema(schema = @Schema(implementation = String.class))
+            )
     )
     @GET
     @Path("/history")
@@ -89,10 +97,13 @@ public class HintResource {
     }
 
     // =================================================================================================================
-    @ApiOperation(
-            value = "Enable hints",
-            notes = "Enables the hints to be presented to current user",
-            response = Response.class
+    @Operation(
+            summary = "Enable hints",
+            description = "Enables the hints to be presented to current user"
+    )
+    @ApiResponse(
+            responseCode = "200",
+            content = @Content(schema = @Schema(implementation = Response.class))
     )
     @POST
     @Path("/enable")
@@ -108,10 +119,13 @@ public class HintResource {
     }
 
     // =================================================================================================================
-    @ApiOperation(
-            value = "Disable hints",
-            notes = "Disables the hints from to be presented to current user",
-            response = Response.class
+    @Operation(
+            summary = "Disable hints",
+            description = "Disables the hints from to be presented to current user"
+    )
+    @ApiResponse(
+            responseCode = "200",
+            content = @Content(schema = @Schema(implementation = Response.class))
     )
     @POST
     @Path("/disable")
@@ -127,10 +141,13 @@ public class HintResource {
     }
 
     // =================================================================================================================
-    @ApiOperation(
-            value = "On hint shown",
-            notes = "Marks the hint as shown to current user",
-            response = Response.class
+    @Operation(
+            summary = "On hint shown",
+            description = "Marks the hint as shown to current user"
+    )
+    @ApiResponse(
+            responseCode = "200",
+            content = @Content(schema = @Schema(implementation = Response.class))
     )
     @POST
     @Path("/history")

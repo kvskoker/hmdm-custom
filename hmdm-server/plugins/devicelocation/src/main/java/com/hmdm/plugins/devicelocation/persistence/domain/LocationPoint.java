@@ -2,7 +2,7 @@ package com.hmdm.plugins.devicelocation.persistence.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.hmdm.persistence.domain.CustomerData;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.io.Serializable;
 
@@ -12,34 +12,34 @@ public class LocationPoint implements CustomerData, Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty("Primary key")
+    @Schema(description = "Primary key")
     private Integer id;
 
-    @ApiModelProperty("Device this point belongs to")
+    @Schema(description = "Device this point belongs to")
     private int deviceId;
 
-    @ApiModelProperty("Device number, for display")
+    @Schema(description = "Device number, for display")
     private String deviceNumber;
 
-    @ApiModelProperty("Customer ID")
+    @Schema(description = "Customer ID")
     private int customerId;
 
-    @ApiModelProperty("Latitude")
+    @Schema(description = "Latitude")
     private Double lat;
 
-    @ApiModelProperty("Longitude")
+    @Schema(description = "Longitude")
     private Double lon;
 
-    @ApiModelProperty("When the device recorded the position, ms since epoch")
+    @Schema(description = "When the device recorded the position, ms since epoch")
     private long ts;
 
-    @ApiModelProperty("Whether the device was flagged lost when this point arrived")
+    @Schema(description = "Whether the device was flagged lost when this point arrived")
     private boolean whileLost;
 
-    @ApiModelProperty("Whether the device is flagged lost right now, for display")
+    @Schema(description = "Whether the device is flagged lost right now, for display")
     private boolean lost;
 
-    @ApiModelProperty("Configuration the device is on, for display")
+    @Schema(description = "Configuration the device is on, for display")
     private String configurationName;
 
     /**
@@ -47,7 +47,7 @@ public class LocationPoint implements CustomerData, Serializable {
      * page can say why a particular device has never reported, instead of leaving a blank
      * row that looks like a bug.
      */
-    @ApiModelProperty("Location tracking mode of the device's configuration")
+    @Schema(description = "Location tracking mode of the device's configuration")
     private String requestUpdates;
 
     public LocationPoint() {

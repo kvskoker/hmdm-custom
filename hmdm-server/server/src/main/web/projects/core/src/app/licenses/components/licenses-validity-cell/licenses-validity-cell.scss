@@ -1,0 +1,19 @@
+@use '@angular/material' as mat;
+.cell {
+  width: 100%;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+
+  mat-icon.expiring {
+    color: #ED554DFF;
+  }
+
+  @include mat.icon-button-overrides(
+      (
+        icon-color: var(--mat-sys-on-primary),
+        disabled-icon-color: var(--mat-sys-outline),
+      )
+  );
+}

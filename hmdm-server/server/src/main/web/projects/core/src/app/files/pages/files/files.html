@@ -1,0 +1,29 @@
+<div class="files">
+  <mat-card class="card scroll-wrap" [hmdmLoader]="isLoadingFiles()">
+    <mat-card-title class="card-title">
+      <h3>{{ 'breadcrumb.files' | translate }}</h3>
+
+      <hmdm-search-container
+        persistKey="files-search-control"
+        [searchControl]="filesSearchControl"
+        [showFiltersButton]="false"
+      ></hmdm-search-container>
+
+      <button
+        class="card-btn primary"
+        *hmdmHasPermission="'edit_files'"
+        matButton="filled"
+        (click)="onAddFileClick()"
+      >
+        <mat-icon>add</mat-icon>
+        {{ 'button.add' | translate }}
+      </button>
+    </mat-card-title>
+
+    <mat-divider></mat-divider>
+
+    <mat-card-content class="card-content scroll-wrap">
+      <core-files-table></core-files-table>
+    </mat-card-content>
+  </mat-card>
+</div>

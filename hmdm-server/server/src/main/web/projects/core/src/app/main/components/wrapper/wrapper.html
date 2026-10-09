@@ -1,0 +1,27 @@
+@if (isLoading()) {
+  <div class="app-container">
+    <mat-spinner></mat-spinner>
+  </div>
+} @else {
+  <mat-drawer-container class="container" autosize>
+    <mat-drawer
+      #drawer
+      class="container-side"
+      mode="side"
+      [opened]="drawerOpened"
+      (openedChange)="onDrawerToggle($event)"
+    >
+      <core-side-menu></core-side-menu>
+    </mat-drawer>
+
+    <mat-drawer-content class="container-content">
+      <core-header (toggleMenu)="drawer.toggle()"></core-header>
+
+      <div class="container-main">
+        <router-outlet></router-outlet>
+      </div>
+    </mat-drawer-content>
+  </mat-drawer-container>
+
+  <core-cookie-notice></core-cookie-notice>
+}

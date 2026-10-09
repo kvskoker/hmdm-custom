@@ -1,0 +1,11 @@
+.dialog {
+  &-app {
+    margin-bottom: 16px;
+  }
+
+  &-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+  }
+}

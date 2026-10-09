@@ -1,0 +1,30 @@
+<form class="settings-form" [formGroup]="formGroup()">
+  <hmdm-select-search
+    formControlName="applicationId"
+    [label]="'form.application.setting.app' | translate"
+    [options]="applicationOptions()"
+  ></hmdm-select-search>
+
+  <hmdm-text-input
+    formControlName="name"
+    [label]="'form.application.setting.name' | translate"
+  ></hmdm-text-input>
+
+  <hmdm-textarea-input
+    formControlName="value"
+    [rows]="3"
+    [showError]="false"
+    [label]="'form.application.setting.value' | translate"
+  ></hmdm-textarea-input>
+
+  <hmdm-checkbox
+    formControlName="variable"
+    [label]="'form.configuration.files.variables' | translate"
+    [help]="'form.configuration.files.variables.hint' | translate"
+  ></hmdm-checkbox>
+
+  <hmdm-text-input
+    formControlName="comment"
+    [label]="'form.application.setting.comment' | translate"
+  ></hmdm-text-input>
+</form>

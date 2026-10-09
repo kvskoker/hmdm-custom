@@ -1,0 +1,28 @@
+<div class="messages scroll-content">
+  <mat-card class="card scroll-content" [hmdmLoader]="isLoadingMessages()">
+    <mat-card-title class="card-title">
+      <hmdm-search-container
+        persistKey="messaging-search-control"
+        [searchControl]="tableSearchControl"
+        [filtersTemplate]="filtersTemplate"
+        [activeFiltersCount]="activeFiltersCount()"
+        [showSearchButton]="false"
+      ></hmdm-search-container>
+
+      <ng-template #filtersTemplate>
+        <push-search-form [formGroup]="formGroup"></push-search-form>
+      </ng-template>
+
+      <button matButton="filled" class="card-btn primary" (click)="onNewMessageClick()">
+        <mat-icon>add</mat-icon>
+        {{ 'plugin.push.button.newMessage' | translate }}
+      </button>
+    </mat-card-title>
+
+    <mat-divider></mat-divider>
+
+    <mat-card-content class="card-content scroll-content">
+      <push-messages-table #table class="scroll-table"></push-messages-table>
+    </mat-card-content>
+  </mat-card>
+</div>

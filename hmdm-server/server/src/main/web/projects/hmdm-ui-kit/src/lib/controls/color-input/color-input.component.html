@@ -1,0 +1,36 @@
+<div class="input-container">
+  <mat-form-field class="input-field" appearance="outline">
+    @if (showLabel()) {
+      <mat-label>{{ label() }}</mat-label>
+    }
+
+    <input matInput [formControl]="formControl" [placeholder]="label()" (blur)="onTouched()" />
+
+    <button
+      type="button"
+      mat-icon-button
+      matSuffix
+      [colorPicker]="formControl.value || '#000000'"
+      [cpOutputFormat]="'hex'"
+      [cpAlphaChannel]="'disabled'"
+      [cpPosition]="'auto'"
+      [cpUseRootViewContainer]="true"
+      (colorPickerChange)="onColorChange($event)"
+      [disabled]="isDisabled()"
+    >
+      <span class="color-swatch" [style.background]="formControl.value || '#000000'"></span>
+    </button>
+
+    @if (help()) {
+      <hmdm-help-tooltip matSuffix [text]="help()" />
+    }
+  </mat-form-field>
+
+  @if (showError()) {
+    <div class="input-error">
+      @if (control && control.invalid && control.touched) {
+        <hmdm-error-message [control]="control"></hmdm-error-message>
+      }
+    </div>
+  }
+</div>

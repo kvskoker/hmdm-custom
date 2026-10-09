@@ -1,0 +1,13 @@
+<hmdm-dialog-template class="dialog">
+  <div class="dialog-content">
+    <mat-form-field class="dialog-form-field" appearance="outline">
+      <textarea matInput readonly cdkTextareaAutosize [value]="jsonData() | json"></textarea>
+    </mat-form-field>
+  </div>
+
+  <div class="dialog-actions" dialog-actions>
+    <button matButton="filled" class="dialog-btn primary" (click)="onCancel()">
+      {{ 'button.close' | translate }}
+    </button>
+  </div>
+</hmdm-dialog-template>

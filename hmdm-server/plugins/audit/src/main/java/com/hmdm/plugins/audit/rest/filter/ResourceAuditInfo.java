@@ -21,9 +21,9 @@
 
 package com.hmdm.plugins.audit.rest.filter;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 import java.awt.image.ImagingOpException;
 import java.io.IOException;
 import java.util.Optional;
@@ -62,8 +62,7 @@ public enum ResourceAuditInfo {
     PASSWORD_CHANGED("PUT", "/rest/private/users/current", true, "plugin.audit.action.password.changed", true, true),
     DEVICE_PASSWORD_RESET("PUT", "/rest/plugins/devicereset/private/password", true, "plugin.audit.action.password.reset", true, true),
     DEVICE_FACTORY_RESET("PUT", "/rest/plugins/devicereset/private/reset", false, "plugin.audit.action.device.reset", false, true),
-    DEVICE_LOCK("PUT", "/rest/plugins/devicereset/private/lock", true, "plugin.audit.action.device.lock", true, true),
-    UPDATE_UPDATE("POST", "/rest/private/update", true, "plugin.audit.action.update.update", true, true);
+    DEVICE_LOCK("PUT", "/rest/plugins/devicereset/private/lock", true, "plugin.audit.action.device.lock", true, true);
 
     /**
      * <p>Method for the REST resource to track audit log for.</p>

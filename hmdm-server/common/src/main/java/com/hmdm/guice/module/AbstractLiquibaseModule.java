@@ -27,11 +27,12 @@ import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.exception.LiquibaseException;
+import liquibase.resource.ClassLoaderResourceAccessor;
 import liquibase.resource.ResourceAccessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -110,7 +111,10 @@ public abstract class AbstractLiquibaseModule extends AbstractModule {
      *
      * @return a resource accessor for change log file.
      */
-    protected abstract ResourceAccessor getResourceAccessor();
+    protected ResourceAccessor getResourceAccessor() {
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        return new ClassLoaderResourceAccessor(cl);
+    }
 
     /**
      * <p>Connects to target database using the parameters from the context.</p>

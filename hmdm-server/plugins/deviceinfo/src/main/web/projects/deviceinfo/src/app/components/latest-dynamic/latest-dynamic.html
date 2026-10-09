@@ -1,0 +1,177 @@
+@if (details(); as deviceInfo) {
+  <div class="latest">
+    <table class="table">
+      <tr>
+        <th>{{ 'plugin.deviceinfo.title.time' | translate }}</th>
+        <td>
+          {{ deviceInfo.latestUpdateTime | date: 'dd.MM.yy HH:mm:ss' }}
+          @if (deviceInfo.latestUpdateTime) {
+            <span>
+              ({{ deviceInfo.latestUpdateInterval }}
+              {{
+                'plugin.deviceinfo.enum.time.' + deviceInfo.latestUpdateIntervalType | translate
+              }})
+            </span>
+          }
+        </td>
+      </tr>
+      <tr>
+        <th>{{ 'plugin.deviceinfo.title.deviceNumber' | translate }}</th>
+        <td>{{ deviceInfo.deviceNumber }}</td>
+      </tr>
+      <tr>
+        <th>{{ 'plugin.deviceinfo.title.description' | translate }}</th>
+        <td [innerHTML]="formatMultiLine(deviceInfo.description)"></td>
+      </tr>
+      <tr>
+        <th>{{ 'plugin.deviceinfo.title.groups' | translate }}</th>
+        <td>
+          @for (group of deviceInfo.groups; track group.id) {
+            <span> {{ group.name }}<br /> </span>
+          }
+        </td>
+      </tr>
+      <tr>
+        <th>{{ 'plugin.deviceinfo.title.imei.required' | translate }}</th>
+        <td>{{ deviceInfo.imeiRequired }}</td>
+      </tr>
+      <tr>
+        <th>{{ 'plugin.deviceinfo.title.imei' | translate }}</th>
+        <td>{{ deviceInfo.imeiActual }}</td>
+      </tr>
+      <tr>
+        <th>{{ 'plugin.deviceinfo.title.phone.required' | translate }}</th>
+        <td>{{ deviceInfo.phoneNumberRequired }}</td>
+      </tr>
+      <tr>
+        <th>{{ 'plugin.deviceinfo.title.phone' | translate }}</th>
+        <td>{{ deviceInfo.phoneNumberActual }}</td>
+      </tr>
+      <tr>
+        <th>{{ 'plugin.deviceinfo.title.iccid' | translate }}</th>
+        <td>{{ deviceInfo.iccid }}</td>
+      </tr>
+      @if (deviceInfo.imsi) {
+        <tr>
+          <th>{{ 'plugin.deviceinfo.title.imsi' | translate }}</th>
+          <td>{{ deviceInfo.imsi }}</td>
+        </tr>
+      }
+      @if (deviceInfo.imei2) {
+        <tr>
+          <th>{{ 'plugin.deviceinfo.title.imei2' | translate }}</th>
+          <td>{{ deviceInfo.imei2 }}</td>
+        </tr>
+      }
+      @if (deviceInfo.phone2) {
+        <tr>
+          <th>{{ 'plugin.deviceinfo.title.phone2' | translate }}</th>
+          <td>{{ deviceInfo.phone2 }}</td>
+        </tr>
+      }
+      @if (deviceInfo.iccid2) {
+        <tr>
+          <th>{{ 'plugin.deviceinfo.title.iccid2' | translate }}</th>
+          <td>{{ deviceInfo.iccid2 }}</td>
+        </tr>
+      }
+      @if (deviceInfo.imsi2) {
+        <tr>
+          <th>{{ 'plugin.deviceinfo.title.imsi2' | translate }}</th>
+          <td>{{ deviceInfo.imsi2 }}</td>
+        </tr>
+      }
+      <tr>
+        <th>{{ 'plugin.deviceinfo.title.serial' | translate }}</th>
+        <td>{{ deviceInfo.serial }}</td>
+      </tr>
+      <tr>
+        <th>{{ 'plugin.deviceinfo.title.mac' | translate }}</th>
+        <td>{{ deviceInfo.mac }}</td>
+      </tr>
+      <tr>
+        <th>{{ 'plugin.deviceinfo.title.cpu' | translate }}</th>
+        <td>{{ deviceInfo.cpu }}</td>
+      </tr>
+      <tr>
+        <th>{{ 'plugin.deviceinfo.title.permission.1' | translate }}</th>
+        <td>
+          <span [ngClass]="{ 'device-data-mismatch': !deviceInfo.adminPermission }">
+            {{ 'plugin.deviceinfo.title.permission.' + deviceInfo.adminPermission | translate }}
+          </span>
+        </td>
+      </tr>
+      <tr>
+        <th>{{ 'plugin.deviceinfo.title.permission.2' | translate }}</th>
+        <td>
+          <span [ngClass]="{ 'device-data-mismatch': !deviceInfo.overlapPermission }">
+            {{ 'plugin.deviceinfo.title.permission.' + deviceInfo.overlapPermission | translate }}
+          </span>
+        </td>
+      </tr>
+      <tr>
+        <th>{{ 'plugin.deviceinfo.title.permission.3' | translate }}</th>
+        <td>
+          <span [ngClass]="{ 'device-data-mismatch': !deviceInfo.historyPermission }">
+            {{ 'plugin.deviceinfo.title.permission.' + deviceInfo.historyPermission | translate }}
+          </span>
+        </td>
+      </tr>
+      <tr>
+        <th>{{ 'plugin.deviceinfo.title.permission.4' | translate }}</th>
+        <td>
+          <span>
+            {{
+              'plugin.deviceinfo.title.permission.' + !!deviceInfo.accessibilityPermission
+                | translate
+            }}
+          </span>
+        </td>
+      </tr>
+      <tr>
+        <th>{{ 'plugin.deviceinfo.title.model' | translate }}</th>
+        <td>{{ deviceInfo.model }}</td>
+      </tr>
+      <tr>
+        <th>{{ 'plugin.deviceinfo.title.os.version' | translate }}</th>
+        <td>{{ deviceInfo.osVersion }}</td>
+      </tr>
+      <tr>
+        <th>{{ 'plugin.deviceinfo.title.battery.level' | translate }}</th>
+        <td [ngClass]="{ 'device-data-mismatch': deviceInfo.batteryLevel < 20 }">
+          {{ deviceInfo.batteryLevel ? deviceInfo.batteryLevel + '%' : undefined }}
+        </td>
+      </tr>
+      <tr>
+        <th>{{ 'plugin.deviceinfo.title.mdm.mode' | translate }}</th>
+        <td>
+          @if (deviceInfo.mdmMode !== undefined) {
+            {{ 'plugin.deviceinfo.boolean.' + deviceInfo.mdmMode | translate }}
+          } @else {
+            &nbsp;
+          }
+        </td>
+      </tr>
+      <tr>
+        <th>{{ 'plugin.deviceinfo.title.kiosk.mode' | translate }}</th>
+        <td>
+          @if (deviceInfo.kioskMode !== undefined) {
+            {{ 'plugin.deviceinfo.boolean.' + deviceInfo.kioskMode | translate }}
+          } @else {
+            &nbsp;
+          }
+        </td>
+      </tr>
+      <tr>
+        <th>{{ 'plugin.deviceinfo.title.launcher.type' | translate }}</th>
+        <td>{{ deviceInfo.launcherType }}</td>
+      </tr>
+      <tr>
+        <th>{{ 'plugin.deviceinfo.title.default.launcher' | translate }}</th>
+        <td [ngClass]="{ 'device-data-mismatch': deviceInfo.defaultLauncher === false }">
+          {{ deviceInfo.launcherPackage }}
+        </td>
+      </tr>
+    </table>
+  </div>
+}

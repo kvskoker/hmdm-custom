@@ -1,9 +1,14 @@
 package com.hmdm;
 
 import com.google.inject.Injector;
-import io.swagger.jaxrs.config.BeanConfig;
-import io.swagger.jaxrs.listing.ApiListingResource;
-import io.swagger.jaxrs.listing.SwaggerSerializers;
+import io.swagger.v3.jaxrs2.integration.JaxrsOpenApiContextBuilder;
+import io.swagger.v3.jaxrs2.integration.resources.AcceptHeaderOpenApiResource;
+import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
+import io.swagger.v3.oas.integration.OpenApiConfigurationException;
+import io.swagger.v3.oas.integration.SwaggerConfiguration;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.servers.Server;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -13,7 +18,9 @@ import org.glassfish.jersey.servlet.ServletContainer;
 import org.jvnet.hk2.guice.bridge.api.GuiceBridge;
 import org.jvnet.hk2.guice.bridge.api.GuiceIntoHK2Bridge;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
+import java.util.Set;
 
 /**
  * <p>A configuration for HMDM server application.</p>
@@ -37,14 +44,27 @@ public class HMDMApplication extends ResourceConfig {
                 Injector injector = (Injector) servletContainer.getServletContext().getAttribute(Injector.class.getName());
                 guiceBridge.bridgeGuiceInjector(injector);
 
-                BeanConfig beanConfig = new BeanConfig();
-                beanConfig.setTitle("Headwind MDM API");
-                beanConfig.setVersion("0.0.2");
-                beanConfig.setSchemes(new String[]{"http"});
-                beanConfig.setBasePath(servletContainer.getServletContext().getContextPath() + "/rest");
-                beanConfig.setResourcePackage("com.hmdm");
-                beanConfig.setScan(true);
-                beanConfig.setPrettyPrint(true);
+
+                String baseUrl = servletContainer.getServletContext().getContextPath() + "/rest";
+
+                OpenAPI openAPI = new OpenAPI()
+                        .info(new Info()
+                                .title("Headwind MDM API")
+                                .version("0.0.2"))
+                        .addServersItem(new Server().url(baseUrl));
+
+                SwaggerConfiguration oasConfig = new SwaggerConfiguration()
+                        .openAPI(openAPI)
+                        .prettyPrint(true)
+                        .resourcePackages(Set.of("com.hmdm"));
+
+                try {
+                    new JaxrsOpenApiContextBuilder<>()
+                            .openApiConfiguration(oasConfig)
+                            .buildContext(true);
+                } catch (OpenApiConfigurationException e) {
+                    e.printStackTrace();
+                }
 
             }
 
@@ -55,8 +75,8 @@ public class HMDMApplication extends ResourceConfig {
             }
         });
 
-        register(ApiListingResource.class);
-        register(SwaggerSerializers.class);
+        register(OpenApiResource.class);
+        register(AcceptHeaderOpenApiResource.class);
 
     }
 

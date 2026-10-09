@@ -37,9 +37,9 @@ public class PublicRestModule extends ServletModule {
         this.serve("/files/*").with(DownloadFilesServlet.class);
         this.bind(AuthResource.class);
         this.bind(JWTAuthResource.class);
-        this.bind(PublicResource.class);
+        this.bind(BrandResource.class);
+        this.bind(PublicAppResource.class);
         this.bind(SyncResource.class);
-        this.bind(PublicFilesResource.class);
         this.bind(QRCodeResource.class);
         this.bind(StatsResource.class);
     }

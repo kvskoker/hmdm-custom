@@ -26,41 +26,45 @@ import com.hmdm.event.EventService;
 import com.hmdm.persistence.DeviceDAO;
 import com.hmdm.persistence.UnsecureDAO;
 import com.hmdm.persistence.domain.Device;
+import com.hmdm.persistence.domain.Settings;
 import com.hmdm.plugin.service.PluginStatusCache;
 import com.hmdm.plugins.deviceinfo.persistence.DeviceInfoDAO;
 import com.hmdm.plugins.deviceinfo.persistence.domain.DeviceDynamicInfo;
-import com.hmdm.plugins.deviceinfo.rest.json.DeviceDynamicInfoRecord;
-import com.hmdm.plugins.deviceinfo.rest.json.DeviceInfo;
-import com.hmdm.plugins.deviceinfo.rest.json.DynamicInfoExportFilter;
-import com.hmdm.plugins.deviceinfo.rest.json.DynamicInfoFilter;
+import com.hmdm.plugins.deviceinfo.persistence.domain.DeviceInfoPluginSettings;
+import com.hmdm.plugins.deviceinfo.rest.json.*;
 import com.hmdm.plugins.deviceinfo.service.DeviceInfoExportService;
 import com.hmdm.rest.json.DeviceLocation;
 import com.hmdm.rest.json.DeviceLookupItem;
 import com.hmdm.rest.json.PaginatedData;
 import com.hmdm.rest.json.Response;
 import com.hmdm.security.SecurityContext;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.Authorization;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.glassfish.jersey.media.multipart.ContentDisposition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.StreamingOutput;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.StreamingOutput;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.hmdm.plugins.deviceinfo.DeviceInfoPluginConfigurationImpl.PLUGIN_ID;
 
@@ -71,8 +75,8 @@ import static com.hmdm.plugins.deviceinfo.DeviceInfoPluginConfigurationImpl.PLUG
  * @author isv
  */
 @Singleton
-@Path("/plugins/deviceinfo/deviceinfo")
-@Api(tags = {"Device Info plugin"})
+@Path("/private/plugin-deviceinfo/info")
+@Tag(name = "Device Info plugin")
 public class DeviceInfoResource {
 
     private static final Logger logger = LoggerFactory.getLogger(DeviceInfoResource.class);
@@ -129,75 +133,24 @@ public class DeviceInfoResource {
     }
 
     // =================================================================================================================
-    @ApiOperation(
-            value = "Save device info",
-            notes = "Save the Device Info dynamic data",
-            response = Void.class
-    )
-    @PUT
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("/public/{deviceNumber}")
-    public Response saveDeviceInfo(@PathParam("deviceNumber") String deviceNumber, List<DeviceDynamicInfo> data) {
-        try {
-            // Find device and set the device ID for records
-            Device dbDevice = this.unsecureDAO.getDeviceByNumber(deviceNumber);
-            if (dbDevice == null) {
-                logger.error("Device {} was not found", deviceNumber);
-                return Response.DEVICE_NOT_FOUND_ERROR();
+    @Operation(
+            summary = "Get device info",
+            description = "Get the current detailed info for device",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "OK",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = DeviceInfo.class)
+                            )
+                    )
             }
-
-            SecurityContext.init(dbDevice.getCustomerId());
-            try {
-                if (this.pluginStatusCache.isPluginDisabled(PLUGIN_ID)) {
-                    logger.error("Rejecting request from device {} due to disabled plugin", deviceNumber);
-                    return Response.PLUGIN_DISABLED();
-                }
-
-                data.forEach(record -> {
-                    record.setDeviceId(dbDevice.getId());
-                    record.setCustomerId(dbDevice.getCustomerId());
-                });
-
-                this.deviceInfoDAO.saveDeviceDynamicData(data);
-
-                // Send locations to the location plugin
-                List<DeviceLocation> locations = new LinkedList<>();
-                for (DeviceDynamicInfo info : data) {
-                    if (info.getGps() != null && info.getGps().getLat() != null && info.getGps().getLon() != null) {
-                        DeviceLocation location = new DeviceLocation();
-                        location.setLat(info.getGps().getLat());
-                        location.setLon(info.getGps().getLon());
-                        location.setTs(info.getTs());
-                        locations.add(location);
-                    }
-                }
-                if (locations.size() > 0) {
-                    this.eventService.fireEvent(
-                            new DeviceLocationUpdatedEvent(dbDevice.getId(), locations, true)
-                    );
-                }
-
-                return Response.OK();
-            } finally {
-                SecurityContext.release();
-            }
-        } catch (Exception e) {
-            logger.error("Unexpected error when saving device dynamic info", e);
-            return Response.INTERNAL_ERROR();
-        }
-    }
-
-    // =================================================================================================================
-    @ApiOperation(
-            value = "Get device info",
-            notes = "Get the current detailed info for device",
-            response = DeviceInfo.class
     )
     @GET
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/private/{deviceNumber}")
+    @Path("/device/{deviceNumber}")
     public Response getDeviceDetailedInfo(@PathParam("deviceNumber") String deviceNumber) {
         try {
             Device dbDevice = this.deviceDAO.getDeviceByNumber(deviceNumber);
@@ -216,16 +169,26 @@ public class DeviceInfoResource {
     }
 
     // =================================================================================================================
-    @ApiOperation(
-            value = "Search devices",
-            notes = "Search ",
-            response = DeviceLookupItem.class,
-            responseContainer = "List"
+    @Operation(
+            summary = "Search devices",
+            description = "Search",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "OK",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    array = @ArraySchema(
+                                            schema = @Schema(implementation = DeviceLookupItem.class)
+                                    )
+                            )
+                    )
+            }
     )
     @GET
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/private/search/device")
+    @Path("/search")
     public Response lookupDevices(@QueryParam("filter") String filter, @QueryParam("limit") int limit) {
         try {
             final List<DeviceLookupItem> devices = this.deviceDAO.findDevices(filter, limit);
@@ -236,21 +199,30 @@ public class DeviceInfoResource {
         }
     }
 
-
+    // =================================================================================================================
     /**
      * <p>Gets the list of dynamic info records matching the specified filter.</p>
      *
      * @param filter a filter to be used for filtering the records.
      * @return a response with list of dynamic info records matching the specified filter.
      */
-    @ApiOperation(
-            value = "Search dynamic info",
-            notes = "Gets the list of dynamic info records matching the specified filter",
-            response = PaginatedData.class,
-            authorizations = {@Authorization("Bearer Token")}
+    @Operation(
+            summary = "Search dynamic info",
+            description = "Gets the list of dynamic info records matching the specified filter",
+            security = @SecurityRequirement(name = "Bearer Token"),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "OK",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = PaginatedData.class)
+                            )
+                    )
+            }
     )
     @POST
-    @Path("/private/search/dynamic")
+    @Path("/searchDynamic")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getPhotos(DynamicInfoFilter filter) {
         try {
@@ -274,6 +246,7 @@ public class DeviceInfoResource {
         }
     }
 
+    // =================================================================================================================
     /**
      * <p>Exports the devices related to selected group or configuration to Excel file and sends it back to client.</p>
      *
@@ -281,9 +254,9 @@ public class DeviceInfoResource {
      * @return a response to be sent to client.
      */
     @POST
-    @Path("/private/export")
+    @Path("/export")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    public javax.ws.rs.core.Response exportDevices(DynamicInfoExportFilter request) {
+    public jakarta.ws.rs.core.Response exportDevices(DynamicInfoExportFilter request) {
         logger.debug("Export device dynamic info request: {}", request);
         try {
             if (!SecurityContext.get().hasPermission("plugin_deviceinfo_access")) {
@@ -293,13 +266,13 @@ public class DeviceInfoResource {
                 } else {
                     logger.error("Forbidding access to Device Info for anonymous user");
                 }
-                return javax.ws.rs.core.Response.status(javax.ws.rs.core.Response.Status.FORBIDDEN).build();
+                return jakarta.ws.rs.core.Response.status(jakarta.ws.rs.core.Response.Status.FORBIDDEN).build();
             }
 
             Device dbDevice = this.deviceDAO.getDeviceByNumber(request.getDeviceNumber());
             if (dbDevice == null) {
                 logger.error("Device {} was not found", request.getDeviceNumber());
-                return javax.ws.rs.core.Response.serverError().build();
+                return jakarta.ws.rs.core.Response.serverError().build();
             }
 
             request.setDeviceId(dbDevice.getId());
@@ -309,7 +282,7 @@ public class DeviceInfoResource {
                     .fileName(fileName + ".csv")
                     .creationDate(new Date())
                     .build();
-            return javax.ws.rs.core.Response.ok( (StreamingOutput) output -> {
+            return jakarta.ws.rs.core.Response.ok( (StreamingOutput) output -> {
                 try {
                     this.deviceInfoExportService.exportDeviceDynamicInfo(request, output);
                     output.flush();
@@ -319,7 +292,7 @@ public class DeviceInfoResource {
             } ).header( "Content-Disposition", contentDisposition ).build();
         } catch (Exception e) {
             logger.error("Unexpected error while exporting the device dynamic info records to CSV file", e);
-            return javax.ws.rs.core.Response.serverError().build();
+            return jakarta.ws.rs.core.Response.serverError().build();
         }
     }
 

@@ -1,0 +1,24 @@
+<form [formGroup]="formGroup()">
+  <hmdm-async-select-search
+    formControlName="deviceFilter"
+    [label]="'search.placeholder.device' | translate"
+    [autocompleteServiceProps]="deviceAutocompleteService"
+  ></hmdm-async-select-search>
+
+  <hmdm-async-select-search
+    formControlName="applicationFilter"
+    [label]="'search.placeholder.application' | translate"
+    [autocompleteServiceProps]="applicationsAutocompleteService"
+  ></hmdm-async-select-search>
+
+  <hmdm-date-range
+    formControlName="dateRange"
+    [label]="'table.heading.device.date' | translate"
+  ></hmdm-date-range>
+
+  <hmdm-selector
+    formControlName="severity"
+    [label]="'plugin.devicelog.option.severyty.default' | translate"
+    [options]="severityOptions"
+  ></hmdm-selector>
+</form>

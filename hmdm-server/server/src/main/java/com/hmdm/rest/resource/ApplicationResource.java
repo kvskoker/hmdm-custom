@@ -21,20 +21,28 @@
 
 package com.hmdm.rest.resource;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 
-import javax.inject.Named;
+import jakarta.inject.Named;
 
 import com.hmdm.notification.PushService;
 import com.hmdm.persistence.*;
@@ -42,23 +50,17 @@ import com.hmdm.persistence.domain.*;
 import com.hmdm.rest.json.*;
 import com.hmdm.security.SecurityContext;
 import com.hmdm.security.SecurityException;
-import com.hmdm.util.FileUtil;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.Authorization;
-import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.hmdm.util.FileExistsException;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-@Api(tags = {"Application"}, authorizations = {@Authorization("Bearer Token")})
+@Tag(name = "Application")
+@SecurityRequirement(name = "Bearer Token")
 @Singleton
 @Path("/private/applications")
 public class ApplicationResource {
@@ -95,11 +97,15 @@ public class ApplicationResource {
     }
 
     // =================================================================================================================
-    @ApiOperation(
-            value = "Get all applications",
-            notes = "Gets the list of all available applications",
-            response = Application.class,
-            responseContainer = "List"
+    @Operation(
+            summary = "Get all applications",
+            description = "Gets the list of all available applications"
+    )
+    @ApiResponse(
+            responseCode = "200",
+            content = @Content(
+                    array = @ArraySchema(schema = @Schema(implementation = Application.class))
+            )
     )
     @GET
     @Path("/search")
@@ -114,16 +120,20 @@ public class ApplicationResource {
     }
 
  // =================================================================================================================
-    @ApiOperation(
-            value = "Search applications",
-            notes = "Search applications meeting the specified filter value",
-            response = Application.class,
-            responseContainer = "List"
+    @Operation(
+            summary = "Search applications",
+            description = "Search applications meeting the specified filter value"
+    )
+    @ApiResponse(
+            responseCode = "200",
+            content = @Content(
+                    array = @ArraySchema(schema = @Schema(implementation = Application.class))
+            )
     )
     @GET
     @Path("/search/{value}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response searchApplications(@PathParam("value") @ApiParam("A filter value") String value) {
+    public Response searchApplications(@PathParam("value") @Parameter(description = "A filter value") String value) {
         if (!SecurityContext.get().hasPermission("applications")) {
             logger.error("Unauthorized attempt to access application list by user " +
                     SecurityContext.get().getCurrentUserName());
@@ -140,7 +150,7 @@ public class ApplicationResource {
      * @param filter a filter to be used for filtering the records.
      * @return a response with list of devices matching the specified filter.
      */
-    @ApiOperation(value = "Get app ids and names for autocompletions")
+    @Operation(summary = "Get app ids and names for autocompletions")
     @POST
     @Path("/autocomplete")
     @Produces(MediaType.APPLICATION_JSON)
@@ -156,16 +166,20 @@ public class ApplicationResource {
     }
 
     // =================================================================================================================
-    @ApiOperation(
-            value = "Get application versions",
-            notes = "Gets the list of versions for specified application",
-            response = ApplicationVersion.class,
-            responseContainer = "List"
+    @Operation(
+            summary = "Get application versions",
+            description = "Gets the list of versions for specified application"
+    )
+    @ApiResponse(
+            responseCode = "200",
+            content = @Content(
+                    array = @ArraySchema(schema = @Schema(implementation = ApplicationVersion.class))
+            )
     )
     @GET
     @Path("/{id}/versions")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllApplicationVersions(@PathParam("id") @ApiParam("Application ID") Integer id) {
+    public Response getAllApplicationVersions(@PathParam("id") @Parameter(description = "Application ID") Integer id) {
         if (!SecurityContext.get().hasPermission("applications")) {
             logger.error("Unauthorized attempt to access application version list by user " +
                     SecurityContext.get().getCurrentUserName());
@@ -180,15 +194,20 @@ public class ApplicationResource {
     }
 
     // =================================================================================================================
-    @ApiOperation(
-            value = "Get application",
-            notes = "Gets the details for specified application",
-            response = Application.class
+    @Operation(
+            summary = "Get application",
+            description = "Gets the details for specified application"
+    )
+    @ApiResponse(
+            responseCode = "200",
+            content = @Content(schema = @Schema(implementation = Application.class))
     )
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getApplication(@PathParam("id") @ApiParam("Application ID") Integer id) {
+    public Response getApplication(@PathParam("id")
+                                   @Parameter(description = "Application ID", schema = @Schema(type = "integer"))
+                                       Integer id) {
         if (!SecurityContext.get().hasPermission("applications")) {
             logger.error("Unauthorized attempt to access application list by user " +
                     SecurityContext.get().getCurrentUserName());
@@ -203,9 +222,9 @@ public class ApplicationResource {
     }
 
     // =================================================================================================================
-    @ApiOperation(
-            value = "Create or update Android application",
-            notes = "Create a new Android application (if id is not provided) or update existing one otherwise."
+    @Operation(
+            summary = "Create or update Android application",
+            description = "Create a new Android application (if id is not provided) or update existing one otherwise."
     )
     @Path("/android")
     @PUT
@@ -254,9 +273,9 @@ public class ApplicationResource {
     }
 
     // =================================================================================================================
-    @ApiOperation(
-            value = "Create or update Web-page application",
-            notes = "Create a new Web-page application (if id is not provided) or update existing one otherwise."
+    @Operation(
+            summary = "Create or update Web-page application",
+            description = "Create a new Web-page application (if id is not provided) or update existing one otherwise."
     )
     @Path("/web")
     @PUT
@@ -305,9 +324,9 @@ public class ApplicationResource {
     }
 
     // =================================================================================================================
-    @ApiOperation(
-            value = "Create or update application version",
-            notes = "Create a new application version (if id is not provided) or update existing one otherwise."
+    @Operation(
+            summary = "Create or update application version",
+            description = "Create a new application version (if id is not provided) or update existing one otherwise."
     )
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
@@ -358,14 +377,16 @@ public class ApplicationResource {
     }
 
     // =================================================================================================================
-    @ApiOperation(
-            value = "Delete application",
-            notes = "Delete an existing application"
+    @Operation(
+            summary = "Delete application",
+            description = "Delete an existing application"
     )
     @DELETE
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response removeApplication(@PathParam("id") @ApiParam("Application ID") Integer id) {
+    public Response removeApplication(@PathParam("id")
+                                      @Parameter(description = "Application ID", schema = @Schema(type = "integer"))
+                                          Integer id) {
         if (!SecurityContext.get().hasPermission("edit_applications")) {
             logger.error("Unauthorized attempt to remove application by user " +
                     SecurityContext.get().getCurrentUserName());
@@ -395,14 +416,16 @@ public class ApplicationResource {
     }
 
     // =================================================================================================================
-    @ApiOperation(
-            value = "Delete application version",
-            notes = "Delete an existing application version"
+    @Operation(
+            summary = "Delete application version",
+            description = "Delete an existing application version"
     )
     @DELETE
     @Path("/versions/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response removeApplicationVersion(@PathParam("id") @ApiParam("Application Version ID") Integer id) {
+    public Response removeApplicationVersion(@PathParam("id")
+                                             @Parameter(description = "Application Version ID", schema = @Schema(type = "integer"))
+                                                 Integer id) {
         if (!SecurityContext.get().hasPermission("edit_application_versions")) {
             logger.error("Unauthorized attempt to delete application version by user " +
                     SecurityContext.get().getCurrentUserName());
@@ -439,16 +462,22 @@ public class ApplicationResource {
     }
 
     // =================================================================================================================
-    @ApiOperation(
-            value = "Get application configurations",
-            notes = "Gets the list of configurations using requested application",
-            response = ApplicationConfigurationLink.class,
-            responseContainer = "List"
+    @Operation(
+            summary = "Get application configurations",
+            description = "Gets the list of configurations using requested application"
+    )
+    @ApiResponse(
+            responseCode = "200",
+            content = @Content(
+                    array = @ArraySchema(schema = @Schema(implementation = ApplicationConfigurationLink.class))
+            )
     )
     @GET
     @Path("/configurations/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getApplicationConfigurations(@PathParam("id") @ApiParam("Application ID") Integer id) {
+    public Response getApplicationConfigurations(@PathParam("id")
+                                                 @Parameter(description = "Application ID", schema = @Schema(type = "integer"))
+                                                     Integer id) {
         if (!SecurityContext.get().hasPermission("applications")) {
             logger.error("Unauthorized attempt to get application configurations by user " +
                     SecurityContext.get().getCurrentUserName());
@@ -458,17 +487,23 @@ public class ApplicationResource {
     }
 
     // =================================================================================================================
-    @ApiOperation(
-            value = "Get application version configurations",
-            notes = "Gets the list of configurations using requested application version",
-            response = ApplicationConfigurationLink.class,
-            responseContainer = "List"
+    @Operation(
+            summary = "Get application version configurations",
+            description = "Gets the list of configurations using requested application version"
+    )
+    @ApiResponse(
+            responseCode = "200",
+            content = @Content(
+                    array = @ArraySchema(schema = @Schema(implementation = ApplicationConfigurationLink.class))
+            )
     )
     @GET
     @Path("/version/{id}/configurations")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getApplicationVersionConfigurations(
-            @PathParam("id") @ApiParam("Application Version ID") Integer id
+            @PathParam("id")
+            @Parameter(description = "Application Version ID", schema = @Schema(type = "integer"))
+            Integer id
     ) {
         if (!SecurityContext.get().hasPermission("applications")) {
             logger.error("Unauthorized attempt to get application version configurations by user " +
@@ -484,9 +519,9 @@ public class ApplicationResource {
     }
 
     // =================================================================================================================
-    @ApiOperation(
-            value = "Update application configurations",
-            notes = "Updates the list of configurations using requested application"
+    @Operation(
+            summary = "Update application configurations",
+            description = "Updates the list of configurations using requested application"
     )
     @POST
     @Path("/configurations")
@@ -534,9 +569,9 @@ public class ApplicationResource {
     }
 
     // =================================================================================================================
-    @ApiOperation(
-            value = "Update application version configurations",
-            notes = "Updates the list of configurations using requested application version"
+    @Operation(
+            summary = "Update application version configurations",
+            description = "Updates the list of configurations using requested application version"
     )
     @POST
     @Path("/version/configurations")
@@ -571,7 +606,7 @@ public class ApplicationResource {
         }
     }
 
-    @ApiOperation(value = "", hidden = true)
+    @Operation(summary = "", hidden = true)
     @GET
     @Path("/admin/search")
     @Produces(MediaType.APPLICATION_JSON)
@@ -579,7 +614,7 @@ public class ApplicationResource {
         return Response.OK(this.applicationDAO.getAllAdminApplications());
     }
 
-    @ApiOperation(value = "", hidden = true)
+    @Operation(summary = "", hidden = true)
     @GET
     @Path("/admin/search/{value}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -587,7 +622,7 @@ public class ApplicationResource {
         return Response.OK(this.applicationDAO.getAllAdminApplicationsByValue(value));
     }
 
-    @ApiOperation(value = "", hidden = true)
+    @Operation(summary = "", hidden = true)
     @GET
     @Path("/admin/common/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -607,11 +642,15 @@ public class ApplicationResource {
     }
 
     // =================================================================================================================
-    @ApiOperation(
-            value = "Validate application package",
-            notes = "Validate the application package ID for uniqueness",
-            response = Application.class,
-            responseContainer = "List"
+    @Operation(
+            summary = "Validate application package",
+            description = "Validate the application package ID for uniqueness"
+    )
+    @ApiResponse(
+            responseCode = "200",
+            content = @Content(
+                    array = @ArraySchema(schema = @Schema(implementation = Application.class))
+            )
     )
     @Path("/validatePkg")
     @PUT

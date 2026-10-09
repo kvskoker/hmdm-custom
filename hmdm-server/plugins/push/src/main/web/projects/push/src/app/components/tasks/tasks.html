@@ -1,0 +1,22 @@
+<div class="tasks scroll-content">
+  <mat-card class="card scroll-content" [hmdmLoader]="isLoadingTasks()">
+    <mat-card-title class="card-title">
+      <hmdm-search-container
+        persistKey="push-tasks-search-control"
+        [searchControl]="tableSearchControl"
+        [showFiltersButton]="false"
+      ></hmdm-search-container>
+
+      <button matButton="filled" class="card-btn primary" (click)="onNewTaskClick()">
+        <mat-icon>add</mat-icon>
+        {{ 'plugin.push.button.new.task' | translate }}
+      </button>
+    </mat-card-title>
+
+    <mat-divider></mat-divider>
+
+    <mat-card-content class="card-content scroll-content">
+      <push-tasks-table #table class="scroll-table"></push-tasks-table>
+    </mat-card-content>
+  </mat-card>
+</div>

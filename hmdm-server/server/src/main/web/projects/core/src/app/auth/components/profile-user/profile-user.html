@@ -1,0 +1,72 @@
+<mat-card>
+  <mat-card-title>
+    <mat-card-header class="card-header">
+      <mat-card-title>
+        {{ 'menu.profile' | translate }}
+      </mat-card-title>
+
+      <button matButton="filled" class="primary" (click)="onSave()">
+        {{ 'button.save' | translate }}
+      </button>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="profile-info">
+        @if (showAccountType()) {
+          <div class="profile-info-row">
+            <span class="profile-info-label">{{ 'form.customer.type' | translate }}</span>
+            <span class="profile-info-value">{{ accountTypeLabel() | translate }}</span>
+          </div>
+        }
+
+        @if (settings()?.expiryTime) {
+          <div class="profile-info-row">
+            <span class="profile-info-label">{{ 'form.customer.expiry.time' | translate }}</span>
+            <span class="profile-info-value" [class.warning-text]="isExpiryWarning()">
+              {{ settings()!.expiryTime | date: 'dd/MM/yyyy' }}
+            </span>
+          </div>
+        }
+
+        @if ((settings()?.deviceLimit ?? 0) > 0) {
+          <div class="profile-info-row">
+            <span class="profile-info-label">{{ 'form.customer.device.limit' | translate }}</span>
+            <span class="profile-info-value" [class.warning-text]="isDeviceLimitExceeded()">
+              {{ settings()!.deviceCount }} / {{ settings()!.deviceLimit }}
+            </span>
+          </div>
+        }
+
+        @if (storageLimitDisplay()) {
+          <div class="profile-info-row">
+            <span class="profile-info-label">{{ 'form.customer.size.limit' | translate }}</span>
+            <span class="profile-info-value">{{ storageLimitDisplay() }} Mb</span>
+          </div>
+        }
+      </div>
+
+      <form [formGroup]="formGroup">
+        <hmdm-text-input
+          [formControlName]="'login'"
+          [label]="'form.user.login' | translate"
+        ></hmdm-text-input>
+
+        <hmdm-text-input
+          [formControlName]="'name'"
+          [label]="'form.user.name' | translate"
+        ></hmdm-text-input>
+
+        <hmdm-text-input
+          [formControlName]="'email'"
+          [label]="'form.user.email' | translate"
+        ></hmdm-text-input>
+
+        <hmdm-selector
+          [formControlName]="'alertLevel'"
+          [label]="'form.user.alert.level' | translate"
+          [options]="alertLevelOptions"
+        ></hmdm-selector>
+      </form>
+    </mat-card-content>
+  </mat-card-title>
+</mat-card>

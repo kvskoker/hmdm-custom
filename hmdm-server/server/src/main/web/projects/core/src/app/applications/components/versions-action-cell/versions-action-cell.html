@@ -1,0 +1,26 @@
+<div class="cell">
+  <button
+    mat-icon-button
+    *hmdmHasPermission="'edit_application_versions'"
+    (click)="onConfigClick()"
+  >
+    <mat-icon>list</mat-icon>
+  </button>
+
+  <button mat-icon-button *hmdmHasPermission="'edit_application_versions'" (click)="onEditClick()">
+    <mat-icon>edit</mat-icon>
+  </button>
+
+  <div
+    *hmdmHasPermission="'edit_application_versions'"
+    matTooltip="{{
+      (isDeleteDisabled() ? 'error.application.version.deletion.prohibited' : 'button.delete')
+        | translate
+    }}"
+    [matTooltipShowDelay]="500"
+  >
+    <button mat-icon-button (click)="onDeleteClick()" [disabled]="isDeleteDisabled()">
+      <mat-icon>delete</mat-icon>
+    </button>
+  </div>
+</div>

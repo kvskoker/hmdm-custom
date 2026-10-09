@@ -1,0 +1,47 @@
+<div class="details scroll-content">
+  <nav class="details-breadcrumb">
+    <a class="details-breadcrumb-link" [routerLink]="['/home', 'configurations']">
+      {{ 'breadcrumb.configurations' | translate }}
+    </a>
+
+    @if (configurationName()) {
+      <span class="details-breadcrumb-current">- {{ configurationName() }}</span>
+    }
+  </nav>
+
+  <mat-tab-group class="details-tabs scroll-content">
+    <mat-tab [label]="'tab.configeditor.common.settings' | translate">
+      <core-configuration-common></core-configuration-common>
+    </mat-tab>
+
+    <mat-tab [label]="'tab.configeditor.design.settings' | translate">
+      <core-configuration-design></core-configuration-design>
+    </mat-tab>
+
+    <mat-tab [label]="'tab.configeditor.applications' | translate">
+      <core-configuration-app></core-configuration-app>
+    </mat-tab>
+
+    <mat-tab [label]="'tab.configeditor.mdm.settings' | translate">
+      <core-configuration-mdm></core-configuration-mdm>
+    </mat-tab>
+
+    <mat-tab [label]="'tab.configeditor.app.settings' | translate">
+      <core-configuration-app-settings></core-configuration-app-settings>
+    </mat-tab>
+
+    <mat-tab [label]="'tab.configeditor.files' | translate">
+      <core-configuration-files></core-configuration-files>
+    </mat-tab>
+  </mat-tab-group>
+
+  <div class="details-bottom">
+    <button matButton color="primary" (click)="onCancel()">
+      {{ 'button.cancel' | translate }}
+    </button>
+
+    <button matButton="filled" color="primary" (click)="onSave()">
+      {{ 'button.save' | translate }}
+    </button>
+  </div>
+</div>

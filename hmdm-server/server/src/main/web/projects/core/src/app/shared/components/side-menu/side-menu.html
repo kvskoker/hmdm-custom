@@ -1,0 +1,47 @@
+<div class="menu">
+  <div class="menu-top">
+    <img class="menu-logo" [src]="logoUrl" alt="HMD" />
+    <h2 class="menu-title">{{ rebranding().appName }}</h2>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <mat-tree #tree [dataSource]="dataSource()" [childrenAccessor]="childrenAccessor">
+    <mat-tree-node
+      *matTreeNodeDef="let node"
+      matTreeNodePadding
+      routerLinkActive="active"
+      [routerLink]="node.isLocked ? null : node.route"
+      [routerLinkActiveOptions]="node.opts || {}"
+      [cdkTreeNodeTypeaheadLabel]="node.name | translate"
+      [class.node-locked]="node.isLocked"
+      (click)="onPluginClick($event, node)"
+    >
+      <mat-icon class="menu-icon">{{ node.icon }}</mat-icon>
+      <span class="menu-text">{{ node.name | translate }}</span>
+
+      @if (node.isLocked) {
+        <span class="badge-locked">locked</span>
+      }
+    </mat-tree-node>
+
+    <mat-tree-node
+      *matTreeNodeDef="let node; when: hasChild"
+      matTreeNodePadding
+      matTreeNodeToggle
+      [cdkTreeNodeTypeaheadLabel]="node.name | translate"
+      [class.node-locked]="node.isLocked"
+    >
+      <button class="menu-toggle" matIconButton matTreeNodeToggle [disabled]="node.isLocked">
+        <mat-icon>
+          {{ tree.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
+        </mat-icon>
+      </button>
+      <span class="menu-text">{{ node.name | translate }}</span>
+
+      @if (node.isLocked) {
+        <span class="badge-locked">locked</span>
+      }
+    </mat-tree-node>
+  </mat-tree>
+</div>

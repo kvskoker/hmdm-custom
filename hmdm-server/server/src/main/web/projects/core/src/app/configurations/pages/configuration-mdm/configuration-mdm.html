@@ -1,0 +1,124 @@
+<form class="mdm" [formGroup]="formGroup">
+  <hmdm-checkbox
+    formControlName="kioskMode"
+    [label]="'form.configuration.settings.mdm.kiosk.mode' | translate"
+  ></hmdm-checkbox>
+
+  <div class="mdm-double">
+    <hmdm-select-search
+      formControlName="mainAppId"
+      [label]="'form.configuration.settings.mdm.app.main' | translate"
+      [options]="applicationOptions()"
+    ></hmdm-select-search>
+
+    <hmdm-text-input
+      formControlName="eventReceivingComponent"
+      [label]="'form.configuration.settings.mdm.component.event.receiver' | translate"
+    ></hmdm-text-input>
+  </div>
+
+  @if (isKioskMode()) {
+    <hmdm-select-search
+      formControlName="contentAppId"
+      [label]="'form.configuration.settings.mdm.app.content' | translate"
+      [options]="applicationOptions()"
+    ></hmdm-select-search>
+
+    <div class="mdm-kiosk mdm-double">
+      <hmdm-checkbox
+        formControlName="kioskHome"
+        [label]="'form.configuration.settings.mdm.kiosk.home' | translate"
+      ></hmdm-checkbox>
+
+      <hmdm-checkbox
+        formControlName="kioskRecents"
+        [label]="'form.configuration.settings.mdm.kiosk.recents' | translate"
+      ></hmdm-checkbox>
+
+      <hmdm-checkbox
+        formControlName="kioskNotifications"
+        [label]="'form.configuration.settings.mdm.kiosk.notifications' | translate"
+      ></hmdm-checkbox>
+
+      <hmdm-checkbox
+        formControlName="kioskSystemInfo"
+        [label]="'form.configuration.settings.mdm.kiosk.system.info' | translate"
+      ></hmdm-checkbox>
+
+      <hmdm-checkbox
+        formControlName="kioskKeyguard"
+        [label]="'form.configuration.settings.mdm.kiosk.keyguard' | translate"
+      ></hmdm-checkbox>
+
+      <hmdm-checkbox
+        formControlName="kioskLockButtons"
+        [label]="'form.configuration.settings.mdm.kiosk.lock.buttons' | translate"
+      ></hmdm-checkbox>
+
+      <hmdm-checkbox
+        formControlName="kioskExit"
+        [label]="'form.configuration.settings.mdm.kiosk.exit' | translate"
+      ></hmdm-checkbox>
+    </div>
+  }
+
+  <div class="mdm-wifi">
+    <hmdm-selector
+      formControlName="wifiSecurityType"
+      [label]="'form.configuration.settings.mdm.component.wifi.security' | translate"
+      [options]="wifiSecurityOptions"
+    ></hmdm-selector>
+
+    <hmdm-text-input
+      formControlName="wifiSSID"
+      [label]="'form.configuration.settings.mdm.component.wifi.ssid' | translate"
+    ></hmdm-text-input>
+
+    <hmdm-text-input
+      formControlName="wifiPassword"
+      [label]="'form.configuration.settings.mdm.component.wifi.password' | translate"
+    ></hmdm-text-input>
+  </div>
+
+  <hmdm-textarea-input
+    formControlName="qrParameters"
+    [label]="'form.configuration.settings.mdm.misc' | translate"
+  ></hmdm-textarea-input>
+
+  <hmdm-checkbox
+    formControlName="mobileEnrollment"
+    [label]="'form.configuration.settings.mdm.mobile.enrollment' | translate"
+  ></hmdm-checkbox>
+
+  <hmdm-checkbox
+    formControlName="encryptDevice"
+    [label]="'form.configuration.settings.mdm.encrypt.device' | translate"
+  ></hmdm-checkbox>
+
+  <div class="mdm-nokiosk">
+    <hmdm-checkbox
+      formControlName="permissive"
+      [label]="'form.configuration.settings.mdm.permissive' | translate"
+    ></hmdm-checkbox>
+
+    <hmdm-checkbox
+      formControlName="lockSafeSettings"
+      [label]="'form.configuration.settings.mdm.lock.safe.settings' | translate"
+    ></hmdm-checkbox>
+
+    <hmdm-textarea-input
+      formControlName="allowedClasses"
+      [label]="'form.configuration.settings.mdm.allowed.classes' | translate"
+    ></hmdm-textarea-input>
+  </div>
+
+  <hmdm-textarea-input
+    formControlName="restrictions"
+    [label]="'form.configuration.settings.mdm.restrictions' | translate"
+  ></hmdm-textarea-input>
+
+  <hmdm-text-input
+    formControlName="newServerUrl"
+    [label]="'form.configuration.settings.mdm.component.server.url' | translate"
+  ></hmdm-text-input>
+</form>

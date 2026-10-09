@@ -1,0 +1,27 @@
+.alert {
+  position: relative;
+
+  &-message {
+    padding: 16px;
+  }
+
+  &.error::before {
+    background-color: var(--mat-sys-error);
+  }
+
+  &.success::before {
+    background-color: var(--mat-sys-success);
+  }
+
+  &.info::before {
+    background-color: var(--mat-sys-info);
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    border-radius: 4px 0 0 4px;
+    width: 8px;
+    height: 100%;
+  }
+}

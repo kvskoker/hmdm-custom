@@ -1,0 +1,8 @@
+<hmdm-table
+  #table
+  class="scroll-table"
+  [config]="tableConfig"
+  [data]="tableData()"
+  [totalItems]="totalItemsCount()"
+  (pageChange)="onPageChange($event)"
+></hmdm-table>

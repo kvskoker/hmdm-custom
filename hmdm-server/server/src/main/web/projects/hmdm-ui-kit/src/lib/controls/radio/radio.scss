@@ -1,0 +1,22 @@
+:host {
+  display: flex;
+  justify-content: center;
+}
+
+.radio {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+
+  &-label-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  &-label {
+    margin-left: 8px;
+    font-size: 16px;
+  }
+}

@@ -1,0 +1,22 @@
+<form class="form">
+  <div class="form-wrapper">
+    <div class="form-configs">
+      @for (config of configurations(); track $index) {
+        <fieldset class="form-fieldset config-row">
+          <div class="config-checkbox">
+            <mat-checkbox
+              [id]="'config-' + config.configurationId"
+              [checked]="config.upload || false"
+              (change)="onConfigurationSelectionChange(config.configurationId, $event.checked)"
+            >
+            </mat-checkbox>
+          </div>
+
+          <div class="form-config">
+            <span class="config-name">{{ config.configurationName }}</span>
+          </div>
+        </fieldset>
+      }
+    </div>
+  </div>
+</form>

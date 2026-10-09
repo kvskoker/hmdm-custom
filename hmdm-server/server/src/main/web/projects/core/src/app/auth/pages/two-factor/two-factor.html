@@ -1,0 +1,25 @@
+<div class="two-factor-container">
+  <h3 class="auth-title">{{'two.factor.plugin.title' | translate}}</h3>
+
+  @if (isSetup()) {
+    <img src="{{qrUrl()}}" class="qr">
+    <span class="qr-desc">{{'two.factor.plugin.qr.description' | translate}}</span>
+  }
+
+  <h4 class="input-title">{{'two.factor.plugin.verification.code' | translate}}</h4>
+
+  <div class="auth-input-wrapper">
+    <hmdm-text-input
+      [label]="'two.factor.plugin.code.input.placeholder' | translate"
+      [formControl]="codeControl"
+      [maxLengthNum]="6"
+      [optionalValidationKey]="'two.factor'"
+    ></hmdm-text-input>
+  </div>
+
+  <div class="auth-buttons">
+    <button [disabled]="codeControl.invalid" matButton="filled" class="primary" (click)="onVerify()">
+      {{'two.factor.plugin.verify' | translate}}
+    </button>
+  </div>
+</div>

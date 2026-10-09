@@ -1,0 +1,33 @@
+.name-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #c62828;
+  font-size: 14px;
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  background: #ffebee;
+  border-radius: 4px;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+}
+
+.application {
+  &-actions {
+    margin-top: 16px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+  }
+}
+
+.storage-warning {
+  padding: 8px;
+  border-radius: 8px;
+  border: 2px solid var(--mat-sys-primary, #b00020);
+}

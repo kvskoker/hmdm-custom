@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <base href="/" />
+    <title>MDM web panel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+
+    <style>
+      .app-boot-loader {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100vh;
+      }
+
+      .app-boot-loader__spinner {
+        box-sizing: border-box;
+        width: 100px;
+        height: 100px;
+        border: 10px solid transparent;
+        border-top-color: #7a9ab9;
+        border-radius: 50%;
+        animation: app-boot-spin 1s linear infinite;
+      }
+
+      @keyframes app-boot-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <core-root>
+      <div class="app-boot-loader">
+        <div class="app-boot-loader__spinner"></div>
+      </div>
+    </core-root>
+  </body>
+</html>

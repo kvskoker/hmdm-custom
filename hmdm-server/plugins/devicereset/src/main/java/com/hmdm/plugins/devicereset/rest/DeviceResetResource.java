@@ -12,22 +12,22 @@ import com.hmdm.plugins.devicereset.rest.json.ResetRequest;
 import com.hmdm.plugins.devicereset.util.PinGenerator;
 import com.hmdm.rest.json.Response;
 import com.hmdm.security.SecurityContext;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.Authorization;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
 import java.util.HashMap;
 import java.util.Map;
 
 @Singleton
 @Path("/plugins/devicereset")
-@Api(tags = {"Device PIN reset plugin"})
+@Tag(name = "Device PIN reset plugin")
 public class DeviceResetResource {
 
     private static final Logger logger = LoggerFactory.getLogger(DeviceResetResource.class);
@@ -58,11 +58,11 @@ public class DeviceResetResource {
      * Generates a new PIN for a device and queues it for delivery. The PIN is
      * returned exactly once, in this response, for the admin to relay to the user.
      */
-    @ApiOperation(
-            value = "Reset device PIN",
-            notes = "Generates a new lock screen PIN and queues it for the device. "
+    @Operation(
+            summary = "Reset device PIN",
+            description = "Generates a new lock screen PIN and queues it for the device. "
                   + "The generated PIN is returned once and never again.",
-            authorizations = {@Authorization("Bearer Token")}
+            security = {@SecurityRequirement(name = "Bearer Token")}
     )
     @POST
     @Path("/private/reset")
@@ -116,10 +116,10 @@ public class DeviceResetResource {
         }
     }
 
-    @ApiOperation(
-            value = "PIN reset history",
-            notes = "Recent PIN reset requests for the current customer. PINs are not included.",
-            authorizations = {@Authorization("Bearer Token")}
+    @Operation(
+            summary = "PIN reset history",
+            description = "Recent PIN reset requests for the current customer. PINs are not included.",
+            security = {@SecurityRequirement(name = "Bearer Token")}
     )
     @GET
     @Path("/private/history")
@@ -133,10 +133,10 @@ public class DeviceResetResource {
         }
     }
 
-    @ApiOperation(
-            value = "Reboot device",
-            notes = "Queues a reboot. The device confirms and then reboots itself.",
-            authorizations = {@Authorization("Bearer Token")}
+    @Operation(
+            summary = "Reboot device",
+            description = "Queues a reboot. The device confirms and then reboots itself.",
+            security = {@SecurityRequirement(name = "Bearer Token")}
     )
     @POST
     @Path("/private/reboot")
@@ -146,10 +146,10 @@ public class DeviceResetResource {
         return queueCommand(request, DeviceCommand.TYPE_REBOOT);
     }
 
-    @ApiOperation(
-            value = "Command history",
-            notes = "Recent reboot and reset commands for the current customer.",
-            authorizations = {@Authorization("Bearer Token")}
+    @Operation(
+            summary = "Command history",
+            description = "Recent reboot and reset commands for the current customer.",
+            security = {@SecurityRequirement(name = "Bearer Token")}
     )
     @GET
     @Path("/private/commands")
@@ -209,10 +209,10 @@ public class DeviceResetResource {
      * Returns 200 with found=false rather than an error, because "no such device"
      * is a normal thing to type, not a failure.
      */
-    @ApiOperation(
-            value = "Device status",
-            notes = "Existence, lock state and last sync time for one device number.",
-            authorizations = {@Authorization("Bearer Token")}
+    @Operation(
+            summary = "Device status",
+            description = "Existence, lock state and last sync time for one device number.",
+            security = {@SecurityRequirement(name = "Bearer Token")}
     )
     @GET
     @Path("/private/status/{number}")
@@ -254,11 +254,11 @@ public class DeviceResetResource {
      * device number - a button alone is too easy to click by accident for something
      * irreversible.
      */
-    @ApiOperation(
-            value = "Factory reset device",
-            notes = "Queues an irreversible wipe. Requires the plugin_devicereset_wipe permission "
+    @Operation(
+            summary = "Factory reset device",
+            description = "Queues an irreversible wipe. Requires the plugin_devicereset_wipe permission "
                   + "and a matching confirmDeviceNumber.",
-            authorizations = {@Authorization("Bearer Token")}
+            security = {@SecurityRequirement(name = "Bearer Token")}
     )
     @POST
     @Path("/private/factoryreset")
@@ -277,7 +277,7 @@ public class DeviceResetResource {
         return queueCommand(request, DeviceCommand.TYPE_FACTORY_RESET);
     }
 
-    @ApiOperation(value = "Lock device", authorizations = {@Authorization("Bearer Token")})
+    @Operation(summary = "Lock device", security = {@SecurityRequirement(name = "Bearer Token")})
     @POST
     @Path("/private/lock")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -286,7 +286,7 @@ public class DeviceResetResource {
         return setLock(request, true);
     }
 
-    @ApiOperation(value = "Unlock device", authorizations = {@Authorization("Bearer Token")})
+    @Operation(summary = "Unlock device", security = {@SecurityRequirement(name = "Bearer Token")})
     @POST
     @Path("/private/unlock")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -295,7 +295,7 @@ public class DeviceResetResource {
         return setLock(request, false);
     }
 
-    @ApiOperation(value = "Locked devices", authorizations = {@Authorization("Bearer Token")})
+    @Operation(summary = "Locked devices", security = {@SecurityRequirement(name = "Bearer Token")})
     @GET
     @Path("/private/locked")
     @Produces(MediaType.APPLICATION_JSON)
@@ -346,9 +346,33 @@ public class DeviceResetResource {
     }
 
     // =================================================================================================
+
+    @GET
+    @Path("/private/history/page")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response historyPage(@QueryParam("kind") @DefaultValue("password") String kind,
+            @QueryParam("page") @DefaultValue("0") int page,
+            @QueryParam("size") @DefaultValue("10") int size,
+            @QueryParam("search") @DefaultValue("") String search,
+            @QueryParam("status") Integer status,
+            @QueryParam("commandType") String commandType,
+            @QueryParam("after") @DefaultValue("0") long after) {
+        if (!java.util.Set.of("password", "commands", "locked").contains(kind)
+                || page < 0 || size < 1 || size > 100 || after < 0 || search.length() > 250
+                || (status != null && (status < 0 || status > 2))
+                || (commandType != null && !java.util.Set.of(DeviceCommand.TYPE_REBOOT, DeviceCommand.TYPE_FACTORY_RESET).contains(commandType))) {
+            return Response.ERROR("Invalid history filter");
+        }
+        try {
+            return Response.OK(this.deviceResetDAO.historyPage(kind, page, size, search.trim(), status, commandType, after));
+        } catch (Exception e) {
+            logger.error("Failed to load history page", e);
+            return Response.INTERNAL_ERROR();
+        }
+    }
     // Device API - path and shape are dictated by the launcher (ServerService#confirmPasswordReset)
 
-    @ApiOperation(value = "Confirm PIN reset", notes = "Called by the device after it applies a new PIN.")
+    @Operation(summary = "Confirm PIN reset", description = "Called by the device after it applies a new PIN.")
     @POST
     @Path("/public/password/{number}")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -369,8 +393,8 @@ public class DeviceResetResource {
         }
     }
 
-    @ApiOperation(value = "Confirm reboot",
-            notes = "Called by the device when it accepts a reboot command, just before rebooting.")
+    @Operation(summary = "Confirm reboot",
+            description = "Called by the device when it accepts a reboot command, just before rebooting.")
     @POST
     @Path("/public/reboot/{number}")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -391,8 +415,8 @@ public class DeviceResetResource {
         }
     }
 
-    @ApiOperation(value = "Confirm factory reset",
-            notes = "Called by the device when it accepts a wipe, immediately before wiping itself.")
+    @Operation(summary = "Confirm factory reset",
+            description = "Called by the device when it accepts a wipe, immediately before wiping itself.")
     @POST
     @Path("/public/{number}")
     @Consumes(MediaType.APPLICATION_JSON)

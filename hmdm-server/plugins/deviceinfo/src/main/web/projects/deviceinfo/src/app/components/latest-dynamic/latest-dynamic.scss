@@ -1,0 +1,36 @@
+.latest {
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 16px;
+}
+
+.device-data-mismatch {
+  color: #d9534f;
+  font-weight: bold;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th {
+    text-align: left;
+    padding: 8px;
+    font-weight: 600;
+    width: 40%;
+    vertical-align: top;
+  }
+
+  td {
+    padding: 8px;
+    vertical-align: top;
+  }
+
+  tr {
+    border-bottom: 1px solid #ddd;
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+}

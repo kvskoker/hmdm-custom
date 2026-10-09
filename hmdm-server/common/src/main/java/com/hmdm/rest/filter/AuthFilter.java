@@ -23,20 +23,23 @@ package com.hmdm.rest.filter;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import com.hmdm.persistence.UserDAO;
 import com.hmdm.persistence.domain.User;
 import com.hmdm.security.SecurityContext;
 
 import java.io.IOException;
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+
+import com.hmdm.session.IHmdmSession;
+import com.hmdm.session.IHmdmSessionProvider;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Singleton
 public class AuthFilter implements Filter {
@@ -45,13 +48,16 @@ public class AuthFilter implements Filter {
     public static final String twoFactorNeeded = "twofactor";
 
     private UserDAO userDAO;
+    private IHmdmSessionProvider sessionProvider;
 
     public AuthFilter() {
     }
 
     @Inject
-    public AuthFilter(UserDAO userDAO) {
+    public AuthFilter(UserDAO userDAO,
+                      @Named("session.class") IHmdmSessionProvider sessionProvider) {
         this.userDAO = userDAO;
+        this.sessionProvider = sessionProvider;
     }
 
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -75,22 +81,24 @@ public class AuthFilter implements Filter {
         // Check that the user is authenticated and forbid access to app if not
         User currentUser = null;
         if (servletRequest instanceof HttpServletRequest && servletResponse instanceof HttpServletResponse) {
-            HttpSession session = ((HttpServletRequest)servletRequest).getSession(false);
-            if (session == null || session.getAttribute(sessionCredentials) == null) {
+            IHmdmSession session = sessionProvider.getSession((HttpServletRequest)servletRequest);
+            if (session != null) {
+                currentUser = session.getUser();
+            }
+            if (currentUser == null) {
                 ((HttpServletResponse)servletResponse).sendError(403);
                 return;
             } else {
-                currentUser = (User) session.getAttribute(sessionCredentials);
-
-                if (session.getAttribute(twoFactorNeeded) != null) {
+                if (session.isTwoFactorNeeded()) {
                     // Two-factor auth needed
                     String path = ((HttpServletRequest) servletRequest).getServletPath();
                     // At this step, allow only resources in TwoFactorAuthResource
                     // After the two-factor auth is completed, the session attribute
                     // should be cleared by the authentication completion method
-                    if (!path.contains("/rest/private/twofactor")) {
-                        session.removeAttribute(sessionCredentials);
-                        session.removeAttribute(twoFactorNeeded);
+                    if (!path.contains("/rest/private/plugin-twofactor")) {
+                        session.invalidate();
+                        sessionProvider.invalidateSession((HttpServletRequest) servletRequest,
+                                (HttpServletResponse) servletResponse);
                         ((HttpServletResponse)servletResponse).sendError(403);
                         return;
                     }

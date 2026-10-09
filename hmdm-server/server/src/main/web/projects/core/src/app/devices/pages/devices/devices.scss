@@ -1,0 +1,108 @@
+.search {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  padding: 16px;
+  height: 100%;
+
+  &-header {
+    margin-bottom: 16px;
+  }
+
+  &-content {
+    padding: 16px;
+  }
+
+  &-actions {
+    display: flex;
+    gap: 16px;
+  }
+}
+
+.table {
+  flex-grow: 1;
+  overflow: hidden;
+  padding: 16px;
+
+  &-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    gap: 16px;
+  }
+
+  &-content {
+    display: contents;
+    gap: 16px;
+    padding: 10px;
+    flex-wrap: wrap;
+  }
+
+  &-inner {
+    position: relative;
+    display: contents;
+  }
+
+  &-actions {
+    display: flex;
+    gap: 16px;
+    justify-content: flex-end;
+
+    &-btn {
+      flex-wrap: nowrap;
+      text-wrap: nowrap;
+    }
+  }
+}
+
+.search {
+  &-params {
+    display: flex;
+    gap: 16px;
+  }
+
+  &-block {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    justify-content: space-between;
+
+    &-grow {
+      flex: 1;
+    }
+  }
+
+  .full-width {
+    width: 100%;
+  }
+
+  &-device {
+    width: 100%;
+    display: flex;
+    gap: 16px;
+
+    hmdm-text-input {
+      flex: 1;
+    }
+  }
+}
+
+.update-spinner {
+  position: absolute;
+  top: 18px;
+  right: 8px;
+}
+
+@media screen and (max-width: 1200px) {
+  .table {
+    &-header {
+      flex-wrap: wrap;
+    }
+
+    &-search {
+      justify-self: flex-end;
+      order: 3;
+    }
+  }
+}

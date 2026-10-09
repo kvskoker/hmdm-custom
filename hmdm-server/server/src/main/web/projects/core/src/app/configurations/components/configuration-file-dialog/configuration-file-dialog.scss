@@ -1,0 +1,27 @@
+.dialog {
+  display: flex;
+  flex-direction: column;
+}
+
+.progress-wrapper {
+  height: 36px;
+}
+
+mat-progress-bar {
+  margin-bottom: 4px;
+}
+
+.progress-label {
+  display: block;
+  font-size: 12px;
+  text-align: right;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.storage-warning {
+  color: #c62828;
+  font-size: 13px;
+  margin-top: 4px;
+  border-radius: 4px;
+  height: 14px;
+}

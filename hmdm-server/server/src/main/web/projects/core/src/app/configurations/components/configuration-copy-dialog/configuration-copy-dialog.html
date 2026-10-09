@@ -1,0 +1,19 @@
+<hmdm-dialog-template>
+  <form [formGroup]="formGroup">
+    <hmdm-text-input
+      formControlName="name"
+      [label]="'form.configuration.copy.new.name' | translate"
+    ></hmdm-text-input>
+
+    <hmdm-textarea-input
+      formControlName="description"
+      [label]="'form.configuration.settings.common.desc' | translate"
+    ></hmdm-textarea-input>
+  </form>
+
+  <hmdm-dialog-common-buttons
+    (save)="onSave()"
+    (cancel)="onCancel()"
+    [isSaveDisabled]="formGroup.invalid"
+  ></hmdm-dialog-common-buttons>
+</hmdm-dialog-template>

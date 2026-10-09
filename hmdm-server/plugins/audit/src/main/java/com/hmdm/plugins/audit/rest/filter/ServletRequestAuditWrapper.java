@@ -1,8 +1,9 @@
 package com.hmdm.plugins.audit.rest.filter;
 
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
+import jakarta.servlet.ReadListener;
+import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
 import java.io.*;
 
 public class ServletRequestAuditWrapper extends HttpServletRequestWrapper {
@@ -45,6 +46,22 @@ public class ServletRequestAuditWrapper extends HttpServletRequestWrapper {
     public ServletInputStream getInputStream() throws IOException {
         final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(body.getBytes());
         ServletInputStream servletInputStream = new ServletInputStream() {
+            @Override
+            public boolean isFinished() {
+                return byteArrayInputStream.available() == 0;
+            }
+
+            @Override
+            public boolean isReady() {
+                // We're wrapping a byte array in memory, so it's always ready (blocking I/O).
+                return true;
+            }
+
+            @Override
+            public void setReadListener(ReadListener readListener) {
+                // Non-blocking IO not supported
+            }
+
             public int read() throws IOException {
                 return byteArrayInputStream.read();
             }

@@ -1,0 +1,22 @@
+<hmdm-dialog-template>
+  <div class="dialog">
+    @if (nameError()) {
+      <div class="name-error">
+        <mat-icon>error</mat-icon>
+        <span>{{ nameError()! | translate }}</span>
+      </div>
+    }
+
+    <core-application-form
+      (formChange)="onFormValueChange($event)"
+      [initialValue]="initialValue"
+    ></core-application-form>
+  </div>
+
+  <hmdm-dialog-common-buttons
+    dialog-actions
+    (cancel)="onCancel()"
+    (save)="onSave()"
+    [isSaveDisabled]="isSaving()"
+  ></hmdm-dialog-common-buttons>
+</hmdm-dialog-template>

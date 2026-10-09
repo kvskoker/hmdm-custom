@@ -23,9 +23,19 @@
     <Parameter name="secure.enrollment" value="0"/>
     <!-- A shared secret between mobile app and control panel. 
          Don't change this unless you know what you're doing -->
-    <Parameter name="hash.secret" value="changeme-C3z9vi54"/>
+    <Parameter name="hash.secret" value="LXVoaKBbxZ"/>
     <!-- If set to 1, Strict-Transport-Security (HSTS) is turned on -->
-<!--    <Parameter name="strict.transport.security" value="${strict.transport.security}"/> -->
+<!--    <Parameter name="strict.transport.security" value="1"/> -->
+
+    <!-- If set to 1, the device will not be enrolled if a device with the same number
+     was already enrolled. To enroll a device, delete it from the list and add back -->
+<!--    <Parameter name="prevent.duplicate.enrollment" value="1"/> -->
+
+    <!-- If set to 1, the password will be transmitted to the server using RSA encryption.
+         The clean-text password can be used to delegate the authorization to third party 
+         authorization services like LDAP. 
+         If set to 0 (default), just a MD5 hash will be sent to the server -->
+    <Parameter name="transmit.password" value="0"/>
 
     <!-- This directory is used to store files by plugins, must be accessible for tomcat user -->
     <Parameter name="plugins.files.directory" value="_BASE_DIRECTORY_/plugins"/>
@@ -47,18 +57,32 @@
     <Parameter name="aapt.command" value="aapt"/>
 
     <!-- MQTT notification service parameters -->
+    
+    <!-- If Headwind MDM uses an embedded MQTT broker, this parameter is a
+    local address to which the server binds to listen on port 31000
+    (MQTT for Push notifications), for example, demo.h-mdm.com:31000
+    If an external MQTT server is used, this is the address of this MQTT server
+    -->
     <Parameter name="mqtt.server.uri" value="_BASE_DOMAIN_:31000"/>
+
+    <!-- Fast device search by last characters, here's the length -->
+    <Parameter name="device.fast.search.chars" value="5"/>
+
+    <!-- Set to 1 if an external MQTT server must be used (ActiveMQ Classic is recommended) -->
+    <Parameter name="mqtt.external" value="0"/>
+
+    <!-- Optional tag for the MQTT client (required if multiple Tomcat nodes are running) -->
+    <!-- <Parameter name="mqtt.client.tag" value="1"/> -->
+
+    <!-- Optional tag for MQTT authentication for more security 
+         (supported by Headwind MDM launcher v5.05 and above) -->
+    <Parameter name="mqtt.auth" value="1"/>
 
     <!-- Optional tag for delaying MQTT messages in milliseconds
      to avoid congestion when all devices are updating configuration at the same time -->
     <!-- <Parameter name="mqtt.message.delay" value="100"/> -->
 
-    <!-- Fast device search by last characters, here's the length -->
-    <Parameter name="device.fast.search.chars" value="5"/>
-
-    <!-- Optional tag for MQTT authentication for more security
-         (supported by Headwind MDM launcher v5.05 and above) -->
-    <Parameter name="mqtt.auth" value="1"/>
+    <!-- <Parameter name="plugin.knox.license" value=""/> -->
 
     <!-- If you have any reverse proxies, specify them here (IP addresses, 
     comma-separated) for correct logging of IP addresses -->
@@ -90,4 +114,13 @@
     <!-- <Parameter name="jwt.secretkey" value="20c68f0d9185b1d18cf6add1e8b491fd89529a44"/> -->
     <!-- <Parameter name="jwt.validity" value="86400"/> -->
     <!-- <Parameter name="jwt.validityrememberme" value="2592000"/> -->
+
+    <!-- IP filters for devices and web panel UI users, comma-separated networks or single IPs -->
+<!--    <Parameter name="device.allowed.address" value='192.168.0.0/16,10.0.0.0/24'/>
+    <Parameter name="ui.allowed.address" value='192.168.0.0/16,10.0.0.0/24,213.11.0.3'/> -->
+
+    <!-- If the URL of an APK starts with this URL, the existing APK hash will not be not changed. 
+         This is important for deployment on the LAN -->
+    <Parameter name="apk.trusted.url" value="https://h-mdm.com"/>
+    
 </Context>

@@ -1,0 +1,79 @@
+<div class="cp-page">
+  <mat-tab-group>
+    <!-- CUSTOMERS TAB -->
+    <mat-tab [label]="'tab.customers' | translate">
+      <mat-card class="cp-table" [hmdmLoader]="isLoadingCustomers()">
+        <mat-card-title class="cp-table-header">
+          <h3 class="cp-table-title">{{ 'tab.customers' | translate }}</h3>
+
+          <hmdm-search-container
+            class="cp-search"
+            persistKey="cp-customers-search"
+            [searchControl]="customersSearchControl"
+            [activeFiltersCount]="customersActiveFiltersCount()"
+            [filtersTemplate]="customersFiltersTemplate"
+            [showSearchButton]="false"
+          ></hmdm-search-container>
+
+          <ng-template #customersFiltersTemplate>
+            <hmdm-selector
+              [formControl]="accountTypeControl"
+              [optional]="true"
+              [options]="accountTypeOptions"
+              [label]="'form.customer.type' | translate"
+            ></hmdm-selector>
+
+            <hmdm-selector
+              [formControl]="customerStatusControl"
+              [optional]="true"
+              [options]="customerStatusOptions"
+              [label]="'form.customer.status' | translate"
+            ></hmdm-selector>
+          </ng-template>
+
+          <div class="cp-table-actions">
+            <button matButton="filled" class="primary" (click)="onAddCustomerClick()">
+              <mat-icon>add</mat-icon>
+              {{ 'button.add' | translate }}
+            </button>
+          </div>
+        </mat-card-title>
+
+        <mat-divider></mat-divider>
+
+        <mat-card-content class="cp-table-content">
+          <hmdm-table
+            [config]="customersTableConfig"
+            [data]="customersData()"
+            [totalItems]="customersTotalItems()"
+            (pageChange)="onCustomersPageChange($event)"
+            (sortChange)="onCustomersSortChange($event)"
+          ></hmdm-table>
+        </mat-card-content>
+      </mat-card>
+    </mat-tab>
+
+    <!-- COMMON APPLICATIONS TAB -->
+    <mat-tab [label]="'tab.common.applications' | translate">
+      <mat-card class="cp-table" [hmdmLoader]="isLoadingApps()">
+        <mat-card-title class="cp-table-header">
+          <h3 class="cp-table-title">{{ 'tab.common.applications' | translate }}</h3>
+
+          <hmdm-search-container
+            class="cp-search"
+            persistKey="cp-apps-search"
+            [searchControl]="appsSearchControl"
+            [showFiltersButton]="false"
+            [showSearchButton]="false"
+          ></hmdm-search-container>
+        </mat-card-title>
+
+        <mat-divider></mat-divider>
+
+        <mat-card-content class="cp-table-content">
+          <hmdm-table [config]="appsTableConfig" [data]="appsData()"></hmdm-table>
+        </mat-card-content>
+      </mat-card>
+    </mat-tab>
+  </mat-tab-group>
+</div>

@@ -1,10 +1,13 @@
 # Headwind MDM — Medtronic Labs fork
 
 Self-hosted Android device management for the Sierra Leone health-worker fleet.
+This upgrade branch targets server 7.03.1 and Android 6.39. See
+[the upgrade notes](docs/UPGRADE-v7.md) before using an existing database.
 A fork of [Headwind MDM](https://h-mdm.com) (Apache-2.0) with three plugins added.
 
-This repository is self-contained. It builds from the source in `hmdm-server/`
-and pulls nothing from the upstream project at build or run time.
+It builds the server and custom plugins from `hmdm-server/`. Version 7 also
+downloads the upstream plugin-platform dependency from Headwind's Maven
+repository at build time. The runtime does not download Headwind source.
 
 ---
 

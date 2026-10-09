@@ -1,0 +1,96 @@
+<form [formGroup]="formGroup">
+  <hmdm-text-input
+    formControlName="name"
+    [label]="'form.application.name' | translate"
+  ></hmdm-text-input>
+
+  <div class="form-row form-row--cols-2">
+    <hmdm-text-input
+      formControlName="pkg"
+      [label]="'form.application.pkg' | translate"
+    ></hmdm-text-input>
+
+    <hmdm-text-input
+      formControlName="version"
+      [label]="'form.application.version' | translate"
+    ></hmdm-text-input>
+  </div>
+
+  <!--
+    <hmdm-selector
+      formControlName="arch"
+      [label]="'form.application.arch' | translate"
+      [options]="architectureOptions"
+    ></hmdm-selector>
+  -->
+
+  <hmdm-checkbox
+    formControlName="system"
+    [label]="'form.application.system' | translate"
+  ></hmdm-checkbox>
+
+  <hmdm-checkbox
+    formControlName="runAfterInstall"
+    [label]="'form.application.run.after.install' | translate"
+  ></hmdm-checkbox>
+
+  <hmdm-checkbox
+    formControlName="runAtBoot"
+    [label]="'form.application.run.at.boot' | translate"
+  ></hmdm-checkbox>
+
+  <hmdm-text-input
+    formControlName="url"
+    [label]="'form.application.url' | translate"
+  ></hmdm-text-input>
+
+  <hmdm-file-input
+    [label]="'form.application.file' | translate"
+    [showError]="false"
+    formControlName="file"
+  ></hmdm-file-input>
+
+  @if (availableSpaceWarning() !== null) {
+    <p class="storage-warning">
+      {{ 'form.file.available' | translate: { space: availableSpaceWarning() } }}
+    </p>
+  }
+
+  @if (uploadStatus() !== 'idle' && !versionExists()) {
+    <div class="upload-status">
+      @if (uploadStatus() === 'uploading') {
+        @if (uploadProgress()) {
+          <mat-progress-bar mode="determinate" [value]="uploadProgress()"></mat-progress-bar>
+          <span class="upload-status__label">{{ uploadProgress() }}%</span>
+        } @else {
+          <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        }
+      }
+      @if (uploadStatus() === 'processing') {
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        <span class="upload-status__label">
+          {{ 'form.application.file.processing' | translate }}
+        </span>
+      }
+      @if (uploadStatus() === 'success') {
+        <span class="upload-status__success">
+          <mat-icon>check</mat-icon>
+          {{ 'success.file.uploaded' | translate }}
+        </span>
+      }
+      @if (uploadStatus() === 'error') {
+        <span class="upload-status__error">
+          <mat-icon>error</mat-icon>
+          {{ 'error.file.upload' | translate }}
+        </span>
+      }
+    </div>
+  }
+
+  @if (versionExists()) {
+    <div class="version-exists-warning">
+      <mat-icon>warning</mat-icon>
+      {{ 'form.application.version.exists' | translate }}
+    </div>
+  }
+</form>

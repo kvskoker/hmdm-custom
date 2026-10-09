@@ -1,0 +1,39 @@
+<div class="dialog">
+  <div class="dialog-top">
+    <h4 class="dialog-title">
+      @if (!pluginLicenseKeyData()?.valid) {
+        {{'missing.license.expired' | translate}}
+      } @else {
+        {{ 'missing.license.expires.in' | translate: {days: pluginLicenseKeyData()?.expiryDays} }}
+      }
+    </h4>
+  </div>
+
+  <div class="dialog-content">
+    <hmdm-textarea-input
+      [label]="'tab.license' | translate"
+      [rows]="4"
+      [formControl]="licenseKeyControl"
+      [showError]="true"
+    >
+    </hmdm-textarea-input>
+  </div>
+
+  <div class="dialog-actions">
+    <button matButton (click)="cancel()">{{'button.cancel' | translate}}</button>
+    @if (pluginLicenseKeyData()?.purchaseLink) {
+      <a
+        matButton
+        [href]="pluginLicenseKeyData()?.purchaseLink"
+        target="_blank"
+      >
+        {{ 'missing.license.button.purchase' | translate }}
+      </a>
+    }
+    <button
+      matButton="filled"
+      [disabled]="!licenseKeyControl.value"
+      (click)="submit()"
+    >{{'button.save' | translate}}</button>
+  </div>
+</div>

@@ -23,13 +23,16 @@ package com.hmdm.plugins.messaging;
 
 import com.google.inject.Module;
 import com.hmdm.plugin.PluginConfiguration;
+import com.hmdm.plugin.PluginTaskModule;
 import com.hmdm.plugins.messaging.guice.module.MessagingLiquibaseModule;
 import com.hmdm.plugins.messaging.guice.module.MessagingPersistenceModule;
 import com.hmdm.plugins.messaging.guice.module.MessagingRestModule;
 
-import javax.servlet.ServletContext;
+import com.hmdm.plugins.messaging.guice.module.MessagingTaskModule;
+import jakarta.servlet.ServletContext;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * <p>A configuration for <code>Messaging</code> plugin.</p>
@@ -82,5 +85,20 @@ public class MessagingPluginConfigurationImpl implements PluginConfiguration {
         modules.add(new MessagingRestModule());
 
         return modules;
+    }
+
+    /**
+     * <p>Gets the list of task modules to be initialized upon application startup.</p>
+     *
+     * @param context a context for plugin usage.
+     * @return an optional list of task modules for plugins.
+     */
+    @Override
+    public Optional<List<Class<? extends PluginTaskModule>>> getTaskModules(ServletContext context) {
+        List<Class<? extends PluginTaskModule>> modules = new ArrayList<>();
+
+        modules.add(MessagingTaskModule.class);
+
+        return Optional.of(modules);
     }
 }

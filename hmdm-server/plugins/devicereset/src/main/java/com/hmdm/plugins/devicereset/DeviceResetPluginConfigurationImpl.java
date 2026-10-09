@@ -6,7 +6,7 @@ import com.hmdm.plugins.devicereset.guice.module.DeviceResetLiquibaseModule;
 import com.hmdm.plugins.devicereset.guice.module.DeviceResetPersistenceModule;
 import com.hmdm.plugins.devicereset.guice.module.DeviceResetRestModule;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -21,8 +21,9 @@
 
 package com.hmdm.guice.module;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
+import liquibase.resource.ClassLoaderResourceAccessor;
 import liquibase.resource.FileSystemResourceAccessor;
 import liquibase.resource.ResourceAccessor;
 
@@ -49,16 +50,7 @@ public class LiquibaseModule extends AbstractLiquibaseModule {
      * @return a path to resource with Db change log.
      */
     protected String getChangeLogResourcePath() {
-        return this.getClass().getResource("/liquibase/db.changelog.xml").getPath();
+        return "classpath:liquibase/db.changelog.xml";
     }
 
-    /**
-     * <p>Gets the resource accessor to be uused for loading the change log file.</p>
-     *
-     * @return a resource accessor for change log file.
-     */
-    @Override
-    protected ResourceAccessor getResourceAccessor() {
-        return new FileSystemResourceAccessor();
-    }
 }

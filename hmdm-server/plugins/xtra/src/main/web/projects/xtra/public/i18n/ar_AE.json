@@ -1,0 +1,15 @@
+{
+  "xtra.plugin.title": "المزيد من الميزات في Headwind MDM Enterprise!",
+  "xtra.plugin.content.description": "ترقية نسختك إلى نسخة تجريبية أمر سهل للغاية ومجاني تمامًا!",
+  "xtra.plugin.content.button": "احصل على تجربة مجانية",
+  "xtra.plugin.kiosk-mode": "وضع الكشك (مهمة واحدة)",
+  "xtra.plugin.device-location-tracking": "تتبع موقع الجهاز",
+  "xtra.plugin.remote-management": "إعادة التشغيل عن بعد، القفل، وإعادة ضبط المصنع",
+  "xtra.plugin.upload-photos": "رفع الصور من الأجهزة",
+  "xtra.plugin.remote-control": "التحكم عن بعد",
+  "xtra.plugin.traffic-filtering": "تصفية حركة مرور الشبكة",
+  "xtra.plugin.two-factor-authentication": "المصادقة الثنائية",
+  "xtra.plugin.export-import-devices": "تصدير واستيراد الأجهزة",
+  "xtra.plugin.device-contacts-management": "إدارة جهات اتصال الجهاز",
+  "xtra.plugin.white-label": "برمجيات White-label (إعادة تسمية العلامة التجارية)"
+}

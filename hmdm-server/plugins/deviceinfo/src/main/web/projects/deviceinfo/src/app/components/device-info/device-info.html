@@ -1,0 +1,164 @@
+@if (details(); as deviceInfo) {
+  @if (deviceInfo.latestDynamicData && splitData(); as data) {
+    <div class="info">
+      <table class="table">
+        <tr>
+          <th>{{ 'plugin.deviceinfo.title.time' | translate }}</th>
+          <td>
+            {{ deviceInfo.latestDynamicData.latestUpdateTime | date: 'dd.MM.yy HH:mm:ss' }}
+            @if (deviceInfo.latestDynamicData.latestUpdateTime) {
+              <span>
+                ({{ deviceInfo.latestDynamicData.latestUpdateInterval }}
+                {{
+                  'plugin.deviceinfo.enum.time.' +
+                    deviceInfo.latestDynamicData.latestUpdateIntervalType | translate
+                }})
+              </span>
+            }
+          </td>
+        </tr>
+
+        <!-- Main -->
+        @if (data.deviceData['deviceDataIncluded']?.value) {
+          <tr>
+            <th colspan="2" class="text-center">
+              {{ 'plugin.deviceinfo.title.group.device' | translate }}
+            </th>
+          </tr>
+          @for (field of deviceFieldsOrder; track field) {
+            @if (data.deviceData[field]; as item) {
+              <tr>
+                <th>{{ 'plugin.deviceinfo.title.group.' + item.name | translate }}</th>
+                @if (item.isBoolean) {
+                  <td>
+                    {{ 'plugin.deviceinfo.boolean.' + item.value | translate }}
+                  </td>
+                } @else {
+                  <td>
+                    {{ item.value }}
+                  </td>
+                }
+              </tr>
+            }
+          }
+        }
+
+        <!-- Wi-Fi -->
+        @if (data.wifiData['wifiDataIncluded']?.value) {
+          <tr>
+            <th colspan="2" class="text-center">
+              {{ 'plugin.deviceinfo.title.group.wifi' | translate }}
+            </th>
+          </tr>
+          @for (field of wifiFieldsOrder; track field) {
+            @if (data.wifiData[field]; as item) {
+              <tr>
+                <th>{{ 'plugin.deviceinfo.title.group.' + item.name | translate }}</th>
+                @if (item.isBoolean) {
+                  <td>
+                    {{ 'plugin.deviceinfo.boolean.' + item.value | translate }}
+                  </td>
+                } @else if (item.isEnumerated) {
+                  <td>
+                    {{ 'plugin.deviceinfo.state.' + field + '.' + item.value | translate }}
+                  </td>
+                } @else {
+                  <td>
+                    {{ item.value }}
+                  </td>
+                }
+              </tr>
+            }
+          }
+        }
+
+        <!-- GPS -->
+        @if (data.gpsData['gpsDataIncluded']?.value) {
+          <tr>
+            <th colspan="2" class="text-center">
+              {{ 'plugin.deviceinfo.title.group.gps' | translate }}
+            </th>
+          </tr>
+          @for (field of gpsFieldsOrder; track field) {
+            @if (data.gpsData[field]; as item) {
+              <tr>
+                <th>{{ 'plugin.deviceinfo.title.group.' + item.name | translate }}</th>
+                @if (item.isBoolean) {
+                  <td>
+                    {{ 'plugin.deviceinfo.boolean.' + item.value | translate }}
+                  </td>
+                } @else if (item.isEnumerated) {
+                  <td>
+                    {{ 'plugin.deviceinfo.state.' + field + '.' + item.value | translate }}
+                  </td>
+                } @else {
+                  <td>
+                    {{ item.value }}
+                  </td>
+                }
+              </tr>
+            }
+          }
+        }
+
+        <!-- Mobile #1 -->
+        @if (data.mobile1Data['mobile1DataIncluded']?.value) {
+          <tr>
+            <th colspan="2" class="text-center">
+              {{ 'plugin.deviceinfo.title.group.mobile1' | translate }}
+            </th>
+          </tr>
+          @for (field of mobile1FieldsOrder; track field) {
+            @if (data.mobile1Data[field]; as item) {
+              <tr>
+                <th>{{ 'plugin.deviceinfo.title.group.' + item.name | translate }}</th>
+                @if (item.isBoolean) {
+                  <td>
+                    {{ 'plugin.deviceinfo.boolean.' + item.value | translate }}
+                  </td>
+                } @else if (item.isEnumerated) {
+                  <td>
+                    {{ 'plugin.deviceinfo.state.' + field + '.' + item.value | translate }}
+                  </td>
+                } @else {
+                  <td>
+                    {{ item.value }}
+                  </td>
+                }
+              </tr>
+            }
+          }
+        }
+
+        <!-- Mobile #2 -->
+        @if (data.mobile2Data['mobile2DataIncluded']?.value) {
+          <tr>
+            <th colspan="2" class="text-center">
+              {{ 'plugin.deviceinfo.title.group.mobile2' | translate }}
+            </th>
+          </tr>
+          @for (field of mobile2FieldsOrder; track field) {
+            @if (data.mobile2Data[field]; as item) {
+              <tr>
+                <th>{{ 'plugin.deviceinfo.title.group.' + item.name | translate }}</th>
+                @if (item.isBoolean) {
+                  <td>
+                    {{ 'plugin.deviceinfo.boolean.' + item.value | translate }}
+                  </td>
+                } @else if (item.isEnumerated) {
+                  <td>
+                    {{ 'plugin.deviceinfo.state.' + field + '.' + item.value | translate }}
+                  </td>
+                } @else {
+                  <td>
+                    {{ item.value }}
+                  </td>
+                }
+              </tr>
+            }
+          }
+        }
+      </table>
+    </div>
+  }
+}

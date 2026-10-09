@@ -1,0 +1,13 @@
+<hmdm-dialog-template>
+  <core-edit-version-form
+    [initialData]="initialData"
+    (formChange)="onFormChange($event)"
+  ></core-edit-version-form>
+
+  <hmdm-dialog-common-buttons
+    dialog-actions
+    [isSaveDisabled]="isFormInvalid"
+    (cancel)="onCancel()"
+    (save)="onSave()"
+  ></hmdm-dialog-common-buttons>
+</hmdm-dialog-template>

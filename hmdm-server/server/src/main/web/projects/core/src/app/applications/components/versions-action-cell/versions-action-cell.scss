@@ -1,0 +1,18 @@
+@use '@angular/material' as mat;
+.cell {
+  width: 100%;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+
+  @include mat.icon-overrides(
+    (
+      color: var(--mat-sys-on-primary),
+    )
+  );
+
+  // icon-overrides fixes the icon color, so mark a disabled button explicitly
+  button:disabled mat-icon {
+    color: var(--mat-sys-outline);
+  }
+}

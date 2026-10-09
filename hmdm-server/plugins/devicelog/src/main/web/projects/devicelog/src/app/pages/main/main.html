@@ -1,0 +1,39 @@
+<div class="logs scroll-content">
+  <mat-card class="card scroll-content" [hmdmLoader]="isLoadingMessages()">
+    <mat-card-title class="card-title">
+      <h3>{{ 'plugin.devicelog.tab.title' | translate }}</h3>
+
+      <hmdm-search-container
+        persistKey="logs-search-control"
+        [searchControl]="tableSearchControl"
+        [filtersTemplate]="filtersTemplate"
+        [activeFiltersCount]="activeFiltersCount()"
+        [showSearchButton]="false"
+      ></hmdm-search-container>
+
+      <ng-template #filtersTemplate>
+        <logs-search-form
+          persistFormKey="logs-search-form"
+          [formGroup]="formGroup"
+          [hmdmPersistForm]="formGroup"
+        ></logs-search-form>
+      </ng-template>
+
+      <button matButton="filled" class="card-btn primary" (click)="onExportClick()">
+        <mat-icon>file_download</mat-icon>
+        {{ 'button.export' | translate }}
+      </button>
+    </mat-card-title>
+
+    <mat-divider></mat-divider>
+
+    <mat-card-content class="card-content scroll-content">
+      <div class="card-inner scroll-content">
+        @if (isUpdatingSilently()) {
+          <mat-spinner class="update-spinner" diameter="30"></mat-spinner>
+        }
+        <logs-table #table class="scroll-table"></logs-table>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
