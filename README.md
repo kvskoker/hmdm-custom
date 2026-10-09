@@ -82,6 +82,40 @@ what the server advertises to devices in QR codes and APK download URLs, so
 
 ---
 
+## Port conflicts
+
+Set host ports in `.env`, above the generated `derived by deploy` block:
+
+```ini
+HMDM_HTTP_PORT=8088
+DB_HOST_PORT=5434
+MQTT_HOST_PORT=31000
+CADDY_HTTP_PORT=80
+CADDY_HTTPS_PORT=443
+```
+
+Then run `bash ./deploy.sh up` (Windows: `.\deploy.ps1 up`). No image rebuild
+is needed for a port change. Existing database and file volumes are retained.
+Do not edit the generated `PANEL_PUBLISH` or `DB_PUBLISH` entries: the scripts
+derive those from the settings above. Invalid port numbers are rejected.
+
+In production, changing `HMDM_HTTP_PORT` moves only the loopback binding, for
+example to `127.0.0.1:8088`. The public address remains `https://your-domain`;
+Caddy still connects internally to `hmdm:8080`, and QR URLs do not change.
+In development, the advertised address and QR URLs use the selected port,
+for example `http://192.168.1.50:8088`. Match the launcher build URLs to it.
+
+Changing `MQTT_HOST_PORT` changes the external push port, not the container's
+31000 listener. Configure the launcher with `-PhmdmMqttPort=YOUR_PORT` and
+update firewall rules. Existing launchers are not automatically reconfigured.
+Keep 31000 unless you have planned that device-side change.
+
+The Caddy port options are for setups forwarding public TCP 80/443 to different
+host ports. Changing them alone does not change the advertised HTTPS URL or
+make certificate validation work on arbitrary ports. If another web server
+already owns public 80/443, arrange reverse proxying/certificate handling before
+starting this stack's Caddy; do not stop the other application blindly.
+
 ## Why port 31000 is published in both modes
 
 Push notifications use MQTT, which is a raw TCP connection rather than HTTP.

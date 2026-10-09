@@ -79,7 +79,7 @@ services:
       - "${PANEL_PUBLISH:-8080}:8080"
       # MQTT push. Always published: devices open a raw TCP connection here,
       # which a reverse proxy cannot carry.
-      - "31000:31000"
+      - "${MQTT_HOST_PORT:-31000}:31000"
     volumes:
       - hmdmdata:/opt/hmdm
 
@@ -98,8 +98,8 @@ services:
       LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL:-}
       CADDY_CA: ${CADDY_CA:-https://acme-v02.api.letsencrypt.org/directory}
     ports:
-      - "80:80"
-      - "443:443"
+      - "${CADDY_HTTP_PORT:-80}:80"
+      - "${CADDY_HTTPS_PORT:-443}:443"
     volumes:
       - ./docker/Caddyfile:/etc/caddy/Caddyfile:ro
       - caddydata:/data      # certificates live here - keep this volume

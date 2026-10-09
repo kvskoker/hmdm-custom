@@ -30,8 +30,12 @@ if (-not (Test-Path .env)) {
     exit 1
 }
 
-# Load .env into the process environment so docker compose sees it.
+# Ignore the generated block, just as deploy.sh does.
+$skipDerived = $false
 Get-Content .env | ForEach-Object {
+    if ($_ -match '^# ---- derived by deploy\.(sh|ps1) from DEPLOY_MODE') { $skipDerived = $true; return }
+    if ($_ -eq '# ---- end derived block ----') { $skipDerived = $false; return }
+    if ($skipDerived) { return }
     if ($_ -match '^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$') {
         $v = $Matches[2].Trim().Trim('"')
         [Environment]::SetEnvironmentVariable($Matches[1], $v, 'Process')
@@ -42,23 +46,40 @@ $mode   = if ($env:DEPLOY_MODE) { $env:DEPLOY_MODE } else { 'dev' }
 $domain = $env:HMDM_DOMAIN
 if (-not $domain) { throw "set HMDM_DOMAIN in .env" }
 
+$portDefaults = @{
+    HMDM_HTTP_PORT = 8080
+    DB_HOST_PORT = 5433
+    MQTT_HOST_PORT = 31000
+    CADDY_HTTP_PORT = 80
+    CADDY_HTTPS_PORT = 443
+}
+foreach ($name in $portDefaults.Keys) {
+    $value = [Environment]::GetEnvironmentVariable($name, 'Process')
+    if (-not $value) { $value = [string]$portDefaults[$name] }
+    $port = 0
+    if ($value -notmatch '^[0-9]{1,5}$' -or -not [int]::TryParse($value, [ref]$port) -or $port -lt 1 -or $port -gt 65535) {
+        throw "$name must be a port number from 1 to 65535"
+    }
+    [Environment]::SetEnvironmentVariable($name, [string]$port, 'Process')
+}
+
 switch ($mode) {
     'prod' {
         if (-not $env:LETSENCRYPT_EMAIL) { throw "set LETSENCRYPT_EMAIL in .env - Let's Encrypt requires it" }
         $env:COMPOSE_PROFILES = 'prod'
         $env:HMDM_PROTOCOL    = 'https'
         $env:HMDM_BASE_HOST   = $domain
-        $env:PANEL_PUBLISH    = '127.0.0.1:8080'
-        $env:DB_PUBLISH       = '127.0.0.1:5433'
+        $env:PANEL_PUBLISH    = "127.0.0.1:$($env:HMDM_HTTP_PORT)"
+        $env:DB_PUBLISH       = "127.0.0.1:$($env:DB_HOST_PORT)"
         if (-not $env:PROXY_ADDRESSES) { $env:PROXY_ADDRESSES = '172.16.0.0/12' }
         if (-not $env:PROXY_IP_HEADER) { $env:PROXY_IP_HEADER = 'X-Real-IP' }
     }
     'dev' {
         $env:COMPOSE_PROFILES = ''
         $env:HMDM_PROTOCOL    = 'http'
-        $env:HMDM_BASE_HOST   = "${domain}:8080"
-        $env:PANEL_PUBLISH    = '8080'
-        $env:DB_PUBLISH       = '5433'
+        $env:HMDM_BASE_HOST   = "${domain}:$($env:HMDM_HTTP_PORT)"
+        $env:PANEL_PUBLISH    = $env:HMDM_HTTP_PORT
+        $env:DB_PUBLISH       = $env:DB_HOST_PORT
         $env:PROXY_ADDRESSES  = ''
         $env:PROXY_IP_HEADER  = ''
     }
@@ -96,11 +117,11 @@ Copy-Item .env .env.bak -Force
 Set-Content -Path .env -Value ($kept + '' + $block) -Encoding ascii
 
 function Show-Banner {
-    $panel = if ($mode -eq 'dev') { "$($env:HMDM_PROTOCOL)://${domain}:8080" } else { "$($env:HMDM_PROTOCOL)://$domain" }
+    $panel = "$($env:HMDM_PROTOCOL)://$($env:HMDM_BASE_HOST)"
     Write-Host ""
     Write-Host "  mode     $mode"
     Write-Host "  panel    $panel"
-    Write-Host "  devices  advertised as $($env:HMDM_PROTOCOL)://$($env:HMDM_BASE_HOST), MQTT on ${domain}:31000"
+    Write-Host "  devices  advertised as $($env:HMDM_PROTOCOL)://$($env:HMDM_BASE_HOST), MQTT host port $($env:MQTT_HOST_PORT)"
     Write-Host ""
 }
 

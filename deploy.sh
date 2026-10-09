@@ -40,6 +40,21 @@ set -a; . /dev/stdin <<< "$USER_ENV"; set +a
 : "${DEPLOY_MODE:=dev}"
 : "${HMDM_DOMAIN:?set HMDM_DOMAIN in .env}"
 
+: "${HMDM_HTTP_PORT:=8080}"
+: "${DB_HOST_PORT:=5433}"
+: "${MQTT_HOST_PORT:=31000}"
+: "${CADDY_HTTP_PORT:=80}"
+: "${CADDY_HTTPS_PORT:=443}"
+for name in HMDM_HTTP_PORT DB_HOST_PORT MQTT_HOST_PORT CADDY_HTTP_PORT CADDY_HTTPS_PORT; do
+  value="${!name}"
+  if [[ ! "$value" =~ ^[0-9]{1,5}$ ]] || (( 10#$value < 1 || 10#$value > 65535 )); then
+    echo "$name must be a port number from 1 to 65535" >&2
+    exit 1
+  fi
+  printf -v "$name" '%d' "$((10#$value))"
+  export "$name"
+done
+
 case "$DEPLOY_MODE" in
   prod)
     : "${LETSENCRYPT_EMAIL:?set LETSENCRYPT_EMAIL in .env - Let us Encrypt requires it}"
@@ -48,8 +63,8 @@ case "$DEPLOY_MODE" in
     # Devices reach the panel on 443 through Caddy, so the advertised host
     # carries no port. Tomcat is bound to loopback; only Caddy talks to it.
     HMDM_BASE_HOST="$HMDM_DOMAIN"
-    PANEL_PUBLISH="127.0.0.1:8080"
-    DB_PUBLISH="127.0.0.1:5433"
+    PANEL_PUBLISH="127.0.0.1:$HMDM_HTTP_PORT"
+    DB_PUBLISH="127.0.0.1:$DB_HOST_PORT"
     # Caddy is the only thing in front of Tomcat. Trusting the whole Docker
     # bridge range is safe here because nothing else can reach the container.
     PROXY_ADDRESSES="${PROXY_ADDRESSES:-172.16.0.0/12}"
@@ -58,9 +73,9 @@ case "$DEPLOY_MODE" in
   dev)
     COMPOSE_PROFILES=""
     HMDM_PROTOCOL=http
-    HMDM_BASE_HOST="$HMDM_DOMAIN:8080"
-    PANEL_PUBLISH="8080"
-    DB_PUBLISH="5433"
+    HMDM_BASE_HOST="$HMDM_DOMAIN:$HMDM_HTTP_PORT"
+    PANEL_PUBLISH="$HMDM_HTTP_PORT"
+    DB_PUBLISH="$DB_HOST_PORT"
     PROXY_ADDRESSES=""
     PROXY_IP_HEADER=""
     ;;
@@ -91,8 +106,8 @@ cp .env .env.bak
 banner() {
     echo
     echo "  mode     $DEPLOY_MODE"
-    echo "  panel    $HMDM_PROTOCOL://$HMDM_DOMAIN$( [ "$DEPLOY_MODE" = dev ] && echo :8080 )"
-    echo "  devices  advertised as $HMDM_PROTOCOL://$HMDM_BASE_HOST, MQTT on $HMDM_DOMAIN:31000"
+    echo "  panel    $HMDM_PROTOCOL://$HMDM_BASE_HOST"
+    echo "  devices  advertised as $HMDM_PROTOCOL://$HMDM_BASE_HOST, MQTT host port $MQTT_HOST_PORT"
     echo
 }
 
