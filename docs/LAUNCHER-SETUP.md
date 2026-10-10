@@ -65,7 +65,20 @@ set them explicitly before deploying a new fleet. Use the same private value for
 server `.env` setting `HMDM_SHARED_SECRET` and, on the APK build computer, the
 user-level `~/.gradle/gradle.properties` setting `hmdmRequestSignature` (Windows:
 `%USERPROFILE%\.gradle\gradle.properties`). Do not put the real value in Git.
-Use a long random value consisting of letters, digits, underscores and hyphens.
+Punctuation, quotes, backslashes and spaces are supported; control characters
+and line breaks are not. The server escapes XML and the APK build escapes Java
+string literals without changing the secret. Do not manually XML-escape it.
+In `.env`, single-quote values containing dollar signs, hashes or shell syntax,
+for example `HMDM_SHARED_SECRET='example-only!$#&<>"\\'` (not a real secret).
+For a value containing a literal single quote, avoid shell-quoting ambiguity:
+leave its `.env` entry commented out and provide `HMDM_SHARED_SECRET` through
+the process environment instead. On Linux, `read -r -s -p 'Shared secret: ' HMDM_SHARED_SECRET`
+followed by `export HMDM_SHARED_SECRET` preserves punctuation without displaying
+it; run `deploy.sh` in that same shell. Supply it again for future deployments.
+On Windows, use a secret manager to populate the process environment. In Java
+`gradle.properties`, quotes are literal and backslashes require escaping; using
+the build process environment avoids that file-format ambiguity. Preserve any
+leading/trailing spaces intentionally present in the original secret.
 The APK build also accepts `HMDM_SHARED_SECRET` from its process environment;
 an explicit Gradle property takes precedence. The server's `.env` is not loaded
 automatically by Gradle.

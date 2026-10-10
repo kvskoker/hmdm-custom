@@ -10,6 +10,7 @@ $pwsh = (Get-Process -Id $PID).Path
 $names = @('DEPLOY_MODE', 'HMDM_DOMAIN', 'LETSENCRYPT_EMAIL', 'SQL_PASS', 'COMPOSE_PROFILES', 'HMDM_PROTOCOL', 'HMDM_BASE_HOST', 'PANEL_PUBLISH', 'DB_PUBLISH', 'PROXY_ADDRESSES', 'PROXY_IP_HEADER', 'HMDM_HTTP_PORT', 'DB_HOST_PORT', 'MQTT_HOST_PORT', 'CADDY_HTTP_PORT', 'CADDY_HTTPS_PORT')
 $saved = @{}
 $names += 'HMDM_PROXY'
+$names += 'HMDM_SHARED_SECRET'
 foreach ($name in $names) {
     $saved[$name] = [Environment]::GetEnvironmentVariable($name)
     [Environment]::SetEnvironmentVariable($name, $null)
@@ -25,6 +26,8 @@ try {
             $mode = if ($scenario -eq 'external') { 'prod' } else { $scenario }
             foreach ($custom in @($false, $true)) {
                 $envText = "DEPLOY_MODE=$mode`nHMDM_DOMAIN=mdm.example.com`nLETSENCRYPT_EMAIL=test@example.com`nSQL_PASS=test-only`n"
+                $fixtureSecret = ' fixture!$#&"<> \value '
+                $envText += "HMDM_SHARED_SECRET='$fixtureSecret'`n"
                 if ($scenario -eq 'external') {
                     $envText = $envText.Replace('LETSENCRYPT_EMAIL=test@example.com', 'LETSENCRYPT_EMAIL=')
                     $envText += "HMDM_PROXY=external`n"
@@ -43,6 +46,8 @@ try {
                     }
                     Assert ($LASTEXITCODE -eq 0) "$shell $mode failed"
                     $config = ($output -join "`n") | ConvertFrom-Json
+                    # Compose escapes literal dollars when serializing reusable config.
+                    Assert ($config.services.hmdm.environment.HMDM_SHARED_SECRET -ceq $fixtureSecret.Replace('$', '$$')) 'Shared secret changed during .env loading'
                     $port = if ($custom) { 8088 } else { 8080 }
                     $hostPort = $config.services.hmdm.ports | Where-Object target -eq 8080
                     Assert ($hostPort.published -eq "$port") 'Incorrect panel port'

@@ -37,7 +37,10 @@ Get-Content .env | ForEach-Object {
     if ($_ -eq '# ---- end derived block ----') { $skipDerived = $false; return }
     if ($skipDerived) { return }
     if ($_ -match '^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$') {
-        $v = $Matches[2].Trim().Trim('"')
+        $v = $Matches[2].Trim()
+        if ($v.Length -ge 2 -and (($v.StartsWith('"') -and $v.EndsWith('"')) -or ($v.StartsWith("'") -and $v.EndsWith("'")))) {
+            $v = $v.Substring(1, $v.Length - 2)
+        }
         [Environment]::SetEnvironmentVariable($Matches[1], $v, 'Process')
     }
 }

@@ -51,9 +51,11 @@ ext.hmdmBaseUrl        = hmdmProp('hmdmBaseUrl',      'HMDM_BASE_URL',      'htt
 ext.hmdmSecondaryUrl   = hmdmProp('hmdmSecondaryUrl', 'HMDM_SECONDARY_URL', ext.hmdmBaseUrl)
 ext.hmdmServerProject  = hmdmProp('hmdmServerProject','HMDM_SERVER_PROJECT','')
 ext.hmdmMqttPort       = hmdmProp('hmdmMqttPort',     'HMDM_MQTT_PORT',     '31000')
-ext.hmdmRequestSignature = hmdmProp('hmdmRequestSignature', 'HMDM_SHARED_SECRET', 'changeme-C3z9vi54')
-if (!(ext.hmdmRequestSignature ==~ /[A-Za-z0-9_-]+/)) {
-    throw new GradleException('Shared secret must contain only letters, digits, underscores or hyphens')
+// Unlike URLs, secrets must not be trimmed or interpolated into Java source.
+ext.hmdmRequestSignature = (project.findProperty('hmdmRequestSignature') ?:
+        System.getenv('HMDM_SHARED_SECRET') ?: 'changeme-C3z9vi54').toString()
+if (ext.hmdmRequestSignature =~ /[\x00-\x1f\x7f]/) {
+    throw new GradleException('Shared secret must not contain control characters or line breaks')
 }
 
 println "[hmdm] BASE_URL=${ext.hmdmBaseUrl}  SECONDARY=${ext.hmdmSecondaryUrl}  MQTT_PORT=${ext.hmdmMqttPort}"
@@ -115,7 +117,7 @@ android {
         // Not recommended for security purposes!
         buildConfigField("Boolean", "TRUST_ANY_CERTIFICATE", "false")
         // A shared secret to sign server config requests and MQTT (Push) messages
-        buildConfigField("String", "REQUEST_SIGNATURE", "\"${hmdmRequestSignature}\"")
+        buildConfigField("String", "REQUEST_SIGNATURE", groovy.json.JsonOutput.toJson(hmdmRequestSignature))
         // Set this parameter to true if the server signature should be checked
         // (additional protection against Man-In-The-Middle attacks)
         buildConfigField("Boolean", "CHECK_SIGNATURE", "false")

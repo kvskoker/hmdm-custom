@@ -48,15 +48,25 @@ fi
 # --- MQTT shared secret override ---------------------------------------------
 # Match the installed launcher's REQUEST_SIGNATURE; never print the value.
 if [ -n "${HMDM_SHARED_SECRET:-}" ]; then
-  if [[ ! "$HMDM_SHARED_SECRET" =~ ^[A-Za-z0-9_-]+$ ]]; then
-    echo "[hmdm] HMDM_SHARED_SECRET must contain only letters, digits, underscores or hyphens" >&2
+  if LC_ALL=C grep -q '[[:cntrl:]]' <<< "$HMDM_SHARED_SECRET" || [[ "$HMDM_SHARED_SECRET" == *$'\n'* ]]; then
+    echo "[hmdm] HMDM_SHARED_SECRET must not contain control characters or line breaks" >&2
     exit 1
   fi
   if ! grep -q '<Parameter name="hash.secret"' "$CTX"; then
     echo "[hmdm] hash.secret parameter missing from Tomcat context" >&2
     exit 1
   fi
-  sed -i "s|<Parameter name=\"hash.secret\".*|<Parameter name=\"hash.secret\" value=\"${HMDM_SHARED_SECRET}\"/>|" "$CTX"
+  # Escape XML first, then sed replacement syntax. Preserve the actual secret.
+  secret_xml=${HMDM_SHARED_SECRET//&/'&amp;'}
+  secret_xml=${secret_xml//</'&lt;'}
+  secret_xml=${secret_xml//>/'&gt;'}
+  secret_xml=${secret_xml//\"/'&quot;'}
+  secret_xml=${secret_xml//\'/'&apos;'}
+  secret_sed=${secret_xml//\\/'\\'}
+  secret_sed=${secret_sed//&/'\&'}
+  secret_sed=${secret_sed//|/'\|'}
+  sed -i "s|<Parameter name=\"hash.secret\".*|<Parameter name=\"hash.secret\" value=\"${secret_sed}\"/>|" "$CTX"
+  unset secret_xml secret_sed
   echo "[hmdm] shared secret configured from environment"
 fi
 
