@@ -57,6 +57,33 @@ Stop following logs with Ctrl+C; the containers keep running. On a fresh install
 
 ## 2. Prepare the Android build tools
 
+### Match the device authentication secret
+
+MQTT authentication requires the server's `hash.secret` to match the launcher's
+compiled `REQUEST_SIGNATURE`. These legacy defaults differ in this repository;
+set them explicitly before deploying a new fleet. Use the same private value for
+server `.env` setting `HMDM_SHARED_SECRET` and, on the APK build computer, the
+user-level `~/.gradle/gradle.properties` setting `hmdmRequestSignature` (Windows:
+`%USERPROFILE%\.gradle\gradle.properties`). Do not put the real value in Git.
+Use a long random value consisting of letters, digits, underscores and hyphens.
+The APK build also accepts `HMDM_SHARED_SECRET` from its process environment;
+an explicit Gradle property takes precedence. The server's `.env` is not loaded
+automatically by Gradle.
+
+For an already installed fleet, first use the exact value compiled into its APK
+as the server setting. Changing the server alone to a new random value breaks
+MQTT authentication for existing launchers. Rebuild the server image once to
+install the environment-override support; later secret changes need a container
+recreation (`deploy up`), not another build. The secret is separate from your APK
+signing keystore and database/admin passwords. Keep `MQTT_AUTH=1`. After a change,
+test one device's automatic command delivery before rolling out more devices.
+
+The bundled launcher uses plain TCP MQTT, not TLS; the shared secret alone does
+not encrypt this channel. Plan a separately tested TLS/VPN deployment for sensitive
+networks rather than assuming HTTPS also protects port 31000.
+
+### Install the toolchain
+
 Install a **JDK 17** and [Android Studio](https://developer.android.com/studio). In Android Studio's SDK Manager install:
 
 - Android SDK Platform 34.

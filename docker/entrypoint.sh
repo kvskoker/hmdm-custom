@@ -45,6 +45,21 @@ if [ ! -f "$CTX" ] || [ -n "$FORCE_RECONFIGURE" ]; then
   echo "[hmdm] wrote $CTX"
 fi
 
+# --- MQTT shared secret override ---------------------------------------------
+# Match the installed launcher's REQUEST_SIGNATURE; never print the value.
+if [ -n "${HMDM_SHARED_SECRET:-}" ]; then
+  if [[ ! "$HMDM_SHARED_SECRET" =~ ^[A-Za-z0-9_-]+$ ]]; then
+    echo "[hmdm] HMDM_SHARED_SECRET must contain only letters, digits, underscores or hyphens" >&2
+    exit 1
+  fi
+  if ! grep -q '<Parameter name="hash.secret"' "$CTX"; then
+    echo "[hmdm] hash.secret parameter missing from Tomcat context" >&2
+    exit 1
+  fi
+  sed -i "s|<Parameter name=\"hash.secret\".*|<Parameter name=\"hash.secret\" value=\"${HMDM_SHARED_SECRET}\"/>|" "$CTX"
+  echo "[hmdm] shared secret configured from environment"
+fi
+
 # --- first-run database seed --------------------------------------------------
 # Liquibase builds the schema when the webapp deploys, so the seed cannot run
 # before Tomcat. The app writes $INSTALL_FLAG once initialization completes -

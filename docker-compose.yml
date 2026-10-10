@@ -61,6 +61,7 @@ services:
 
       MQTT_BIND: 0.0.0.0
       MQTT_AUTH: ${MQTT_AUTH:-1}
+      HMDM_SHARED_SECRET: ${HMDM_SHARED_SECRET:-}
 
       LANGUAGE: ${LANGUAGE:-en}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@localhost}
