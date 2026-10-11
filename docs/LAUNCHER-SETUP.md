@@ -4,6 +4,37 @@ For this repository: custom Headwind server 7.03.1 and launcher 6.39.
 
 The setup order is **server address -> signed APK -> upload -> configuration -> QR code -> test device**. Building the server does not build the Android APK. You can build the APK on your Windows or Linux computer and upload it through the server's web panel.
 
+## Windows build script (existing signing key)
+
+After installing the Android build tools described below, run this from the
+repository root. Replace the keystore path and alias with your existing key.
+Choose a version code higher than the APK installed on your devices; 15391 is
+only an example.
+
+```powershell
+.\tools\build-launcher.ps1 `
+  -KeystorePath "C:\path\to\your-release.jks" `
+  -KeyAlias "hmdm" `
+  -VersionCode 15391 `
+  -VersionName "6.39-custom.1"
+```
+
+The script reads `HMDM_DOMAIN` from the repository root `.env`. With
+`DEPLOY_MODE=prod` it uses HTTPS; with `DEPLOY_MODE=dev` it uses HTTP and
+`HMDM_HTTP_PORT` (default 8080). A missing domain stops the build. MQTT defaults
+to `31000`. Explicit `-ServerUrl` and `-MqttPort` overrides remain available.
+Use `-SdkPath` or `-JavaHome`
+for nonstandard Android SDK or JDK installations.
+
+It prompts securely for the exact server shared secret, checks the generated
+configuration, builds an unsigned release, then prompts for signing passwords.
+It prints the verified signed APK path and SHA256 hash. Upload that APK using
+the steps below. It does not create a keystore or change the server. Keep the
+existing signing key to update enrolled devices without changing signing identity.
+If conflicting Gradle properties are detected, correct them and rerun the script.
+The shared secret is embedded in the APK and generated build files; do not
+publish those files or commit secrets to Git.
+
 ## 1. Prepare the server address
 
 Use one real, device-accessible address, such as `https://mdm.example.com`. Replace that example everywhere below with your address. For production, use HTTPS with a publicly trusted certificate. `localhost` on a phone means the phone itself, not your server.

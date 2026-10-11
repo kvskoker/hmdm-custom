@@ -1,4 +1,33 @@
-# Deploying the PIN reset plugin to production (mdm.maxcit.com)
+# Deploying the PIN reset plugin to production (historical v5 guide)
+
+> This document records the original v5/Tomcat 9 deployment. Do not run its
+> version checkout, database deletion or WAR replacement steps on the current
+> custom v7 Docker installation. For v7 use [the upgrade guide](UPGRADE-v7.md),
+> [Nginx setup](NGINX-SETUP.md) and [launcher setup](LAUNCHER-SETUP.md).
+
+## Current v7 deployment address
+
+The production hostname is `HMDM_DOMAIN` in the repository root `.env`; it is
+not a fixed domain in this guide. Set `DEPLOY_MODE=prod` for HTTPS. Keep existing
+credentials and set `HMDM_HTTP_PORT` to your Docker host port. The public panel
+and QR download URLs use `https://${HMDM_DOMAIN}`.
+
+From the repository root on the VPS, verify the resolved settings without
+contacting the server:
+
+```bash
+bash tools/diagnose-web-speed.sh --check
+```
+
+For the hostname-aware WebSocket regression test, run this on a development
+machine with Node.js 22.18+ and the configured root `.env`:
+
+```bash
+node tools/test-websocket-url.mjs
+```
+
+The test is offline; it does not connect to the production host. The remaining
+sections below are historical notes, not the current deployment procedure.
 
 ## What is actually being deployed
 

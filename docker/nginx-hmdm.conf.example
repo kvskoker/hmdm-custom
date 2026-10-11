@@ -1,4 +1,5 @@
-# Host-installed Nginx only. Replace the domain and port before enabling.
+# Host-installed Nginx only. Replace the domain with HMDM_DOMAIN from .env
+# and the upstream port with HMDM_HTTP_PORT before enabling.
 # Initial HTTP configuration; enable trusted HTTPS before enrolling devices.
 # If this hostname already has a server block, merge into that block instead.
 map $http_upgrade $hmdm_connection_upgrade {
@@ -8,7 +9,7 @@ map $http_upgrade $hmdm_connection_upgrade {
 
 server {
     listen 80;
-    server_name mdm.maxcit.com;
+    server_name YOUR_HMDM_DOMAIN;
     client_max_body_size 512m;
 
     location / {
