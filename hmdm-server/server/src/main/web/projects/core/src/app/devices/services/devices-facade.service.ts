@@ -53,6 +53,7 @@ export class DevicesFacadeService {
   private formData: TOptional<TSearchDevicesFormValue> | null = null;
   private searchTerm: string = '';
   private lastRequestBody: TSearchDevicesRequest | null = null;
+  exportFilters() { return this.lastRequestBody ? {...this.lastRequestBody} : {value: this.searchTerm || null}; }
   private currentUserId: number | null | undefined = undefined;
 
   deviceSettings: Signal<TDevicesSettingsDTO | null> = this._deviceSettings.asReadonly();

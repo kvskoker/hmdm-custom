@@ -19,6 +19,8 @@
       </ng-template>
 
       <div class="table-actions">
+        <a mat-button routerLink="/home/device-register" [queryParams]="{q: tableSearchControl.value}"><mat-icon>assignment_ind</mat-icon>Assignments</a>
+        <button mat-button (click)="exportDevices()" [disabled]="exporting || isLoadingDevices()"><mat-icon>download</mat-icon>Export Excel</button>
         <button
           *hmdmHasPermission="'edit_devices'"
           matButton="outlined"
@@ -61,6 +63,7 @@
     <mat-divider></mat-divider>
 
     <mat-card-content class="table-content">
+      @if(exportError) { <p role="alert">{{exportError}}</p> }
       <div class="table-inner">
         @if (isUpdatingSilently()) {
           <mat-spinner class="update-spinner" diameter="30"></mat-spinner>

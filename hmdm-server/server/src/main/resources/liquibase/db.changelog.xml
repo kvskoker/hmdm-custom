@@ -2659,4 +2659,19 @@
         </rollback>
     </changeSet>
 
+    <changeSet id="custom-device-register-1" author="hmdm-custom">
+        <sql>
+            CREATE TABLE deviceRegisterSettings (
+                customerId INTEGER PRIMARY KEY REFERENCES customers(id) ON DELETE CASCADE,
+                fields TEXT NOT NULL,
+                inactiveDays INTEGER NOT NULL CHECK (inactiveDays BETWEEN 1 AND 3650)
+            );
+            CREATE TABLE deviceRegisterValues (
+                deviceId INTEGER PRIMARY KEY REFERENCES devices(id) ON DELETE CASCADE,
+                data JSONB NOT NULL DEFAULT '{}'::jsonb,
+                updatedBy INTEGER,
+                updatedAt TIMESTAMP NOT NULL DEFAULT NOW()
+            );
+        </sql>
+    </changeSet>
 </databaseChangeLog>

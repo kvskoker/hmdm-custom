@@ -1,0 +1,15 @@
+@use '@angular/material' as mat;
+:host { display: block; padding: 16px; min-width: 0; @include mat.form-field-density(0); }
+header, .controls { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+h1 { font-size: 24px; margin-right: auto; } h2 { font-size: 18px; }
+section { border-bottom: 1px solid #ccc; padding: 16px 0; margin-bottom: 16px; }
+.controls mat-form-field { flex: 1 1 200px; max-width: 320px; }
+ul { display: flex; flex-wrap: wrap; gap: 12px; padding: 0; list-style: none; }
+li { display: flex; align-items: center; }
+.table-wrap { overflow: auto; width: 100%; }
+table { border-collapse: collapse; min-width: 100%; }
+th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #ddd; min-width: 130px; max-width: 280px; overflow-wrap: anywhere; }
+th { background: #f1f3f5; color: #20252a; }
+th:first-child, td:first-child { position: sticky; left: 0; background: #f1f3f5; }
+.error, .inactive { color: #b42318; }
+@media(max-width:600px) { :host {padding:8px;} h1 {font-size:20px;} .controls mat-form-field {max-width:none;} }

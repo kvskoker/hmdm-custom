@@ -9,6 +9,9 @@ It builds the server and custom plugins from `hmdm-server/`. Version 7 also
 downloads the upstream plugin-platform dependency from Headwind's Maven
 repository at build time. The runtime does not download Headwind source.
 
+For CHW ownership, custom assignment fields, Excel import/export and the
+configurable inactivity policy, see [Device assignments](docs/DEVICE-ASSIGNMENTS.md).
+
 ---
 
 ## Deploy

@@ -22,6 +22,20 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.hmdm.persistence.mapper.DeviceMapper">
+    <sql id="inactiveThreshold">
+        COALESCE((SELECT inactiveDays::bigint * 86400000 FROM deviceRegisterSettings
+                  WHERE customerId = devices.customerId), 2592000000)
+    </sql>
+    <sql id="assignmentFilters">
+        <if test="assignmentField != null and assignmentField != '' and assignmentValue != null">
+            AND EXISTS (SELECT 1 FROM deviceRegisterValues rv WHERE rv.deviceId=devices.id
+                        AND rv.data -&gt;&gt; #{assignmentField} = #{assignmentValue})
+        </if>
+        <if test="inactive != null">
+            AND (COALESCE(devices.lastUpdate, 0) &lt;= 0 OR
+                 EXTRACT(EPOCH FROM NOW()) * 1000 - devices.lastUpdate &gt;= <include refid="inactiveThreshold"/>) = #{inactive}
+        </if>
+    </sql>
 
     <sql id="deviceWithGroupsSelect">
         SELECT devices.id AS deviceId, devices.number, devices.description, devices.lastUpdate,
@@ -103,7 +117,7 @@
                 WHEN 'STATUS' = #{sortBy} THEN
                     (CASE
                         WHEN (EXTRACT(EPOCH FROM NOW()) * 1000 - devices.lastupdate) &lt; (2 * 3600 * 1000) THEN '1_green'
-                        WHEN (EXTRACT(EPOCH FROM NOW()) * 1000 - devices.lastupdate) &lt; (4 * 3600 * 1000) THEN '2_yellow'
+                        WHEN (EXTRACT(EPOCH FROM NOW()) * 1000 - devices.lastupdate) &lt; <include refid="inactiveThreshold"/> THEN '2_yellow'
                         ELSE '3_red'
                     END)::VARCHAR(100)
                 WHEN 'LAST_UPDATE' = #{sortBy} THEN devices.lastUpdate::VARCHAR(100)
@@ -143,6 +157,7 @@
         LEFT JOIN userDeviceGroupsAccess access ON groups.id = access.groupId AND access.userId = users.id
         WHERE devices.customerId = #{customerId}
         AND (users.allDevicesAvailable = TRUE OR NOT access.id IS NULL)
+        <include refid="assignmentFilters"/>
         <if test="value != null &amp;&amp; !fastSearch">
             AND (
             devices.number ILIKE #{value}
@@ -157,6 +172,8 @@
             OR devices.custom1 ILIKE #{value}
             OR devices.custom2 ILIKE #{value}
             OR devices.custom3 ILIKE #{value}
+            OR EXISTS (SELECT 1 FROM deviceRegisterValues rv, jsonb_each_text(rv.data) v
+                       WHERE rv.deviceId=devices.id AND v.value ILIKE #{value})
             OR devices.oldNumber ILIKE #{value}
             OR configurations.name ILIKE #{value}
             OR groups.name ILIKE #{value}
@@ -258,7 +275,7 @@
                applicationVersions.version AS launcherVersion,
                CASE
                    WHEN (EXTRACT(EPOCH FROM NOW()) * 1000 - devices.lastupdate) &lt; (2 * 3600 * 1000) THEN 'green'
-                   WHEN (EXTRACT(EPOCH FROM NOW()) * 1000 - devices.lastupdate) &lt; (4 * 3600 * 1000) THEN 'yellow'
+                   WHEN (EXTRACT(EPOCH FROM NOW()) * 1000 - devices.lastupdate) &lt; <include refid="inactiveThreshold"/> THEN 'yellow'
                    ELSE 'red'
                END AS statusCode
         FROM devices
@@ -285,6 +302,7 @@
         LEFT JOIN userDeviceGroupsAccess access ON groups.id = access.groupId AND access.userId = users.id
         WHERE devices.customerId = #{customerId}
         AND (users.allDevicesAvailable = TRUE OR NOT access.id IS NULL)
+        <include refid="assignmentFilters"/>
         <if test="value != null &amp;&amp; !fastSearch">
             AND (
             devices.number ILIKE #{value}
@@ -299,6 +317,8 @@
             OR devices.custom1 ILIKE #{value}
             OR devices.custom2 ILIKE #{value}
             OR devices.custom3 ILIKE #{value}
+            OR EXISTS (SELECT 1 FROM deviceRegisterValues rv, jsonb_each_text(rv.data) v
+                       WHERE rv.deviceId=devices.id AND v.value ILIKE #{value})
             OR devices.oldNumber ILIKE #{value}
             OR configurations.name ILIKE #{value}
             OR groups.name ILIKE #{value}

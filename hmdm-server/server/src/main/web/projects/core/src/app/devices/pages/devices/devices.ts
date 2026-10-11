@@ -12,6 +12,8 @@ import {
   WritableSignal,
 } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+import { DeviceRegisterService } from '../../services/device-register.service';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -48,6 +50,7 @@ import {DeviceLicenseAlertDialog} from '../../components/device-license-alert-di
   styleUrl: './devices.scss',
   imports: [
     ReactiveFormsModule,
+    RouterLink,
     MatCardModule,
     MatButtonModule,
     MatDivider,
@@ -64,6 +67,16 @@ import {DeviceLicenseAlertDialog} from '../../components/device-license-alert-di
   ],
 })
 export class Devices extends BaseComponent implements OnInit, OnDestroy, AfterViewInit {
+  private readonly registerService = inject(DeviceRegisterService);
+  exporting = false;
+  exportError = '';
+  async exportDevices() {
+    if (this.exporting) return;
+    this.exporting = true; this.exportError = '';
+    try { await this.registerService.export(this.devicesFacadeService.exportFilters()); }
+    catch(e) { this.exportError = this.registerService.error(e); }
+    finally { this.exporting = false; }
+  }
   @ViewChild('table') table!: Table<TDevice>;
   @ViewChild('filtersTemplate', { read: TemplateRef }) filtersTemplate!: TemplateRef<any>;
 

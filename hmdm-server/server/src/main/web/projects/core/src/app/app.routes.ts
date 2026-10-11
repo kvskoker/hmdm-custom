@@ -84,6 +84,10 @@ export const routes: Routes = [
         loadComponent: () => import('./auth/pages/profile/profile').then((m) => m.Profile),
       },
       {
+        path: 'device-register',
+        loadComponent: () => import('./devices/pages/device-register/device-register').then(m => m.DeviceRegister),
+      },
+      {
         path: 'devices',
         loadComponent: () => import('./devices/pages/devices/devices').then((m) => m.Devices),
       },

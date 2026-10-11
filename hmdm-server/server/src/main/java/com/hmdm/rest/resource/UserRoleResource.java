@@ -87,6 +87,7 @@ public class UserRoleResource {
     @Path("/permissions")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getPermissions() {
+        if (!userRoleDAO.hasAccess()) throw new ForbiddenException();
         return Response.OK(this.userRoleDAO.getPermissionsList());
     }
 
@@ -105,6 +106,7 @@ public class UserRoleResource {
     @Path("/all")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllRoles() {
+        if (!userRoleDAO.hasAccess()) throw new ForbiddenException();
         return Response.OK(this.userRoleDAO.findAll());
     }
 

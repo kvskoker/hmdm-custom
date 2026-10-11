@@ -1,0 +1,38 @@
+<header><a mat-icon-button routerLink="/home/devices" matTooltip="Devices" aria-label="Back to devices"><mat-icon>arrow_back</mat-icon></a><h1>Device assignments</h1>
+  <button mat-button (click)="export()" [disabled]="busy"><mat-icon>download</mat-icon>Export Excel</button>
+  <button *hmdmHasPermission="'edit_devices'" mat-button (click)="upload.click()" [disabled]="busy"><mat-icon>upload</mat-icon>Import Excel</button>
+  <input #upload type="file" accept=".xlsx" hidden (change)="importFile($event)">
+  <button *hmdmHasPermission="'settings'" mat-icon-button (click)="showSettings=!showSettings;resetSettings()" [disabled]="busy" matTooltip="Custom fields and inactivity policy" aria-label="Custom fields and inactivity policy"><mat-icon>settings</mat-icon></button>
+</header>
+@if(error){<p role="alert" class="error">{{error}}</p>} @if(notice){<p role="status">{{notice}}</p>}
+@if(showSettings){<section><h2>Fields and inactivity policy</h2>
+  <form (ngSubmit)="saveSettings()" #policy="ngForm">
+    <mat-form-field><mat-label>Inactive after (days)</mat-label><input matInput type="number" name="days" [(ngModel)]="draft.inactiveDays" min="1" max="3650" step="1" required></mat-form-field>
+    <ul>@for(f of draft.fields;track f){<li>{{f}} <button mat-icon-button type="button" (click)="draft.fields.splice($index,1)" [disabled]="busy" matTooltip="Hide field (keep stored values)" aria-label="Hide field"><mat-icon>close</mat-icon></button></li>}</ul>
+    <div class="controls"><mat-form-field><mat-label>New field name</mat-label><input matInput name="newField" [(ngModel)]="newField" maxlength="60"></mat-form-field>
+      <button mat-icon-button type="button" (click)="addField()" [disabled]="busy||draft.fields.length>=30" matTooltip="Add field" aria-label="Add field"><mat-icon>add</mat-icon></button>
+      <button mat-flat-button type="submit" [disabled]="busy||policy.invalid"><mat-icon>save</mat-icon>Save policy</button></div>
+  </form></section>}
+@if(edit){<section><h2>Assignment: {{edit.number}}</h2><form (ngSubmit)="saveEdit()" class="controls">
+  @for(f of settings.fields;track f){<mat-form-field><mat-label>{{f}}</mat-label><input matInput [name]="f" [(ngModel)]="edit.values[f]" maxlength="500"></mat-form-field>}
+  <button mat-flat-button [disabled]="busy||!settings.fields.length"><mat-icon>save</mat-icon>Save</button><button mat-button type="button" (click)="edit=null" [disabled]="busy">Cancel</button>
+</form></section>}
+@if(preview){<section><h2>Import preview: {{preview.rows.length}} devices</h2><div class="table-wrap"><table><thead><tr><th>Device number</th>@for(f of preview.fields;track f){<th>{{f}}</th>}</tr></thead><tbody>
+  @for(r of preview.rows.slice(previewPage*25,previewPage*25+25);track r.number){<tr><td>{{r.number}}</td>@for(f of preview.fields;track f){<td>{{r.values[f]===undefined ? '(unchanged)' : r.values[f]}}</td>}</tr>}
+  </tbody></table></div><mat-paginator [length]="preview.rows.length" [pageSize]="25" [pageIndex]="previewPage" (page)="previewPage=$event.pageIndex"></mat-paginator>
+  <mat-checkbox [(ngModel)]="confirm">Replace supplied fields, including clearing blank cells</mat-checkbox>
+  <button mat-flat-button (click)="apply()" [disabled]="busy||!confirm">Apply import</button><button mat-button (click)="preview=null" [disabled]="busy">Cancel</button></section>}
+<form class="controls" (ngSubmit)="find()">
+  <mat-form-field><mat-label>Search devices or assignments</mat-label><input matInput name="search" [(ngModel)]="search"></mat-form-field>
+  <mat-form-field><mat-label>Assignment field</mat-label><mat-select name="field" [(ngModel)]="field"><mat-option value="">All fields</mat-option>@for(f of settings.fields;track f){<mat-option [value]="f">{{f}}</mat-option>}</mat-select></mat-form-field>
+  <mat-form-field><mat-label>Exact field value</mat-label><input matInput name="value" [(ngModel)]="value" [disabled]="!field"></mat-form-field>
+  <mat-form-field><mat-label>Monitoring status</mat-label><mat-select name="monitoring" [(ngModel)]="monitoring"><mat-option value="">All devices</mat-option><mat-option value="inactive">Inactive / never connected</mat-option><mat-option value="active">Within policy</mat-option></mat-select></mat-form-field>
+  <button mat-icon-button type="submit" [disabled]="busy" matTooltip="Search" aria-label="Search"><mat-icon>search</mat-icon></button>
+  <button mat-icon-button type="button" (click)="clear()" [disabled]="busy" matTooltip="Clear filters" aria-label="Clear filters"><mat-icon>filter_alt_off</mat-icon></button>
+</form>
+<p>Inactive threshold: {{settings.inactiveDays}} days</p>
+<div class="table-wrap" [attr.aria-busy]="busy"><table><thead><tr><th>Device number</th><th>IMEI</th><th>Phone</th><th>Status</th><th>Last seen</th><th>Configuration</th>@for(f of settings.fields;track f){<th>{{f}}</th>}<th>Actions</th></tr></thead><tbody>
+@for(row of rows;track row.number){<tr><td>{{row.number}}</td><td>{{row.imei}}</td><td>{{row.phone}}</td><td [class.inactive]="row.status==='red'">{{status(row)}}</td><td>{{row.lastUpdate ? (row.lastUpdate | date:'medium') : 'Never'}}</td><td>{{row.configuration}}</td>@for(f of settings.fields;track f){<td>{{row.values[f]}}</td>}<td><button *hmdmHasPermission="'edit_devices'" mat-icon-button (click)="startEdit(row)" [disabled]="busy" matTooltip="Edit assignment" aria-label="Edit assignment"><mat-icon>edit</mat-icon></button></td></tr>}
+@empty{<tr><td [attr.colspan]="7+settings.fields.length">{{busy ? 'Loading devices...' : 'No matching devices.'}}</td></tr>}
+</tbody></table></div>
+<mat-paginator [length]="total" [pageIndex]="page" [pageSize]="size" [pageSizeOptions]="[25,50,100]" [disabled]="busy" (page)="paginate($event)"></mat-paginator>

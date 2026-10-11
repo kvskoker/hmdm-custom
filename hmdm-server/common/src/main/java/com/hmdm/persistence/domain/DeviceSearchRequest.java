@@ -31,6 +31,15 @@ import java.util.Date;
 @Schema(description = "A request for searching the devices")
 @JsonIgnoreProperties(value = {"customerId", "userId"}, ignoreUnknown = true)
 public class DeviceSearchRequest implements Serializable {
+    private String assignmentField;
+    private String assignmentValue;
+    private Boolean inactive;
+    public String getAssignmentField() { return assignmentField; }
+    public void setAssignmentField(String value) { assignmentField = value; }
+    public String getAssignmentValue() { return assignmentValue; }
+    public void setAssignmentValue(String value) { assignmentValue = value; }
+    public Boolean getInactive() { return inactive; }
+    public void setInactive(Boolean value) { inactive = value; }
 
     private static final long serialVersionUID = -8435796711101758494L;
     @Schema(description = "A filter to search devices")
