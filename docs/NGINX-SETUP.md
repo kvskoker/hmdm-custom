@@ -167,6 +167,32 @@ on the devices' network. Verify QR URLs use `https://${HMDM_DOMAIN}`, without
 Headwind is still starting, the proxy port differs from `HMDM_HTTP_PORT`, or the
 proxy is in a container and cannot reach the host's loopback interface.
 
+## Intermittent logo and cold-load requests
+
+The default logo endpoint previously produced an absolute HTTP redirect when
+Tomcat saw the proxied request as HTTP, even though the browser used HTTPS.
+The corrected server returns the bundled PNG directly, preserving custom logos.
+This fix requires a server image rebuild, not only an Nginx reload:
+
+```bash
+bash ./deploy.sh rebuild
+HMDM_DOMAIN="$(bash tools/diagnose-web-speed.sh --domain)" || exit 1
+curl -sS -D - -o /dev/null "https://${HMDM_DOMAIN}/rest/public/brand/logo"
+```
+
+Expect HTTP 200 and `Content-Type: image/png`, with no `Location` redirect.
+The frontend service worker also now caches JavaScript on demand instead of
+prefetching every top-level chunk. This reduces background downloads, but does
+not eliminate the initial Angular/shared-library dependency downloads.
+After deploying, close existing MDM tabs and test in a fresh private window.
+If a normal window still uses the old service worker, clear site data for this
+MDM hostname only (this signs you out), then reopen it.
+
+The network panel's total finish time includes background requests; measure the
+time until the sign-in form is usable separately. Compare cold and warm loads
+under the same network conditions. Neither these changes nor fast loopback
+timings prove that every browser-side bottleneck has been resolved.
+
 ## WebSocket and session checks
 
 For this root deployment, the browser's alert socket must connect to

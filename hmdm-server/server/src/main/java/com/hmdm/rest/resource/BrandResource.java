@@ -36,6 +36,8 @@ import com.hmdm.rest.json.Response;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.StreamingOutput;
+import jakarta.ws.rs.core.Context;
+import jakarta.servlet.ServletContext;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -120,16 +122,16 @@ public class BrandResource {
     )
     @GET
     @Path("/logo")
-    @Produces(MediaType.APPLICATION_JSON)
-    public jakarta.ws.rs.core.Response getRebrandedLogo() {
+    @Produces("image/png")
+    public jakarta.ws.rs.core.Response getRebrandedLogo(@Context ServletContext servletContext) {
         try {
-            if (!appLogo.equals("")) {
+            if (appLogo != null && !appLogo.isEmpty()) {
                 File file = new File(appLogo);
                 if (file.exists()) {
-                    InputStream input = new FileInputStream(file);
-
                     return jakarta.ws.rs.core.Response.ok( (StreamingOutput) output -> {
-                        IOUtils.copy(input, output);
+                        try (InputStream input = new FileInputStream(file)) {
+                            IOUtils.copy(input, output);
+                        }
                     } )
                             .header("Cache-Control", "no-cache")
                             .header( "Content-Type", "image/png" ).build();
@@ -138,7 +140,15 @@ public class BrandResource {
                     return jakarta.ws.rs.core.Response.status(jakarta.ws.rs.core.Response.Status.NOT_FOUND).build();
                 }
             } else {
-                return jakarta.ws.rs.core.Response.temporaryRedirect(new URI("../images/logo.png")).build();
+                // Serve the bundled image directly; proxy scheme detection must not
+                // turn a logo request over HTTPS into a redirect to HTTP.
+                try (InputStream input = servletContext.getResourceAsStream("/images/logo.png")) {
+                    if (input == null) {
+                        return jakarta.ws.rs.core.Response.status(jakarta.ws.rs.core.Response.Status.NOT_FOUND).build();
+                    }
+                    return jakarta.ws.rs.core.Response.ok(input.readAllBytes(), "image/png")
+                            .header("Cache-Control", "no-cache").build();
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
