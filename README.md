@@ -1,15 +1,12 @@
 # Custom Headwind MDM
 
-Self-hosted Android device management.
-This upgrade branch targets server 7.03.1 and Android 6.39. See
-[the upgrade notes](docs/UPGRADE-v7.md) before using an existing database.
-A fork of [Headwind MDM](https://h-mdm.com) (Apache-2.0) with three plugins added.
+Self-hosted Android device management. A fork of [Headwind MDM](https://h-mdm.com) (Apache-2.0) with three plugins added.
 
 It builds the server and custom plugins from `hmdm-server/`. Version 7 also
 downloads the upstream plugin-platform dependency from Headwind's Maven
 repository at build time. The runtime does not download Headwind source.
 
-For CHW ownership, custom assignment fields, Excel import/export and the
+For device ownership, custom assignment fields, Excel import/export and the
 configurable inactivity policy, see [Device assignments](docs/DEVICE-ASSIGNMENTS.md).
 
 ---
@@ -19,12 +16,12 @@ configurable inactivity policy, see [Device assignments](docs/DEVICE-ASSIGNMENTS
 Two settings in `.env` decide everything.
 
 ```bash
-git clone git@github.com:YOURORG/YOURREPO.git && cd YOURREPO
+git https://github.com/kvskoker/hmdm-custom.git && cd hmdm-custom
 cp .env.example .env      # edit DEPLOY_MODE and HMDM_DOMAIN
 ./deploy.sh up            # Windows:  .\deploy.ps1 up
 ```
 
-First build takes 3–5 minutes. After that the panel is up at the address the
+First build takes 5-10 minutes. After that the panel is up at the address the
 script prints. Sign in with **admin / admin** and change the password.
 
 **Then upload a launcher APK — enrollment does not work without one.** A QR code
