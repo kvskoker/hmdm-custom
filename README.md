@@ -13,6 +13,9 @@ configurable inactivity policy, see [Device assignments](docs/DEVICE-ASSIGNMENTS
 
 ## Deploy
 
+For non-Docker installations and upgrades from base v7, see the
+[native installation and upgrade guide](docs/INSTALL-UPGRADE-NATIVE.md).
+
 Two settings in `.env` decide everything.
 
 ```bash
